@@ -1,4 +1,4 @@
-import { defineConfig } from "cf/config";
+import { defineConfig } from "@cloudflare/config/public";
 
 export default defineConfig({
   worker: {

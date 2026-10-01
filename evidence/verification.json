@@ -1,23 +1,25 @@
 {
-  "capturedAt": "2026-10-01T04:45:33.958Z",
+  "capturedAt": "2026-10-01T05:17:21.402Z",
   "environment": {
-    "node": "v22.23.3",
+    "node": "v24.12.0",
+    "nodeExecutable": "/nix/store/b1h0af3yb3z9jz048phclcqw6ihiww67-nodejs-24.12.0/bin/node",
+    "cfExecutable": "/Users/toma_7698/.bun/bin/cf",
     "platform": "darwin",
     "arch": "arm64"
   },
   "versions": {
     "hono": "4.13.12",
     "honox": "0.1.61",
-    "vite": "1.0.0",
     "vite-plus": "1.0.0",
-    "cf": "1.0.0-beta.6",
+    "@cloudflare/config": "0.20.0",
     "@mdx-js/rollup": "3.1.1",
     "@hono/vite-ssg": "0.3.3",
     "@hono/vite-build": "1.11.1",
     "wrangler": "4.145.0",
     "@playwright/test": "1.63.0",
     "typescript": "5.9.3",
-    "viteUnderlying": "8.3.1"
+    "viteUnderlying": "8.3.1",
+    "cf": "1.0.0-beta.6"
   },
   "outputs": {
     "dist/worker/index.js": {

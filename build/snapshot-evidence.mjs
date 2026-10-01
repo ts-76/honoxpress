@@ -1,3 +1,5 @@
+import { execFileSync } from "node:child_process";
+import { accessSync, constants } from "node:fs";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile, copyFile } from "node:fs/promises";
 import { platform, arch } from "node:os";
@@ -9,9 +11,8 @@ const versions = {};
 for (const name of [
   "hono",
   "honox",
-  "vite",
   "vite-plus",
-  "cf",
+  "@cloudflare/config",
   "@mdx-js/rollup",
   "@hono/vite-ssg",
   "@hono/vite-build",
@@ -22,6 +23,21 @@ for (const name of [
   versions[name] = (await json(`node_modules/${name}/package.json`)).version;
 }
 versions.viteUnderlying = underlyingVite;
+const cfExecutable = process.env.PATH.split(path.delimiter)
+  .map((dir) => path.join(dir, "cf"))
+  .find((file) => {
+    try {
+      accessSync(file, constants.X_OK);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+if (!cfExecutable || cfExecutable.includes("node_modules/.bin"))
+  throw new Error("Expected an existing global cf executable");
+const cfVersion = execFileSync(cfExecutable, ["--version"], { encoding: "utf8" });
+versions.cf = cfVersion.match(/v(\d+\.\d+\.\d+(?:-[\w.]+)?)/)?.[1];
+if (!versions.cf) throw new Error("Unable to read global cf version");
 const unit = await json("dist/evidence/unit-tests.json");
 if (unit.numPassedTests !== 5 || unit.numFailedTests !== 0 || !unit.success)
   throw new Error("Unit verification is incomplete");
@@ -76,7 +92,13 @@ await writeFile(
   JSON.stringify(
     {
       capturedAt: new Date().toISOString(),
-      environment: { node: process.version, platform: platform(), arch: arch() },
+      environment: {
+        node: process.version,
+        nodeExecutable: process.execPath,
+        cfExecutable,
+        platform: platform(),
+        arch: arch(),
+      },
       versions,
       outputs,
       graphs,

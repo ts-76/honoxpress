@@ -27,16 +27,15 @@
     "honox": "^0.1.61"
   },
   "devDependencies": {
+    "@cloudflare/config": "0.20.0",
     "@hono/vite-build": "^1.11.1",
     "@hono/vite-ssg": "^0.3.3",
     "@mdx-js/rollup": "^3.1.1",
     "@playwright/test": "^1.63.0",
     "@types/node": "22.20.4",
-    "cf": "1.0.0-beta.6",
     "remark-frontmatter": "^5.0.0",
     "remark-mdx-frontmatter": "^6.0.0",
     "typescript": "^5.9.3",
-    "vite": "catalog:",
     "vite-plus": "catalog:",
     "wrangler": "^4.145.0"
   },

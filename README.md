@@ -42,9 +42,9 @@ cf設定は`dist/worker/index.js`と`dist/public`を1つのWorker設定で扱い
 
 ## 再現コマンド
 
-Node **22.23.3**（`.node-version`）、pnpm **11.22.0**（`packageManager`）、Vite Plus **1.0.0**で検証しました。cf **1.0.0-beta.6**はMacの既存インストールと同じ版を開発依存にも固定しています。実バージョンと再現可能な依存解決は`pnpm-lock.yaml`と[`evidence/verification.json`](evidence/verification.json)に記録しています。npm lockfileとNodeの開発依存は除去しました。マシン全体のNode・cf設定は変更していません。
+Devbox管理のNode **24.12.0**（`.node-version`）、pnpm **11.22.0**（`packageManager`）、Vite Plus **1.0.0**で検証しました。cf **1.0.0-beta.6**はMacの既存グローバルCLIを使用します。projectにcf本体は入れず、設定APIと型を提供する`@cloudflare/config` **0.20.0**へ直接依存します。実バージョンと再現可能な依存解決は`pnpm-lock.yaml`と[`evidence/verification.json`](evidence/verification.json)に記録しています。npm lockfileとNodeの開発依存は除去しました。Node/pnpmは既存Devbox global、シェル設定は既存chezmoi管理を保持し、追加PATHや別のNode管理ツールは導入していません。
 
-既存のNode管理ツールで`.node-version`のNodeを選び、`node --version`と`pnpm --version`を確認して実行します。Vite Plus単体の要件よりcfの要件が高いため、repoのengineは`^22.20.0 || ^24.12.0 || >=26.0.0`です。
+通常のログインシェルでは既存chezmoiの`.zshrc`がDevbox globalを有効にします。`command -v node`と`command -v pnpm`がDevbox profileを指し、`node --version`が24.12.0、`pnpm --version`が11.22.0、`command -v cf`が既存グローバルCLIを指すことを確認して実行します。pnpmの最新版取得もDevbox管理に従い、この環境でDevboxが提供する11.22.0を保持します。Vite Plus単体の要件よりcfの要件が高いため、repoのengineは`^22.20.0 || ^24.12.0 || >=26.0.0`です。
 
 ```sh
 pnpm install --frozen-lockfile
@@ -68,13 +68,13 @@ pnpm types:cf   # cf workers types: .cloudflare/typesへ型生成
 
 Vite Plus組み込みの`vp build`は1段階のViteビルドです。子ビルドには`NODE_ENV=production`を明示し、Vitestが付ける`NODE_ENV=test`の影響を防いでいます。通常ビルドとテスト内再ビルドでmanifestとWorker出力が同一であることも検査します。このPoCの全パイプラインには`pnpm build`（または`pnpm exec vp run build`）を使います。`build:client` → `build:ssg` → `build:worker`もそれぞれ`vp build --mode ...`です。全ビルドの先頭で`dist`だけを削除し、後続段階は先行assets/HTMLを保持します。manifestはclient生成後にSSG・Workerへ渡し、最後に公開ディレクトリの`.vite`を削除します。検証用manifestは`dist/evidence`に残します。検査は共有出力を書き換えるためVitestを逐次実行し、PlaywrightをVitestの対象から除外しています。検証にtask cacheを設定していません。
 
-pnpmのcatalogと`vite@*` overrideは公式migratorの設定を保持しています。Hono系プラグインがimportする`vite`をVite Plus coreへ揃えるため、直接Vite依存も必要です。`defineConfig`とテスト内の`createServer`/`build`は`vite-plus`、unit APIは`vite-plus/test`です。実パッケージの`export * from "vite"`も確認しました。OxfmtがTSX・MDX・Markdown・CSSを整形し、`lazyPlugins`は静的チェック時のアプリplugin起動を防ぎます。
+pnpmのcatalogと`vite@*` overrideは公式migratorの設定を保持しています。Hono系プラグインがimportする`vite`をVite Plus coreへ揃えます。直接`vite`依存は削除しても全ビルド・検査が通ることを確認しました。transitive Viteにはoverrideを適用します。`defineConfig`とテスト内の`createServer`/`build`は`vite-plus`、unit APIは`vite-plus/test`です。Vite Plus経由のAPI解決も確認しました。OxfmtがTSX・MDX・Markdown・CSSを整形し、`lazyPlugins`は静的チェック時のアプリplugin起動を防ぎます。
 
 ## cf設定と制約
 
-`cloudflare.config.ts`がWorker入口・互換性・asset routingを持ち、`wrangler.config.ts`は内部ビルドツールのassets directory・dev IP/portを持ちます。既存`wrangler.jsonc`は移行前の参考設定として残していますが、cfは読みません。直接Wranglerを実行するnpm scriptsはありません。
+`cloudflare.config.ts`がWorker入口・互換性・asset routingを持ち、`wrangler.config.ts`は内部ビルドツールのassets directory・dev IP/portを持ちます。設定importは`@cloudflare/config/public`です。グローバルcfの`cf/config`もこのpublic exportを再exportするだけですが、projectからグローバルpackageへのimportは解決できないため、設定ライブラリだけを導入しました。既存`wrangler.jsonc`は移行前の参考設定として残していますが、cfは読みません。直接Wranglerを実行するnpm scriptsはありません。
 
-このHonoXの分離ビルド構成では、cfは内部でWrangler **4.145.0**へ委譲するため、その依存は保持しています。cf自体はbundlerではありません。Cloudflare Vite pluginを追加する別構成への変更は行っていません。`cf build`がpackage.jsonの全build scriptを実行することもないため、先に`pnpm build`が必要です。
+このHonoXの分離ビルド構成では、cfは内部でWrangler **4.145.0**へ委譲するため、その直接依存は保持しています。実際に除去した検査ではcfが「Cloudflare dev-server未宣言」として失敗しました。cfはprojectのpackage.jsonにWranglerなどのdev-serverがちょうど1つ宣言されていることを要求します。cf自体はbundlerではありません。Cloudflare Vite pluginを追加する別構成への変更は行っていません。`cf build`がpackage.jsonの全build scriptを実行することもないため、先に`pnpm build`が必要です。
 
 `cf dev`は既定でローカル起動し、`--local`を拒否します。設定にremote resource bindingはありません。`cf deploy --dry-run --prebuilt`は既に作ったBuild Outputを検証するだけでAPI送信・デプロイを行いません。cfが最終生成したbundleにもdocs本文/MDXコンパイラーがなく、asset一覧とHTMLが`dist/public`と一致することを自動検査します。古いcf assetの削除も検査しています。
 
@@ -82,20 +82,22 @@ cfはbetaで、設定とBuild Output仕様が変わる可能性があります�
 
 ## 検証結果
 
-最終確認はすべて成功しました。
+最終確認はDevbox Node 24.12.0・pnpm 11.22.0と既存グローバルcfで成功しました。通常の対話ログインシェルとrepo内の双方でNode/pnpmがDevbox profileを解決し、chezmoiのsource/targetは一致しています。shellenvが制限付き実行で止まるとNodebrewの旧Nodeが選ばれるため、確認は通常シェルで行いました。chezmoi管理元・配置先、Devbox package設定の変更は不要でした。
 
-| 検査                                  | 結果                 |
-| ------------------------------------- | -------------------- |
-| `pnpm typecheck`                      | 成功                 |
-| client / SSG / Workerの3段階ビルド    | 成功                 |
-| ビルド自動検査                        | 5 / 5成功            |
-| Playwright: Vite開発                  | 2 / 2成功            |
-| Playwright: cf dev本番ローカル        | 2 / 2成功            |
-| cf workers types                      | 成功                 |
-| cf build / prebuilt dry-run           | 成功、実デプロイなし |
-| Vite Plus format / Oxlint・tsgo / tsc | 成功                 |
-| GitHub Actions CI                     | 未設置               |
-| Cloudflare実デプロイ                  | 未実行（依頼範囲外） |
+| 検査                                   | 結果                 |
+| -------------------------------------- | -------------------- |
+| 通常シェル / repo内: Devbox Node・pnpm | 成功                 |
+| `pnpm install --frozen-lockfile`       | 成功、ポリシー適合   |
+| `pnpm typecheck`                       | 成功                 |
+| client / SSG / Workerの3段階ビルド     | 成功                 |
+| ビルド自動検査                         | 5 / 5成功            |
+| Playwright: Vite開発                   | 2 / 2成功            |
+| Playwright: cf dev本番ローカル         | 2 / 2成功            |
+| cf workers types                       | 成功                 |
+| cf build / prebuilt dry-run            | 成功、実デプロイなし |
+| Vite Plus format / Oxlint・tsgo / tsc  | 成功                 |
+| GitHub Actions CI                      | 未設置               |
+| Cloudflare実デプロイ                   | 未実行（依頼範囲外） |
 
 ビルド検査では、日英HTML、CounterのIsland識別子、client manifestの実ファイル、iframeパス、Worker/clientの読み込まれたmodule graph、bundle本文を検査しています。旧HTML・旧client JS・旧Worker出力を意図的に作り、後続の全ビルドで削除され、新しい日英HTMLとassetsが残ることも確認しています。
 
@@ -130,6 +132,7 @@ SSGの実行前hookが`/`、`/demo/clock`、`/demo/status`を除外した記録�
 - [Vite Plus migration](https://viteplus.dev/guide/migrate) / [migration rules](https://viteplus.dev/guide/migrate-rules)
 - [Vite Plus check](https://viteplus.dev/guide/check) / [Vitest5](https://viteplus.dev/guide/vitest-v5)
 - [pnpm import](https://pnpm.io/cli/import)
+- [Devbox globalとshellenv](https://www.jetify.com/docs/devbox/cli-reference/devbox-global) / [chezmoi apply](https://www.chezmoi.io/reference/commands/apply/)
 - [Cloudflare cf overview](https://developers.cloudflare.com/cf/) / [migrate](https://developers.cloudflare.com/cf/wrangler/migrate/)
 - [cf develop/build/dry-runと内部ツールへの委譲](https://developers.cloudflare.com/cf/projects/)
 
