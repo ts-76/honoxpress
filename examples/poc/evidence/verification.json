@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-01T05:17:21.402Z",
+  "capturedAt": "2026-10-01T05:59:08.916Z",
   "environment": {
     "node": "v24.12.0",
     "nodeExecutable": "/nix/store/b1h0af3yb3z9jz048phclcqw6ihiww67-nodejs-24.12.0/bin/node",
@@ -23,8 +23,8 @@
   },
   "outputs": {
     "dist/worker/index.js": {
-      "bytes": 147665,
-      "sha256": "ad9ffda79542c28519bd581e8b7f563b80a9688b6148c10277b5f43da69a9814"
+      "bytes": 151346,
+      "sha256": "ee7f6db018ace03906e43fcf8a4411e1d973b55fca84756da1e0c9606029502b"
     },
     "dist/public/docs/getting-started.html": {
       "bytes": 1501,
@@ -37,7 +37,7 @@
   },
   "graphs": {
     "worker": {
-      "loadedModules": 76,
+      "loadedModules": 79,
       "docsOrCompilerModules": []
     },
     "client": {
@@ -76,7 +76,7 @@
     "passed": true,
     "staleOutputRemoved": true,
     "docsOrCompilerInBundle": false,
-    "bundleBytes": 154222,
+    "bundleBytes": 157854,
     "assets": [
       "docs/getting-started.html",
       "ja/docs/getting-started.html",

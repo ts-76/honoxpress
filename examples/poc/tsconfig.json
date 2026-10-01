@@ -11,5 +11,14 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["packages/docs/src", "tests/core.test.ts", "vite.config.ts"]
+  "include": [
+    "app",
+    "build",
+    "tests",
+    "vite.config.ts",
+    "playwright.config.ts",
+    "cloudflare.config.ts",
+    "wrangler.config.ts",
+    ".cloudflare/types"
+  ]
 }

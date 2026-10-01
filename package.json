@@ -3,41 +3,34 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vp dev --host 127.0.0.1 --port 5173 --strictPort",
-    "build": "node build/build.mjs",
-    "build:client": "vp build --mode client",
-    "build:ssg": "vp build --mode ssg",
-    "build:worker": "vp build --mode worker",
-    "typecheck": "tsc --noEmit",
-    "test:build": "vp test run --reporter=default --reporter=json --outputFile=dist/evidence/unit-tests.json",
-    "test:browser": "playwright test",
-    "verify": "pnpm check && pnpm lint && pnpm typecheck && pnpm build && pnpm types:cf && pnpm test:build && pnpm test:browser && pnpm preview:dry-run",
-    "preview": "cf dev",
-    "preview:dry-run": "cf deploy --dry-run --prebuilt",
+    "build:package": "pnpm --filter @honox-docs-poc/docs build",
     "check": "vp check",
     "lint": "vp lint --deny-warnings",
     "fmt": "vp fmt",
+    "typecheck": "pnpm build:package && tsc --noEmit && pnpm --filter @honox-docs-poc/example typecheck",
+    "test:unit": "vp test run tests/core.test.ts",
     "test": "vp test run",
-    "build:cf": "cf build",
-    "types:cf": "cf workers types",
-    "evidence": "node build/snapshot-evidence.mjs"
+    "verify": "pnpm build:package && pnpm check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm --filter @honox-docs-poc/example verify",
+    "dev": "pnpm --filter @honox-docs-poc/example dev",
+    "build": "pnpm --filter @honox-docs-poc/example build",
+    "build:client": "pnpm --filter @honox-docs-poc/example build:client",
+    "build:ssg": "pnpm --filter @honox-docs-poc/example build:ssg",
+    "build:worker": "pnpm --filter @honox-docs-poc/example build:worker",
+    "preview": "pnpm --filter @honox-docs-poc/example preview",
+    "preview:dry-run": "pnpm --filter @honox-docs-poc/example preview:dry-run",
+    "build:cf": "pnpm --filter @honox-docs-poc/example build:cf",
+    "types:cf": "pnpm --filter @honox-docs-poc/example types:cf",
+    "test:build": "pnpm --filter @honox-docs-poc/example test:build",
+    "test:browser": "pnpm --filter @honox-docs-poc/example test:browser",
+    "evidence": "pnpm --filter @honox-docs-poc/example evidence"
   },
   "dependencies": {
-    "hono": "^4.13.12",
-    "honox": "^0.1.61"
+    "@honox-docs-poc/docs": "workspace:*"
   },
   "devDependencies": {
-    "@cloudflare/config": "0.20.0",
-    "@hono/vite-build": "^1.11.1",
-    "@hono/vite-ssg": "^0.3.3",
-    "@mdx-js/rollup": "^3.1.1",
-    "@playwright/test": "^1.63.0",
     "@types/node": "22.20.4",
-    "remark-frontmatter": "^5.0.0",
-    "remark-mdx-frontmatter": "^6.0.0",
     "typescript": "^5.9.3",
-    "vite-plus": "catalog:",
-    "wrangler": "^4.145.0"
+    "vite-plus": "catalog:"
   },
   "engines": {
     "node": "^22.20.0 || ^24.12.0 || >=26.0.0"

@@ -1,0 +1,30 @@
+{
+  "../../node_modules/.pnpm/honox@0.1.61_hono@4.13.12_supports-color@10.2.2_wrangler@4.145.0_@types+node@22.20.4_/node_modules/honox/dist/client/runtime.js": {
+    "file": "static/runtime-BluLGSYi.js",
+    "name": "runtime",
+    "src": "../../node_modules/.pnpm/honox@0.1.61_hono@4.13.12_supports-color@10.2.2_wrangler@4.145.0_@types+node@22.20.4_/node_modules/honox/dist/client/runtime.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "app/client.ts"
+    ]
+  },
+  "app/client.ts": {
+    "file": "static/client-CItnRoHP.js",
+    "name": "client",
+    "src": "app/client.ts",
+    "isEntry": true,
+    "dynamicImports": [
+      "app/islands/counter.tsx",
+      "../../node_modules/.pnpm/honox@0.1.61_hono@4.13.12_supports-color@10.2.2_wrangler@4.145.0_@types+node@22.20.4_/node_modules/honox/dist/client/runtime.js"
+    ]
+  },
+  "app/islands/counter.tsx": {
+    "file": "static/counter-CXbKpBId.js",
+    "name": "counter",
+    "src": "app/islands/counter.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "app/client.ts"
+    ]
+  }
+}

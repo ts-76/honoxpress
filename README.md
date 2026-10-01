@@ -42,7 +42,7 @@ cf設定は`dist/worker/index.js`と`dist/public`を1つのWorker設定で扱い
 
 ## 再現コマンド
 
-Devbox管理のNode **24.12.0**（`.node-version`）、pnpm **11.22.0**（`packageManager`）、Vite Plus **1.0.0**で検証しました。cf **1.0.0-beta.6**はMacの既存グローバルCLIを使用します。projectにcf本体は入れず、設定APIと型を提供する`@cloudflare/config` **0.20.0**へ直接依存します。実バージョンと再現可能な依存解決は`pnpm-lock.yaml`と[`evidence/verification.json`](evidence/verification.json)に記録しています。npm lockfileとNodeの開発依存は除去しました。Node/pnpmは既存Devbox global、シェル設定は既存chezmoi管理を保持し、追加PATHや別のNode管理ツールは導入していません。
+Devbox管理のNode **24.12.0**（`.node-version`）、pnpm **11.22.0**（`packageManager`）、Vite Plus **1.0.0**で検証しました。cf **1.0.0-beta.6**はMacの既存グローバルCLIを使用します。projectにcf本体は入れず、設定APIと型を提供する`@cloudflare/config` **0.20.0**へ直接依存します。実バージョンと再現可能な依存解決は`pnpm-lock.yaml`と[`examples/poc/evidence/verification.json`](examples/poc/evidence/verification.json)に記録しています。npm lockfileとNodeの開発依存は除去しました。Node/pnpmは既存Devbox global、シェル設定は既存chezmoi管理を保持し、追加PATHや別のNode管理ツールは導入していません。
 
 通常のログインシェルでは既存chezmoiの`.zshrc`がDevbox globalを有効にします。`command -v node`と`command -v pnpm`がDevbox profileを指し、`node --version`が24.12.0、`pnpm --version`が11.22.0、`command -v cf`が既存グローバルCLIを指すことを確認して実行します。pnpmの最新版取得もDevbox管理に従い、この環境でDevboxが提供する11.22.0を保持します。Vite Plus単体の要件よりcfの要件が高いため、repoのengineは`^22.20.0 || ^24.12.0 || >=26.0.0`です。
 
@@ -101,15 +101,15 @@ cfはbetaで、設定とBuild Output仕様が変わる可能性があります�
 
 ビルド検査では、日英HTML、CounterのIsland識別子、client manifestの実ファイル、iframeパス、Worker/clientの読み込まれたmodule graph、bundle本文を検査しています。旧HTML・旧client JS・旧Worker出力を意図的に作り、後続の全ビルドで削除され、新しい日英HTMLとassetsが残ることも確認しています。
 
-SSGの実行前hookが`/`、`/demo/clock`、`/demo/status`を除外した記録は[`evidence/ssg.json`](evidence/ssg.json)にあります。別のHonoアプリに実行回数を数える`/demo/clock`と`/demo/:name`を置く検査でも、SSG時の呼び出し回数は**0**でした。
+SSGの実行前hookが`/`、`/demo/clock`、`/demo/status`を除外した記録は[`evidence/ssg.json`](examples/poc/evidence/ssg.json)にあります。別のHonoアプリに実行回数を数える`/demo/clock`と`/demo/:name`を置く検査でも、SSG時の呼び出し回数は**0**でした。
 
 ブラウザーでは、日英URL・タイトル・言語、本文リンク、Counterの増加、英→日→英の再遷移後の再hydration、iframe読み込み、直接demoリンク、CSS/JSの200、各階層の404を確認しました。demoのリクエストごとのUUIDと`no-store`も確認しています。本番では末尾slashの307、manifest・MDXソース・Workerソースの非公開も確認しました。開発の未存在static JSはVite自身の空bodyの404、本番はWorkerの404になります。
 
-再生成可能な証拠は`dist/evidence`へ出力し、今回の検証記録は[`evidence/verification.json`](evidence/verification.json)、[`Worker module graph`](evidence/worker-modules.json)、[`client manifest`](evidence/client-manifest.json)に保存しました。本番ローカルの操作後スクリーンショット: [English](evidence/screenshots/english.png) / [日本語](evidence/screenshots/japanese.png)。
+再生成可能な証拠は`dist/evidence`へ出力し、今回の検証記録は[`examples/poc/evidence/verification.json`](examples/poc/evidence/verification.json)、[`Worker module graph`](examples/poc/evidence/worker-modules.json)、[`client manifest`](examples/poc/evidence/client-manifest.json)に保存しました。本番ローカルの操作後スクリーンショット: [English](examples/poc/evidence/screenshots/english.png) / [日本語](examples/poc/evidence/screenshots/japanese.png)。
 
 ## 設計上の発見と制約
 
-1. **標準createAppのeager importはWorkerへ本文を入れる。** `honox/server`のデフォルトglobは全MDXを読み込みます。通常のrouterでWorkerを作る比較テストでは日英本文sentinelと2つのMDX moduleが残ります（[`比較結果`](evidence/eager-control.json)）。今回のWorkerは公式`honox/server/base`とliteral globで入口を制限し、本文・MDX module・`@mdx-js`/remark依存が読み込みgraphにも生成bundleにもないことを確認しました。単に実行時の404へ変更したり、createAppの後でルートを除外する方法ではありません。
+1. **標準createAppのeager importはWorkerへ本文を入れる。** `honox/server`のデフォルトglobは全MDXを読み込みます。通常のrouterでWorkerを作る比較テストでは日英本文sentinelと2つのMDX moduleが残ります（[`比較結果`](examples/poc/evidence/eager-control.json)）。今回のWorkerは公式`honox/server/base`とliteral globで入口を制限し、本文・MDX module・`@mdx-js`/remark依存が読み込みgraphにも生成bundleにもないことを確認しました。単に実行時の404へ変更したり、createAppの後でルートを除外する方法ではありません。
 2. **SSGの出力除外と実行除外は別。** Hono SSGはルート情報の取得でもリクエストを実行します。`disableSSG`やレスポンス後のフィルターだけでは動的処理を避けられません。docs以外を`beforeRequestHook`で除外し、demoにも`isSSGContext`による実行ガードを設けました。任意のdocsパラメータルートはこのPoCでは対象外です。
 3. **MDXのIsland検出には注意が必要。** HonoX 0.1.61ではこのMDXを`honox-island`へ変換できましたが、raw MDX依存の自動追跡が`__importing_islands`を付けず、`Script/HasIslands`はSSGでscriptを出しませんでした。標準Renderer内でdocsのclient scriptをmanifestから直接出力することで解決しています。未生成manifestではSSGを失敗させます。全ページがCounterを持つ今回の最小構成に適した対応です。
 4. **hydration属性は完了通知ではない。** HonoXは`data-hono-hydrated`を動的import前に設定します。ブラウザー検査は`createClient()`のPromise完了を待ちます。通常のdocument navigationを使い、再遷移時のCounterは0から始まります。SPA遷移・永続stateは実装していません。
@@ -137,3 +137,20 @@ SSGの実行前hookが`/`、`/demo/clock`、`/demo/status`を除外した記録�
 - [cf develop/build/dry-runと内部ツールへの委譲](https://developers.cloudflare.com/cf/projects/)
 
 Macのghq checkoutは`~/ghq/github.com/ts-76/honox-docs-poc`です。ChatGPT Projectsの作成・会話移動・ローカルフォルダの紐付けは、このrepoの実装やcf設定とは別の作業で、未実行です。
+
+## OSS化の成果順
+
+最終package名・ライセンス・repo公開化・npm公開は未決定です。packageは仮名`@honox-docs-poc/docs`のprivate workspaceとして評価し、利用者はHonoX標準routes/_rendererを所有します。runtimeの純粋metadata APIにcompiler/Node/build処理を混ぜません。
+
+1. [#1 package境界とmetadata API](https://github.com/ts-76/honox-docs-poc/issues/1)
+2. [#2 薄いMDX/SSG build連携](https://github.com/ts-76/honox-docs-poc/issues/2)
+3. [#3 nav/TOC/言語リンク・コピーUI](https://github.com/ts-76/honox-docs-poc/issues/3)
+4. [#4 tarballと外部consumer](https://github.com/ts-76/honox-docs-poc/issues/4)
+5. [#5 CIと公開判断ガイド](https://github.com/ts-76/honox-docs-poc/issues/5)
+6. [#6 判断後のhono-decks実ページpilot](https://github.com/ts-76/honox-docs-poc/issues/6)（ユーザー判断待ち）
+
+各成果は作業branchのDraft PRでレビューします。mainへのmerge、npm publish/auth/token作成、公開化、実deployは実行しません。パッケージの利用者APIは[package README](packages/docs/README.md)を参照してください。
+
+## Workspace境界
+
+再利用packageは`packages/docs`、標準HonoXアプリは`examples/poc`です。cf beta6はworkspace rootでアプリ検出を拒否するため、rootのdev/build/preview/test/evidence scriptsはexampleへ委譲します。app/routesと_rendererの構造はexample内で保持し、URLは変えません。上のapp/build/dist相対パスはexampleのcwdを基準にしています。core APIの6件のunit検査はrootで別途実行します。

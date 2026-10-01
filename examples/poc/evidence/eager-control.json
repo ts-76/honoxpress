@@ -1,5 +1,5 @@
 {
-  "bytes": 158474,
+  "bytes": 162227,
   "mdxModules": [
     "./app/routes/docs/getting-started.mdx",
     "./app/routes/ja/docs/getting-started.mdx"

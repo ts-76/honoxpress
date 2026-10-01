@@ -1,0 +1,48 @@
+{
+  "name": "@honox-docs-poc/example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "pnpm build:package && node build/build.mjs",
+    "build:client": "vp build --mode client",
+    "build:ssg": "vp build --mode ssg",
+    "build:worker": "vp build --mode worker",
+    "typecheck": "pnpm build:package && tsc --noEmit",
+    "test:build": "vp test run tests/build.test.mjs --reporter=default --reporter=json --outputFile=dist/evidence/unit-tests.json",
+    "test:browser": "playwright test",
+    "verify": "pnpm build:package && pnpm check && pnpm lint && pnpm typecheck && pnpm build && pnpm types:cf && pnpm test:build && pnpm test:browser && pnpm preview:dry-run",
+    "preview": "cf dev",
+    "preview:dry-run": "cf deploy --dry-run --prebuilt",
+    "check": "vp check",
+    "lint": "vp lint --deny-warnings",
+    "fmt": "vp fmt",
+    "test": "vp test run",
+    "build:cf": "cf build",
+    "types:cf": "cf workers types",
+    "evidence": "node build/snapshot-evidence.mjs",
+    "build:package": "pnpm --filter @honox-docs-poc/docs build"
+  },
+  "dependencies": {
+    "@honox-docs-poc/docs": "workspace:*",
+    "hono": "^4.13.12",
+    "honox": "^0.1.61"
+  },
+  "devDependencies": {
+    "@cloudflare/config": "0.20.0",
+    "@hono/vite-build": "^1.11.1",
+    "@hono/vite-ssg": "^0.3.3",
+    "@mdx-js/rollup": "^3.1.1",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "22.20.4",
+    "remark-frontmatter": "^5.0.0",
+    "remark-mdx-frontmatter": "^6.0.0",
+    "typescript": "^5.9.3",
+    "vite-plus": "catalog:",
+    "wrangler": "^4.145.0"
+  },
+  "engines": {
+    "node": "^22.20.0 || ^24.12.0 || >=26.0.0"
+  },
+  "packageManager": "pnpm@11.22.0"
+}

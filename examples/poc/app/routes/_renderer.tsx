@@ -1,3 +1,4 @@
+import { docsCatalog } from "../docs-catalog";
 import { jsxRenderer } from "hono/jsx-renderer";
 
 // HonoX's Script/HasIslands detector does not follow raw MDX imports in 0.1.61.
@@ -29,12 +30,15 @@ export default jsxRenderer(({ children, frontmatter }, c) => {
         <header>
           <a href="/">HonoX Docs PoC</a>
           <nav aria-label="Languages">
-            <a href="/docs/getting-started" lang="en">
-              English
-            </a>
-            <a href="/ja/docs/getting-started" lang="ja">
-              日本語
-            </a>
+            {docsCatalog.translations(docs ? c.req.path : "/docs/getting-started").map((link) =>
+              link.href ? (
+                <a href={link.href} lang={link.locale}>
+                  {link.locale === "ja" ? "日本語" : "English"}
+                </a>
+              ) : (
+                <span lang={link.locale}>{link.locale} (unavailable)</span>
+              ),
+            )}
           </nav>
         </header>
         <main>{children}</main>

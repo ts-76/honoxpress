@@ -1,0 +1,24 @@
+{
+  "name": "@honox-docs-poc/docs",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Local evaluation name for Hono JSX docs helpers; publication identity is undecided",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "engines": {
+    "node": "^22.20.0 || ^24.12.0 || >=26.0.0"
+  }
+}
