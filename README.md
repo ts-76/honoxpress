@@ -165,3 +165,9 @@ Issue #2 adds a separate build-only package entry. MDX frontmatter and generated
 両repoのMITライセンスを確認しました（[Nimbus](https://github.com/cloudflare/nimbus/blob/main/LICENSE) / [Fumapress](https://github.com/fuma-nama/fumapress/blob/main/LICENSE)）。今回のJSX/CSS/アイコンは独自実装で、コード・ロゴ・fontなどの素材は流用していません。今後流用する場合は対象ファイルのlicenseと必要なcopyright/NOTICEを保持します。このproject自体の最終licenseは未決定です。詳しいコピー手順と謝辞は配布対象の[package README](packages/docs/README.md)にも含めています。
 
 標準UIのPlaywright追加検査は開発・本番local各1件、合計6 browser testsです。active nav、heading/TOC anchor、実clipboard成功と拒否時の案内、native mobile開閉、skip link/keyboard focus、390pxでのoverflow、dark modeの本文contrastを検査します。全項目のa11y認証は行っていません。
+
+## tarballと外部consumer
+
+`pnpm pack:docs`はprivate評価packageのtarballを`artifacts`へ作るだけで、公開しません。`pnpm test:consumer`はpackageの古い出力削除→pack files/exports/types検査→repo外の一時consumerへtarball install→凍結install→runtime/型/配布asset検査→standard HonoXの全受入を実行します。アプリ部分は既存exampleのコピーですが、package source/workspaceリンクやrepoのnode_modulesに依存しません。UI/CSSは実際にインストールしたpackageからコピーして上書きします。
+
+検証スクリプトは[scripts/verify-consumer.mjs](scripts/verify-consumer.mjs)、型とruntime fixtureは[fixtures/consumer](fixtures/consumer)。成功時は一時consumerを削除し、失敗時は診断用に残します。ログとtarballはGit対象外の`artifacts`、確認結果は[consumer evidence](packages/docs/evidence/consumer.json)です。全`pnpm verify`にも外部consumer受入を含めています。npm publish/auth/tokenやhono-decks実ページへの導入は行いません。

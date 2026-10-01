@@ -9,7 +9,9 @@
     "templates"
   ],
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "./templates/*.css"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -22,7 +24,7 @@
     "./templates/*": "./templates/*"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json"
   },
   "peerDependencies": {
     "hono": "^4.13.12",

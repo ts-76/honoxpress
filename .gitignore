@@ -10,3 +10,4 @@ playwright-report/
 .cloudflare/
 .vite/
 packages/*/dist/
+artifacts/

@@ -1,0 +1,71 @@
+{
+  "capturedAt": "2026-10-01T07:00:47.134Z",
+  "node": "v24.12.0",
+  "package": {
+    "name": "@honox-docs-poc/docs",
+    "version": "0.0.0",
+    "private": true,
+    "license": "undecided",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./build": {
+        "types": "./dist/build.d.ts",
+        "import": "./dist/build.js"
+      },
+      "./templates/*": "./templates/*"
+    }
+  },
+  "tarball": {
+    "filename": "honox-docs-poc-docs-0.0.0.tgz",
+    "sha256": "35991eab53460476c1588e18cd80de9923a738d2cd5b103e1e9c8a90d5f8f496",
+    "files": [
+      "package/README.md",
+      "package/dist/build.d.ts",
+      "package/dist/build.js",
+      "package/dist/catalog.d.ts",
+      "package/dist/catalog.js",
+      "package/dist/client.d.ts",
+      "package/dist/client.js",
+      "package/dist/index.d.ts",
+      "package/dist/index.js",
+      "package/package.json",
+      "package/templates/copy-code.tsx",
+      "package/templates/demo-frame.tsx",
+      "package/templates/docs-ui.tsx",
+      "package/templates/docs.css"
+    ]
+  },
+  "externalConsumer": {
+    "outsideRepository": true,
+    "packageInstalledFromTarball": true,
+    "packageStaleOutputRemoved": true,
+    "workspaceOrSourceLinks": false,
+    "successfulDirectoryRemoved": true
+  },
+  "validation": {
+    "runtimeAndPrivateExports": "passed",
+    "types": "passed (including expected type errors)",
+    "templatesAndCss": "passed",
+    "staticChecks": "passed; deny-warnings",
+    "clientSSGWorker": "passed",
+    "buildTests": 5,
+    "browserTests": 6,
+    "cfBuild": "passed",
+    "cfDryRun": "passed; no deployment"
+  },
+  "graphs": {
+    "worker": {
+      "loadedModules": 82,
+      "docsCompilerOrBuildModules": []
+    },
+    "client": {
+      "loadedModules": 35,
+      "docsCompilerOrBuildModules": []
+    }
+  },
+  "npmPublish": "not executed",
+  "cloudflareDeployment": "not executed"
+}
