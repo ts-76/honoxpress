@@ -8,6 +8,7 @@ import ssg from "@hono/vite-ssg";
 import worker from "@hono/vite-build/cloudflare-workers";
 import { defaultPlugin } from "hono/ssg";
 import { mkdir, writeFile } from "node:fs/promises";
+import { docsMetadataPlugin, remarkDocsHeadings } from "@honox-docs-poc/docs/build";
 import { docsOnlyPlugin } from "./build/docs-only.ts";
 
 function audit(target: string): Plugin {
@@ -83,13 +84,18 @@ export default defineConfig(({ mode }) => {
       options: { typeAware: true, typeCheck: true },
     },
     plugins: lazyPlugins(async () => [
+      docsMetadataPlugin({ locales: ["en", "ja"], defaultLocale: "en", worker: mode === "worker" }),
       honox({ entry: mode === "worker" ? "./app/worker.ts" : "./app/server.ts" }),
       ...(mode === "worker"
         ? []
         : [
             mdx({
               jsxImportSource: "hono/jsx",
-              remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: "frontmatter" }]],
+              remarkPlugins: [
+                remarkFrontmatter,
+                [remarkMdxFrontmatter, { name: "frontmatter" }],
+                remarkDocsHeadings,
+              ],
             }),
           ]),
       ...(mode === "ssg"

@@ -1,6 +1,7 @@
 {
   "loaded": [
     "\u0000virtual:build-entry-module",
+    "\u0000virtual:honox-docs/catalog",
     "./app/docs-catalog.ts",
     "./app/routes/_404.tsx",
     "./app/routes/_renderer.tsx",
@@ -77,6 +78,7 @@
     "/Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc/node_modules/.pnpm/honox@0.1.61_hono@4.13.12_supports-color@10.2.2_wrangler@4.145.0_@types+node@22.20.4_/node_modules/honox/dist/server/server.js",
     "/Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc/node_modules/.pnpm/honox@0.1.61_hono@4.13.12_supports-color@10.2.2_wrangler@4.145.0_@types+node@22.20.4_/node_modules/honox/dist/server/utils/file.js",
     "/Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc/packages/docs/dist/catalog.js",
+    "/Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc/packages/docs/dist/client.js",
     "/Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc/packages/docs/dist/index.js",
     "node:async_hooks"
   ],
@@ -86,6 +88,7 @@
       "modules": [
         "\u0000rolldown/runtime.js",
         "\u0000virtual:build-entry-module",
+        "\u0000virtual:honox-docs/catalog",
         "./app/docs-catalog.ts",
         "./app/routes/_404.tsx",
         "./app/routes/_renderer.tsx",
@@ -151,7 +154,8 @@
         "/Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc/node_modules/.pnpm/honox@0.1.61_hono@4.13.12_supports-color@10.2.2_wrangler@4.145.0_@types+node@22.20.4_/node_modules/honox/dist/server/context-storage.js",
         "/Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc/node_modules/.pnpm/honox@0.1.61_hono@4.13.12_supports-color@10.2.2_wrangler@4.145.0_@types+node@22.20.4_/node_modules/honox/dist/server/server.js",
         "/Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc/node_modules/.pnpm/honox@0.1.61_hono@4.13.12_supports-color@10.2.2_wrangler@4.145.0_@types+node@22.20.4_/node_modules/honox/dist/server/utils/file.js",
-        "/Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc/packages/docs/dist/catalog.js"
+        "/Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc/packages/docs/dist/catalog.js",
+        "/Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc/packages/docs/dist/client.js"
       ]
     }
   ]

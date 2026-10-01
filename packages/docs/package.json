@@ -13,10 +13,23 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./build": {
+      "types": "./dist/build.d.ts",
+      "import": "./dist/build.js"
     }
   },
   "scripts": {
     "build": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "hono": "^4.13.12",
+    "vite-plus": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vite-plus": {
+      "optional": true
+    }
   },
   "engines": {
     "node": "^22.20.0 || ^24.12.0 || >=26.0.0"

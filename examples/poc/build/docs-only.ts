@@ -1,17 +1,6 @@
-import type { SSGPlugin } from "hono/ssg";
+import { docsOnlyPlugin as createPlugin } from "@honox-docs-poc/docs/build";
+import type { SSGReport } from "@honox-docs-poc/docs/build";
 
-export const isDocsPath = (pathname: string) => /^\/(?:ja\/)?docs\/[^:*]+$/.test(pathname);
-
-export function docsOnlyPlugin(report: { accepted: string[]; skipped: string[] }): SSGPlugin {
-  return {
-    beforeRequestHook(req) {
-      const path = new URL(req.url).pathname;
-      if (!isDocsPath(path)) {
-        report.skipped.push(path);
-        return false;
-      }
-      report.accepted.push(path);
-      return req;
-    },
-  };
-}
+// Keep the adversarial fixture's public hook small and consumer-owned.
+export const docsOnlyPlugin = (report: SSGReport) =>
+  createPlugin({ locales: ["en", "ja"], defaultLocale: "en" }, report);

@@ -19,6 +19,7 @@ async function assertArtifacts() {
     assert.match(html, /component-name="\/app\/islands\/counter.tsx"/);
     assert.match(html, new RegExp(`src="/${manifest["app/client.ts"].file}"`));
     assert.match(html, /src="\/demo\/clock"/);
+    assert.match(html, /<h2 id="[^"]+"/);
   }
   const worker = await read("dist/worker/index.js");
   assert.doesNotMatch(
@@ -126,15 +127,21 @@ test("positive control: standard eager router includes MDX bodies in a Worker bu
   const { default: remarkFrontmatter } = await import("remark-frontmatter");
   const { default: remarkMdxFrontmatter } = await import("remark-mdx-frontmatter");
   const { default: worker } = await import("@hono/vite-build/cloudflare-workers");
+  const { docsMetadataPlugin, remarkDocsHeadings } = await import("@honox-docs-poc/docs/build");
   const result = await build({
     configFile: false,
     mode: "eager-control",
     logLevel: "error",
     plugins: [
+      docsMetadataPlugin({ locales: ["en", "ja"], defaultLocale: "en", worker: false }),
       honox(),
       mdx({
         jsxImportSource: "hono/jsx",
-        remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: "frontmatter" }]],
+        remarkPlugins: [
+          remarkFrontmatter,
+          [remarkMdxFrontmatter, { name: "frontmatter" }],
+          remarkDocsHeadings,
+        ],
       }),
       worker({ entry: "./app/server.ts", outputDir: "dist/eager-control", minify: false }),
     ],

@@ -1,3 +1,4 @@
+import { resolveClientScript } from "@honox-docs-poc/docs";
 import { docsCatalog } from "../docs-catalog";
 import { jsxRenderer } from "hono/jsx-renderer";
 
@@ -13,9 +14,11 @@ export default jsxRenderer(({ children, frontmatter }, c) => {
   const ja = c.req.path.startsWith("/ja/");
   const docs = /^\/(?:ja\/)?docs\//.test(c.req.path);
   const production = import.meta.env.PROD || import.meta.env.MODE === "ssg";
-  const clientSrc = production ? `/${manifest?.["app/client.ts"]?.file ?? ""}` : "/app/client.ts";
-  if (docs && production && !manifest?.["app/client.ts"])
-    throw new Error("Build client before SSG");
+  const clientSrc = docs
+    ? production
+      ? resolveClientScript(manifest, "app/client.ts")
+      : "/app/client.ts"
+    : undefined;
   return (
     <html lang={ja ? "ja" : "en"}>
       <head>

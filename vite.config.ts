@@ -14,5 +14,5 @@ export default defineConfig({
     rules: { "vite-plus/prefer-vite-plus-imports": "error" },
     options: { typeAware: true, typeCheck: true },
   },
-  test: { include: ["tests/core.test.ts"] },
+  test: { include: ["tests/*.test.ts"] },
 });

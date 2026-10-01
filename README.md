@@ -154,3 +154,5 @@ Macのghq checkoutは`~/ghq/github.com/ts-76/honox-docs-poc`です。ChatGPT Pro
 ## Workspace境界
 
 再利用packageは`packages/docs`、標準HonoXアプリは`examples/poc`です。cf beta6はworkspace rootでアプリ検出を拒否するため、rootのdev/build/preview/test/evidence scriptsはexampleへ委譲します。app/routesと_rendererの構造はexample内で保持し、URLは変えません。上のapp/build/dist相対パスはexampleのcwdを基準にしています。core APIの6件のunit検査はrootで別途実行します。
+
+Issue #2 adds a separate build-only package entry. MDX frontmatter and generated TOC come from the actual route files in dev/SSG, eliminating the temporary duplicate catalog. Worker mode provides an empty metadata catalog and never discovers MDX. The explicit renderer uses the package's manifest resolver; the consumer still owns client→SSG→Worker ordering, cleaning and literal Worker route selection. Core/build helper unit coverage is 10 cases in addition to the 5 application build regressions.

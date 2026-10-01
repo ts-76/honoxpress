@@ -7,3 +7,6 @@ export type {
   Heading,
   LocaleLink,
 } from "./catalog.js";
+
+export { resolveClientScript } from "./client.js";
+export type { ClientManifest } from "./client.js";
