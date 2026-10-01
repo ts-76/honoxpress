@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "staleOutputRemoved": true,
+  "docsOrCompilerInBundle": false,
+  "bundleBytes": 154222,
+  "assets": [
+    "docs/getting-started.html",
+    "ja/docs/getting-started.html",
+    "static/client-CItnRoHP.js",
+    "static/counter-CXbKpBId.js",
+    "static/runtime-BluLGSYi.js",
+    "style.css"
+  ],
+  "assetsConfig": {
+    "htmlHandling": "drop-trailing-slash",
+    "notFoundHandling": "none",
+    "runWorkerFirst": [
+      "/demo/*"
+    ]
+  }
+}

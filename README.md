@@ -4,13 +4,13 @@
 
 ## 実装した構成
 
-| URL | ソース | 開発 | 本番構成 |
-| --- | --- | --- | --- |
-| `/docs/getting-started` | `app/routes/docs/getting-started.mdx` | HonoX SSR | Workers Static AssetsのHTML |
-| `/ja/docs/getting-started` | `app/routes/ja/docs/getting-started.mdx` | HonoX SSR | Workers Static AssetsのHTML |
-| `/demo/clock` | `app/routes/demo/index.tsx` | Honoによるリクエスト時生成 | 同じWorkerの動的Hono |
-| `/demo/status` | 同上 | リクエスト時JSON生成 | 同じWorkerの動的Hono |
-| `/` | `app/routes/index.tsx` | HonoX SSR | WorkerのHonoX SSR |
+| URL                        | ソース                                   | 開発                       | 本番構成                    |
+| -------------------------- | ---------------------------------------- | -------------------------- | --------------------------- |
+| `/docs/getting-started`    | `app/routes/docs/getting-started.mdx`    | HonoX SSR                  | Workers Static AssetsのHTML |
+| `/ja/docs/getting-started` | `app/routes/ja/docs/getting-started.mdx` | HonoX SSR                  | Workers Static AssetsのHTML |
+| `/demo/clock`              | `app/routes/demo/index.tsx`              | Honoによるリクエスト時生成 | 同じWorkerの動的Hono        |
+| `/demo/status`             | 同上                                     | リクエスト時JSON生成       | 同じWorkerの動的Hono        |
+| `/`                        | `app/routes/index.tsx`                   | HonoX SSR                  | WorkerのHonoX SSR           |
 
 ルートはHonoX標準の`app/routes`と`_renderer.tsx`です。frontmatterは`title`と`description`のみで、`id`はありません。URLはファイルパスが決めます。日英MDX内にCounter IslandとDemoFrameを置いています。React、検索、下書き、独自`docs.mount`、hono-decksは導入していません。
 
@@ -38,57 +38,64 @@ dist/                      # git管理外
   evidence/                # manifest、module graph、SSG・browser結果
 ```
 
-Wranglerは`dist/worker/index.js`と`dist/public`を1つのWorker設定で扱います。assetsは先に解決し、`/demo/*`は`run_worker_first`でWorkerへ送ります。`html_handling: drop-trailing-slash`で拡張子なしURLを提供し、`not_found_handling: none`で未一致はWorkerの404へ渡します。HonoXのContext storageに合わせて`nodejs_compat`を指定しています。
+cf設定は`dist/worker/index.js`と`dist/public`を1つのWorker設定で扱います。assetsは先に解決し、`/demo/*`は`run_worker_first`でWorkerへ送ります。`html_handling: drop-trailing-slash`で拡張子なしURLを提供し、`not_found_handling: none`で未一致はWorkerの404へ渡します。HonoXのContext storageに合わせて`nodejs_compat`を指定しています。
 
 ## 再現コマンド
 
-Node **22.23.3**で検証しました（最低22.12、現行の22系推奨）。依存の実バージョンは`package-lock.json`と[`evidence/verification.json`](evidence/verification.json)に固定されています。
+Node **22.23.3**（`.node-version`）、pnpm **11.22.0**（`packageManager`）、Vite Plus **1.0.0**で検証しました。cf **1.0.0-beta.6**はMacの既存インストールと同じ版を開発依存にも固定しています。実バージョンと再現可能な依存解決は`pnpm-lock.yaml`と[`evidence/verification.json`](evidence/verification.json)に記録しています。npm lockfileとNodeの開発依存は除去しました。マシン全体のNode・cf設定は変更していません。
+
+既存のNode管理ツールで`.node-version`のNodeを選び、`node --version`と`pnpm --version`を確認して実行します。Vite Plus単体の要件よりcfの要件が高いため、repoのengineは`^22.20.0 || ^24.12.0 || >=26.0.0`です。
 
 ```sh
-npm ci
-npx playwright install chromium
-npm run verify
-npm run preview:dry-run
-node build/snapshot-evidence.mjs
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium
+pnpm verify
+pnpm evidence
 ```
 
-Macの既存Node 22.0.0はVite 8の要件を満たさなかったため、このrepoには開発依存としてNode 22も入れています。既存Nodeで初回導入する場合は、導入後にrepo内のNodeを使ってoptional dependenciesを再評価してください。マシン全体のNode設定は変更しません。
+手動確認は別ターミナルで実行します。
 
 ```sh
-npm ci
-PATH="$PWD/node_modules/node/bin:$PATH" npm install --include=optional
-PATH="$PWD/node_modules/node/bin:$PATH" npx playwright install chromium
-npm run verify
+pnpm dev        # Vite Plus / HonoX開発: http://127.0.0.1:5173
+pnpm build      # clean → client → SSG → Worker
+pnpm preview    # cf dev / 本番ローカル: http://127.0.0.1:8787
+pnpm build:cf   # cf build: .cloudflare/output/v0へBuild Output生成
+pnpm preview:dry-run  # cf deploy --dry-run --prebuilt、アップロードなし
+pnpm types:cf   # cf workers types: .cloudflare/typesへ型生成
 ```
 
-手動確認は、別ターミナルで次を実行します。
+`verify`はVite Plusのformat・Oxlint/tsgo型チェック、警告禁止lint、従来の`tsc`、3段階ビルド、cf型生成、Vitest5のビルド検査、両環境のPlaywright、cf prebuilt dry-runを実行します。ビルド検査の最後に`cf build`も実行します。Playwrightが5173/8787を起動・停止するため、検査前に手動サーバーを止めてください。実Cloudflareデプロイは行いません。
 
-```sh
-npm run dev       # http://127.0.0.1:5173
-npm run build
-npm run preview   # http://127.0.0.1:8787、wrangler dev --local
-```
+Vite Plus組み込みの`vp build`は1段階のViteビルドです。子ビルドには`NODE_ENV=production`を明示し、Vitestが付ける`NODE_ENV=test`の影響を防いでいます。通常ビルドとテスト内再ビルドでmanifestとWorker出力が同一であることも検査します。このPoCの全パイプラインには`pnpm build`（または`pnpm exec vp run build`）を使います。`build:client` → `build:ssg` → `build:worker`もそれぞれ`vp build --mode ...`です。全ビルドの先頭で`dist`だけを削除し、後続段階は先行assets/HTMLを保持します。manifestはclient生成後にSSG・Workerへ渡し、最後に公開ディレクトリの`.vite`を削除します。検証用manifestは`dist/evidence`に残します。検査は共有出力を書き換えるためVitestを逐次実行し、PlaywrightをVitestの対象から除外しています。検証にtask cacheを設定していません。
 
-`verify`は型チェック、全ビルド、ビルド検査、両環境のPlaywright検査を実行します。Playwrightが5173/8787を起動・停止するため、その検査前には手動サーバーを止めてください。`preview:dry-run`は実デプロイしません。
+pnpmのcatalogと`vite@*` overrideは公式migratorの設定を保持しています。Hono系プラグインがimportする`vite`をVite Plus coreへ揃えるため、直接Vite依存も必要です。`defineConfig`とテスト内の`createServer`/`build`は`vite-plus`、unit APIは`vite-plus/test`です。実パッケージの`export * from "vite"`も確認しました。OxfmtがTSX・MDX・Markdown・CSSを整形し、`lazyPlugins`は静的チェック時のアプリplugin起動を防ぎます。
 
-個別の`build:client` → `build:ssg` → `build:worker`もありますが、通常は`npm run build`を使ってください。全ビルドは最初に`dist`だけを削除し、各後続段階は先行するassets/HTMLを保持します。Workerは専用ディレクトリだけをcleanします。manifestはclient生成後にSSG・Workerへ渡し、最後に公開ディレクトリの`.vite`を削除します。検証用manifestは`dist/evidence`へ残します。
+## cf設定と制約
+
+`cloudflare.config.ts`がWorker入口・互換性・asset routingを持ち、`wrangler.config.ts`は内部ビルドツールのassets directory・dev IP/portを持ちます。既存`wrangler.jsonc`は移行前の参考設定として残していますが、cfは読みません。直接Wranglerを実行するnpm scriptsはありません。
+
+このHonoXの分離ビルド構成では、cfは内部でWrangler **4.145.0**へ委譲するため、その依存は保持しています。cf自体はbundlerではありません。Cloudflare Vite pluginを追加する別構成への変更は行っていません。`cf build`がpackage.jsonの全build scriptを実行することもないため、先に`pnpm build`が必要です。
+
+`cf dev`は既定でローカル起動し、`--local`を拒否します。設定にremote resource bindingはありません。`cf deploy --dry-run --prebuilt`は既に作ったBuild Outputを検証するだけでAPI送信・デプロイを行いません。cfが最終生成したbundleにもdocs本文/MDXコンパイラーがなく、asset一覧とHTMLが`dist/public`と一致することを自動検査します。古いcf assetの削除も検査しています。
+
+cfはbetaで、設定とBuild Output仕様が変わる可能性があります。今回`cf build`はDocker daemon未起動のメッセージを出しますが、Containersなしの本PoCでは終了コード0でBuild Output生成・dry-run・全テストが成功しました。Viteの依存`@rollup/pluginutils`の欠落source map警告もunit時に出ますが、テストは成功します。
 
 ## 検証結果
 
 最終確認はすべて成功しました。
 
-| 検査 | 結果 |
-| --- | --- |
-| `npm run typecheck` | 成功 |
-| client / SSG / Workerの3段階ビルド | 成功 |
-| ビルド自動検査 | 4 / 4成功 |
-| Playwright: Vite開発 | 2 / 2成功 |
-| Playwright: Wrangler本番ローカル | 2 / 2成功 |
-| Wrangler設定から型生成 | 成功 |
-| Wrangler deploy dry-run | 成功、実デプロイなし |
-| 公式Hono CLIによる生成Worker `/demo/status`へのrequest | 成功 |
-| GitHub Actions CI | 未設置 |
-| Cloudflare実デプロイ | 未実行（依頼範囲外） |
+| 検査                                  | 結果                 |
+| ------------------------------------- | -------------------- |
+| `pnpm typecheck`                      | 成功                 |
+| client / SSG / Workerの3段階ビルド    | 成功                 |
+| ビルド自動検査                        | 5 / 5成功            |
+| Playwright: Vite開発                  | 2 / 2成功            |
+| Playwright: cf dev本番ローカル        | 2 / 2成功            |
+| cf workers types                      | 成功                 |
+| cf build / prebuilt dry-run           | 成功、実デプロイなし |
+| Vite Plus format / Oxlint・tsgo / tsc | 成功                 |
+| GitHub Actions CI                     | 未設置               |
+| Cloudflare実デプロイ                  | 未実行（依頼範囲外） |
 
 ビルド検査では、日英HTML、CounterのIsland識別子、client manifestの実ファイル、iframeパス、Worker/clientの読み込まれたmodule graph、bundle本文を検査しています。旧HTML・旧client JS・旧Worker出力を意図的に作り、後続の全ビルドで削除され、新しい日英HTMLとassetsが残ることも確認しています。
 
@@ -105,7 +112,7 @@ SSGの実行前hookが`/`、`/demo/clock`、`/demo/status`を除外した記録�
 3. **MDXのIsland検出には注意が必要。** HonoX 0.1.61ではこのMDXを`honox-island`へ変換できましたが、raw MDX依存の自動追跡が`__importing_islands`を付けず、`Script/HasIslands`はSSGでscriptを出しませんでした。標準Renderer内でdocsのclient scriptをmanifestから直接出力することで解決しています。未生成manifestではSSGを失敗させます。全ページがCounterを持つ今回の最小構成に適した対応です。
 4. **hydration属性は完了通知ではない。** HonoXは`data-hono-hydrated`を動的import前に設定します。ブラウザー検査は`createClient()`のPromise完了を待ちます。通常のdocument navigationを使い、再遷移時のCounterは0から始まります。SPA遷移・永続stateは実装していません。
 5. **MDXはコードです。** ビルド時に実行する信頼済みローカルファイルのみを対象にします。外部投稿MDXの実行、runtime compile、検索・draft機能は対象外です。動的Workerのrouteを増やす場合は`app/worker.ts`の入力globとテストを更新します。
-6. **現行依存との互換性。** HonoX 0.1.61はclient設定に非推奨`esbuild`オプションを使い、Vite 8.3.1が警告します。今回のビルドとブラウザー操作は成功しました。Cloudflareの実サービス、他ブラウザー、CI、性能負荷試験は検証していません。
+6. **現行依存との互換性。** HonoX 0.1.61はclient設定に非推奨`esbuild`オプションを使い、Vite Plus同梱Vite 8.3.1が警告します。今回のビルドとブラウザー操作は成功しました。Cloudflareの実サービス、他ブラウザー、CI、性能負荷試験は検証していません。
 
 ## 確認した公式資料
 
@@ -117,3 +124,13 @@ SSGの実行前hookが`/`、`/demo/clock`、`/demo/status`を除外した記録�
 - [Wrangler configuration](https://developers.cloudflare.com/workers/wrangler/configuration/) / [CLI commands](https://developers.cloudflare.com/workers/wrangler/commands/)
 
 挙動とmodule graphの最終的な根拠は、lockfileで固定したローカル依存のソースと、このrepoの自動検査です。
+
+## ツールチェイン移行で確認した公式資料
+
+- [Vite Plus migration](https://viteplus.dev/guide/migrate) / [migration rules](https://viteplus.dev/guide/migrate-rules)
+- [Vite Plus check](https://viteplus.dev/guide/check) / [Vitest5](https://viteplus.dev/guide/vitest-v5)
+- [pnpm import](https://pnpm.io/cli/import)
+- [Cloudflare cf overview](https://developers.cloudflare.com/cf/) / [migrate](https://developers.cloudflare.com/cf/wrangler/migrate/)
+- [cf develop/build/dry-runと内部ツールへの委譲](https://developers.cloudflare.com/cf/projects/)
+
+Macのghq checkoutは`~/ghq/github.com/ts-76/honox-docs-poc`です。ChatGPT Projectsの作成・会話移動・ローカルフォルダの紐付けは、このrepoの実装やcf設定とは別の作業で、未実行です。

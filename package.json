@@ -2,8 +2,25 @@
   "name": "honox-docs-poc",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": ">=22.12.0"
+  "scripts": {
+    "dev": "vp dev --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "node build/build.mjs",
+    "build:client": "vp build --mode client",
+    "build:ssg": "vp build --mode ssg",
+    "build:worker": "vp build --mode worker",
+    "typecheck": "tsc --noEmit",
+    "test:build": "vp test run --reporter=default --reporter=json --outputFile=dist/evidence/unit-tests.json",
+    "test:browser": "playwright test",
+    "verify": "pnpm check && pnpm lint && pnpm typecheck && pnpm build && pnpm types:cf && pnpm test:build && pnpm test:browser && pnpm preview:dry-run",
+    "preview": "cf dev",
+    "preview:dry-run": "cf deploy --dry-run --prebuilt",
+    "check": "vp check",
+    "lint": "vp lint --deny-warnings",
+    "fmt": "vp fmt",
+    "test": "vp test run",
+    "build:cf": "cf build",
+    "types:cf": "cf workers types",
+    "evidence": "node build/snapshot-evidence.mjs"
   },
   "dependencies": {
     "hono": "^4.13.12",
@@ -14,25 +31,17 @@
     "@hono/vite-ssg": "^0.3.3",
     "@mdx-js/rollup": "^3.1.1",
     "@playwright/test": "^1.63.0",
-    "@types/node": "^26.6.3",
-    "node": "^22.23.3",
+    "@types/node": "22.20.4",
+    "cf": "1.0.0-beta.6",
     "remark-frontmatter": "^5.0.0",
     "remark-mdx-frontmatter": "^6.0.0",
     "typescript": "^5.9.3",
-    "vite": "^8.3.1",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
     "wrangler": "^4.145.0"
   },
-  "scripts": {
-    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
-    "build": "node build/build.mjs",
-    "build:client": "vite build --mode client",
-    "build:ssg": "vite build --mode ssg",
-    "build:worker": "vite build --mode worker",
-    "typecheck": "tsc --noEmit",
-    "test:build": "node --test tests/build.test.mjs",
-    "test:browser": "playwright test",
-    "verify": "npm run typecheck && npm run build && npm run test:build && npm run test:browser",
-    "preview": "wrangler dev --local --ip 127.0.0.1 --port 8787",
-    "preview:dry-run": "wrangler deploy --dry-run --outdir dist/dry-run"
-  }
+  "engines": {
+    "node": "^22.20.0 || ^24.12.0 || >=26.0.0"
+  },
+  "packageManager": "pnpm@11.22.0"
 }

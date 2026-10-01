@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-01T04:12:15.651Z",
+  "capturedAt": "2026-10-01T04:45:33.958Z",
   "environment": {
     "node": "v22.23.3",
     "platform": "darwin",
@@ -8,35 +8,38 @@
   "versions": {
     "hono": "4.13.12",
     "honox": "0.1.61",
-    "vite": "8.3.1",
+    "vite": "1.0.0",
+    "vite-plus": "1.0.0",
+    "cf": "1.0.0-beta.6",
     "@mdx-js/rollup": "3.1.1",
     "@hono/vite-ssg": "0.3.3",
     "@hono/vite-build": "1.11.1",
     "wrangler": "4.145.0",
     "@playwright/test": "1.63.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "viteUnderlying": "8.3.1"
   },
   "outputs": {
     "dist/worker/index.js": {
-      "bytes": 149678,
-      "sha256": "29f0bbe2e7e01a3dbb78786182429814d5d821a3d4e6977f055c2607d7451dfe"
+      "bytes": 147665,
+      "sha256": "ad9ffda79542c28519bd581e8b7f563b80a9688b6148c10277b5f43da69a9814"
     },
     "dist/public/docs/getting-started.html": {
       "bytes": 1501,
-      "sha256": "f2170e91ba04b03b193a052bc74a64779eac8ab741bb20b12169a6e6cd6237a0"
+      "sha256": "f005a6d16126ad0e77f0f2be71c26de40c99597b615e967a88735bd9d859b729"
     },
     "dist/public/ja/docs/getting-started.html": {
       "bytes": 1579,
-      "sha256": "d741cfd0150fd2581ec07c4c55f6ffecc3102f01b1f44c1b329f51abc5f7481e"
+      "sha256": "9bd1fa3149045f686ba19e725ef2ada384c6a53a821067e9ef1040ae090cdda1"
     }
   },
   "graphs": {
     "worker": {
-      "loadedModules": 75,
+      "loadedModules": 76,
       "docsOrCompilerModules": []
     },
     "client": {
-      "loadedModules": 32,
+      "loadedModules": 34,
       "docsOrCompilerModules": []
     }
   },
@@ -64,11 +67,39 @@
   ],
   "typecheck": "passed",
   "buildTests": {
-    "passed": 4,
+    "passed": 5,
     "failed": 0
   },
-  "wranglerDryRun": "passed; no deployment",
-  "honoCliDemoRequest": "passed",
+  "cfBuild": {
+    "passed": true,
+    "staleOutputRemoved": true,
+    "docsOrCompilerInBundle": false,
+    "bundleBytes": 154222,
+    "assets": [
+      "docs/getting-started.html",
+      "ja/docs/getting-started.html",
+      "static/client-CItnRoHP.js",
+      "static/counter-CXbKpBId.js",
+      "static/runtime-BluLGSYi.js",
+      "style.css"
+    ],
+    "assetsConfig": {
+      "htmlHandling": "drop-trailing-slash",
+      "notFoundHandling": "none",
+      "runWorkerFirst": [
+        "/demo/*"
+      ]
+    }
+  },
+  "cfDryRun": "passed; prebuilt; no upload or deployment",
+  "cfTypes": "passed",
+  "staticChecks": {
+    "format": "passed",
+    "lint": "passed; deny-warnings",
+    "tsgo": "passed",
+    "tsc": "passed"
+  },
+  "packageManager": "pnpm@11.22.0",
   "ci": "not configured",
   "cloudflareDeployment": "not executed (out of scope)"
 }
