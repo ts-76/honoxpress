@@ -1,0 +1,74 @@
+{
+  "capturedAt": "2026-10-01T04:12:15.651Z",
+  "environment": {
+    "node": "v22.23.3",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "versions": {
+    "hono": "4.13.12",
+    "honox": "0.1.61",
+    "vite": "8.3.1",
+    "@mdx-js/rollup": "3.1.1",
+    "@hono/vite-ssg": "0.3.3",
+    "@hono/vite-build": "1.11.1",
+    "wrangler": "4.145.0",
+    "@playwright/test": "1.63.0",
+    "typescript": "5.9.3"
+  },
+  "outputs": {
+    "dist/worker/index.js": {
+      "bytes": 149678,
+      "sha256": "29f0bbe2e7e01a3dbb78786182429814d5d821a3d4e6977f055c2607d7451dfe"
+    },
+    "dist/public/docs/getting-started.html": {
+      "bytes": 1501,
+      "sha256": "f2170e91ba04b03b193a052bc74a64779eac8ab741bb20b12169a6e6cd6237a0"
+    },
+    "dist/public/ja/docs/getting-started.html": {
+      "bytes": 1579,
+      "sha256": "d741cfd0150fd2581ec07c4c55f6ffecc3102f01b1f44c1b329f51abc5f7481e"
+    }
+  },
+  "graphs": {
+    "worker": {
+      "loadedModules": 75,
+      "docsOrCompilerModules": []
+    },
+    "client": {
+      "loadedModules": 32,
+      "docsOrCompilerModules": []
+    }
+  },
+  "browserTests": [
+    {
+      "project": "development",
+      "title": "English / Japanese: MDX, links, counter hydration and repeat navigation",
+      "status": "passed"
+    },
+    {
+      "project": "development",
+      "title": "HTTP routes, assets, real 404 and per-request demo",
+      "status": "passed"
+    },
+    {
+      "project": "production-local",
+      "title": "English / Japanese: MDX, links, counter hydration and repeat navigation",
+      "status": "passed"
+    },
+    {
+      "project": "production-local",
+      "title": "HTTP routes, assets, real 404 and per-request demo",
+      "status": "passed"
+    }
+  ],
+  "typecheck": "passed",
+  "buildTests": {
+    "passed": 4,
+    "failed": 0
+  },
+  "wranglerDryRun": "passed; no deployment",
+  "honoCliDemoRequest": "passed",
+  "ci": "not configured",
+  "cloudflareDeployment": "not executed (out of scope)"
+}

@@ -1,0 +1,30 @@
+{
+  "app/client.ts": {
+    "file": "static/client-B66RGvty.js",
+    "name": "client",
+    "src": "app/client.ts",
+    "isEntry": true,
+    "dynamicImports": [
+      "app/islands/counter.tsx",
+      "node_modules/honox/dist/client/runtime.js"
+    ]
+  },
+  "app/islands/counter.tsx": {
+    "file": "static/counter-Bt3pd-d_.js",
+    "name": "counter",
+    "src": "app/islands/counter.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "app/client.ts"
+    ]
+  },
+  "node_modules/honox/dist/client/runtime.js": {
+    "file": "static/runtime-uanQeOhi.js",
+    "name": "runtime",
+    "src": "node_modules/honox/dist/client/runtime.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "app/client.ts"
+    ]
+  }
+}

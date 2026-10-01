@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "honox-docs-poc",
+  "main": "./dist/worker/index.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist/public",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "none",
+    "run_worker_first": ["/demo/*"]
+  }
+}

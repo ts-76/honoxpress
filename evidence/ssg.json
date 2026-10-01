@@ -1,0 +1,18 @@
+{
+  "accepted": [
+    "/docs/getting-started",
+    "/ja/docs/getting-started"
+  ],
+  "skipped": [
+    "/",
+    "/demo/clock",
+    "/demo/status"
+  ],
+  "result": {
+    "success": true,
+    "files": [
+      "dist/public/docs/getting-started.html",
+      "dist/public/ja/docs/getting-started.html"
+    ]
+  }
+}

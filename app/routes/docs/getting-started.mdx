@@ -1,0 +1,24 @@
+---
+title: Getting started · HonoX Docs PoC
+description: Static English MDX with a HonoX island and dynamic Worker demo.
+---
+
+import Counter from '../../islands/counter'
+import DemoFrame from '../../components/demo-frame'
+
+# Getting started
+
+This trusted local MDX page is generated as HTML before deployment.
+DOCS_BODY_EN_7f91 is a bundle exclusion sentinel.
+
+[日本語を読む](/ja/docs/getting-started) · [Home](/)
+
+## Interactive counter
+
+<Counter label="Increment" />
+
+## Live demo
+
+The iframe below requests Hono dynamically; SSG never executes it.
+
+<DemoFrame />

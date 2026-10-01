@@ -1,0 +1,24 @@
+---
+title: はじめに · HonoX Docs PoC
+description: HonoX Islandと動的Workerデモを含む静的な日本語MDX。
+---
+
+import Counter from '../../../islands/counter'
+import DemoFrame from '../../../components/demo-frame'
+
+# はじめに
+
+信頼済みのローカルMDXを、デプロイ前にHTMLへ静的生成します。
+DOCS_BODY_JA_8e42 はbundleへの混入を検知する文字列です。
+
+[Read in English](/docs/getting-started) · [ホーム](/)
+
+## 操作できるカウンター
+
+<Counter label="増やす" />
+
+## 動的デモ
+
+このiframeはHonoへリクエストします。SSG中にはデモを実行しません。
+
+<DemoFrame title="動的Workerデモ" />
