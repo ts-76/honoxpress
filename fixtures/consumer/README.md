@@ -17,6 +17,7 @@ The fixture pins direct dependencies to the already verified lock versions and
 retains Vite Plus's transitive Vite override and existing pnpm build policies.
 It performs fresh install followed by frozen install. Successful temporary
 directories are removed; failed directories/logs are retained for diagnosis.
+Every direct dependency is pinned from the frozen example install. The fresh consumer lockfile/package manifest are retained as local artifacts before cleanup.
 Tarball/list/hash and acceptance results are saved under `artifacts` and
 `packages/docs/evidence/consumer.json`. This is preparation only: no registry
 publish/auth/token, repository publication, deployment, or hono-decks pilot.

@@ -110,11 +110,14 @@ manifest.scripts = Object.fromEntries(
       value.replace("pnpm build:package && ", "").replace("--port 5173", "--port 5177"),
     ]),
 );
-const versions = await json(path.join(example, "evidence/verification.json"));
+const dependencyVersions = {};
 for (const section of ["dependencies", "devDependencies"])
-  for (const [name, value] of Object.entries(manifest[section]))
-    if (name !== "@honox-docs-poc/docs" && value !== "catalog:")
-      manifest[section][name] = versions.versions[name] ?? value;
+  for (const [name, value] of Object.entries(manifest[section])) {
+    if (name === "@honox-docs-poc/docs") continue;
+    const version = (await json(path.join(example, "node_modules", name, "package.json"))).version;
+    dependencyVersions[name] = version;
+    if (value !== "catalog:") manifest[section][name] = version;
+  }
 await writeFile(path.join(consumer, "package.json"), JSON.stringify(manifest, null, 2) + "\n");
 let workspace = await readFile(path.join(root, "pnpm-workspace.yaml"), "utf8");
 workspace = workspace.replace(/^packages:\n(?:  - .*\n)+/, "");
@@ -134,6 +137,11 @@ tsconfig.include.push("usage.ts");
 await writeFile(path.join(consumer, "tsconfig.json"), JSON.stringify(tsconfig, null, 2) + "\n");
 await run("pnpm", ["install"], consumer);
 await run("pnpm", ["install", "--frozen-lockfile"], consumer);
+await copyFile(
+  path.join(consumer, "pnpm-lock.yaml"),
+  path.join(artifacts, "consumer-pnpm-lock.yaml"),
+);
+await copyFile(path.join(consumer, "package.json"), path.join(artifacts, "consumer-package.json"));
 await run(process.execPath, ["smoke.mjs"], consumer);
 const installedPackage = await realpath(path.join(consumer, "node_modules/@honox-docs-poc/docs"));
 assert.ok(!installedPackage.startsWith(await realpath(packageRoot)));
@@ -195,6 +203,10 @@ const evidence = {
     cfDryRun: "passed; no deployment",
   },
   graphs,
+  dependencyVersions,
+  consumerLockfileSha256: createHash("sha256")
+    .update(await readFile(path.join(artifacts, "consumer-pnpm-lock.yaml")))
+    .digest("hex"),
   npmPublish: "not executed",
   cloudflareDeployment: "not executed",
 };
