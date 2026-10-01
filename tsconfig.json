@@ -11,5 +11,5 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["packages/docs/src", "tests", "vite.config.ts"]
+  "include": ["packages/docs/src", "tests", "vite.config.ts", "packages/docs/templates"]
 }

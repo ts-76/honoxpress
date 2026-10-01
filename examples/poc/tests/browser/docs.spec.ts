@@ -15,27 +15,35 @@ test("English / Japanese: MDX, links, counter hydration and repeat navigation", 
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page).toHaveTitle("Getting started · HonoX Docs PoC");
   await expect(page.getByRole("heading", { name: "Getting started", exact: true })).toBeVisible();
-  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(1);
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(2);
   await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
   await page.getByRole("button", { name: "Increment", exact: true }).click({ clickCount: 3 });
   await expect(page.getByTestId("count")).toHaveText("3");
   await expect(page.frameLocator("iframe").getByTestId("demo-time")).toBeVisible();
+  await page.evaluate(() => {
+    (document.activeElement as HTMLElement)?.blur();
+    window.scrollTo(0, 0);
+  });
   await page.screenshot({ path: testInfo.outputPath("english.png"), fullPage: true });
 
   await page.getByRole("link", { name: "日本語を読む", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
   await expect(page).toHaveTitle("はじめに · HonoX Docs PoC");
   await expect(page.getByRole("heading", { name: "はじめに", exact: true })).toBeVisible();
-  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(1);
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(2);
   await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
   await expect(page.getByTestId("count")).toHaveText("0");
   await page.getByRole("button", { name: "増やす", exact: true }).click();
   await expect(page.getByTestId("count")).toHaveText("1");
   await expect(page.frameLocator("iframe").getByTestId("demo-time")).toBeVisible();
+  await page.evaluate(() => {
+    (document.activeElement as HTMLElement)?.blur();
+    window.scrollTo(0, 0);
+  });
   await page.screenshot({ path: testInfo.outputPath("japanese.png"), fullPage: true });
 
   await page.getByRole("link", { name: "Read in English", exact: true }).click();
-  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(1);
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(2);
   await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
   await expect(page.getByTestId("count")).toHaveText("0");
   await page.getByRole("button", { name: "Increment", exact: true }).click();

@@ -2,13 +2,15 @@
   "passed": true,
   "staleOutputRemoved": true,
   "docsOrCompilerInBundle": false,
-  "bundleBytes": 157971,
+  "bundleBytes": 165663,
   "assets": [
     "docs/getting-started.html",
     "ja/docs/getting-started.html",
-    "static/client-CItnRoHP.js",
-    "static/counter-CXbKpBId.js",
-    "static/runtime-BluLGSYi.js",
+    "static/client-BPsN6WUn.js",
+    "static/copy-code-IKR9M6vH.js",
+    "static/counter-pgwnFZ3H.js",
+    "static/jsx-dev-runtime-DD7nnKIt.js",
+    "static/runtime-DfRZTXEG.js",
     "style.css"
   ],
   "assetsConfig": {

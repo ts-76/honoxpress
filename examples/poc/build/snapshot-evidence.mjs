@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { accessSync, constants } from "node:fs";
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile, copyFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile, copyFile, readdir } from "node:fs/promises";
 import { platform, arch } from "node:os";
 import path from "node:path";
 import { version as underlyingVite } from "vite-plus";
@@ -44,7 +44,7 @@ if (unit.numPassedTests !== 5 || unit.numFailedTests !== 0 || !unit.success)
 const cfBuild = await json("dist/evidence/cf-build.json");
 if (!cfBuild.passed) throw new Error("cf verification is incomplete");
 const browser = await json("dist/evidence/browser-tests.json");
-if (browser.stats.unexpected !== 0 || browser.stats.expected !== 4)
+if (browser.stats.unexpected !== 0 || browser.stats.expected !== 6)
   throw new Error("Browser verification is incomplete");
 const outputs = {};
 for (const file of [
@@ -74,10 +74,14 @@ for (const file of [
 ]) {
   await copyFile(`dist/evidence/${file}`, `evidence/${file}`);
 }
-const screenshotDir =
-  "test-results/docs-English-Japanese-MDX--3d870-ation-and-repeat-navigation-production-local";
-for (const lang of ["english", "japanese"])
-  await copyFile(`${screenshotDir}/${lang}.png`, `evidence/screenshots/${lang}.png`);
+const screenshotFiles = await readdir("test-results", { recursive: true });
+for (const name of ["english", "japanese", "mobile", "dark"]) {
+  const screenshot = screenshotFiles.find(
+    (file) => file.includes("production-local") && file.endsWith(`/${name}.png`),
+  );
+  if (!screenshot) throw new Error(`Missing production screenshot: ${name}`);
+  await copyFile(`test-results/${screenshot}`, `evidence/screenshots/${name}.png`);
+}
 const tests = browser.suites.flatMap((s) =>
   s.specs.flatMap((spec) =>
     spec.tests.map((t) => ({

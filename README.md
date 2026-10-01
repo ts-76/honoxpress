@@ -90,9 +90,10 @@ cfはbetaで、設定とBuild Output仕様が変わる可能性があります�
 | `pnpm install --frozen-lockfile`       | 成功、ポリシー適合   |
 | `pnpm typecheck`                       | 成功                 |
 | client / SSG / Workerの3段階ビルド     | 成功                 |
+| package API/build/UI unit              | 11 / 11成功          |
 | ビルド自動検査                         | 5 / 5成功            |
-| Playwright: Vite開発                   | 2 / 2成功            |
-| Playwright: cf dev本番ローカル         | 2 / 2成功            |
+| Playwright: Vite開発                   | 3 / 3成功            |
+| Playwright: cf dev本番ローカル         | 3 / 3成功            |
 | cf workers types                       | 成功                 |
 | cf build / prebuilt dry-run            | 成功、実デプロイなし |
 | Vite Plus format / Oxlint・tsgo / tsc  | 成功                 |
@@ -156,3 +157,11 @@ Macのghq checkoutは`~/ghq/github.com/ts-76/honox-docs-poc`です。ChatGPT Pro
 再利用packageは`packages/docs`、標準HonoXアプリは`examples/poc`です。cf beta6はworkspace rootでアプリ検出を拒否するため、rootのdev/build/preview/test/evidence scriptsはexampleへ委譲します。app/routesと_rendererの構造はexample内で保持し、URLは変えません。上のapp/build/dist相対パスはexampleのcwdを基準にしています。core APIの6件のunit検査はrootで別途実行します。
 
 Issue #2 adds a separate build-only package entry. MDX frontmatter and generated TOC come from the actual route files in dev/SSG, eliminating the temporary duplicate catalog. Worker mode provides an empty metadata catalog and never discovers MDX. The explicit renderer uses the package's manifest resolver; the consumer still owns client→SSG→Worker ordering, cleaning and literal Worker route selection. Core/build helper unit coverage is 10 cases in addition to the 5 application build regressions.
+
+## 標準UIの参考・謝辞
+
+[Cloudflare Nimbus](https://nimbus-docs.com/philosophy/)（[registry](https://nimbus-docs.com/registry/)、[repo](https://github.com/cloudflare/nimbus)）と[Fumapress](https://press.fumadocs.dev/docs)（[plugins](https://press.fumadocs.dev/docs/plugins)、[config source](https://github.com/fuma-nama/fumapress/blob/main/packages/core/src/config.tsx)、[repo](https://github.com/fuma-nama/fumapress)）のdesktop/mobile実UIを観察し、本文幅・余白・文字組み・sidebar/TOC・選択表示・code操作・mobile配置を参考にしました。両プロジェクトに感謝します。Fumapressの指定サイトは元設計書どおりで、別製品への読み替えではありません。
+
+両repoのMITライセンスを確認しました（[Nimbus](https://github.com/cloudflare/nimbus/blob/main/LICENSE) / [Fumapress](https://github.com/fuma-nama/fumapress/blob/main/LICENSE)）。今回のJSX/CSS/アイコンは独自実装で、コード・ロゴ・fontなどの素材は流用していません。今後流用する場合は対象ファイルのlicenseと必要なcopyright/NOTICEを保持します。このproject自体の最終licenseは未決定です。詳しいコピー手順と謝辞は配布対象の[package README](packages/docs/README.md)にも含めています。
+
+標準UIのPlaywright追加検査は開発・本番local各1件、合計6 browser testsです。active nav、heading/TOC anchor、実clipboard成功と拒否時の案内、native mobile開閉、skip link/keyboard focus、390pxでのoverflow、dark modeの本文contrastを検査します。全項目のa11y認証は行っていません。

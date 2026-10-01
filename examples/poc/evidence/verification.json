@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-01T06:08:13.920Z",
+  "capturedAt": "2026-10-01T06:31:19.196Z",
   "environment": {
     "node": "v24.12.0",
     "nodeExecutable": "/nix/store/b1h0af3yb3z9jz048phclcqw6ihiww67-nodejs-24.12.0/bin/node",
@@ -23,25 +23,25 @@
   },
   "outputs": {
     "dist/worker/index.js": {
-      "bytes": 151563,
-      "sha256": "fd4fffab40217992e4a47463c2652139f49e9bc76cc026df85aa90f9b80b1052"
+      "bytes": 157974,
+      "sha256": "6fad9876cefc1c69c6ddd470509e238b6bc1a56c97480466035a79d8a867a71f"
     },
     "dist/public/docs/getting-started.html": {
-      "bytes": 1562,
-      "sha256": "3e31e3427e98e76a36f3fb3594fad424e1165972911480c4dd47129ce09648a2"
+      "bytes": 4933,
+      "sha256": "51fec5eab1c4800d182b8ca80c41b14363041229eb8c67b27fb74f2b3dbc027e"
     },
     "dist/public/ja/docs/getting-started.html": {
-      "bytes": 1651,
-      "sha256": "5d8da0609acb0cd8ec425a2f081c3427251cac71fc052fc52bfc94b88a6c1fc7"
+      "bytes": 5700,
+      "sha256": "cf3d93a8abda783081ef89e1c4b9af798f6664fae99df972adcd277d20a9a464"
     }
   },
   "graphs": {
     "worker": {
-      "loadedModules": 81,
+      "loadedModules": 82,
       "docsOrCompilerModules": []
     },
     "client": {
-      "loadedModules": 34,
+      "loadedModules": 35,
       "docsOrCompilerModules": []
     }
   },
@@ -65,6 +65,16 @@
       "project": "production-local",
       "title": "HTTP routes, assets, real 404 and per-request demo",
       "status": "passed"
+    },
+    {
+      "project": "development",
+      "title": "owned UI: active nav, TOC, real clipboard, failure state, mobile, keyboard and dark mode",
+      "status": "passed"
+    },
+    {
+      "project": "production-local",
+      "title": "owned UI: active nav, TOC, real clipboard, failure state, mobile, keyboard and dark mode",
+      "status": "passed"
     }
   ],
   "typecheck": "passed",
@@ -76,13 +86,15 @@
     "passed": true,
     "staleOutputRemoved": true,
     "docsOrCompilerInBundle": false,
-    "bundleBytes": 157971,
+    "bundleBytes": 165663,
     "assets": [
       "docs/getting-started.html",
       "ja/docs/getting-started.html",
-      "static/client-CItnRoHP.js",
-      "static/counter-CXbKpBId.js",
-      "static/runtime-BluLGSYi.js",
+      "static/client-BPsN6WUn.js",
+      "static/copy-code-IKR9M6vH.js",
+      "static/counter-pgwnFZ3H.js",
+      "static/jsx-dev-runtime-DD7nnKIt.js",
+      "static/runtime-DfRZTXEG.js",
       "style.css"
     ],
     "assetsConfig": {

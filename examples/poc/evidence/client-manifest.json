@@ -1,6 +1,6 @@
 {
   "../../node_modules/.pnpm/honox@0.1.61_hono@4.13.12_supports-color@10.2.2_wrangler@4.145.0_@types+node@22.20.4_/node_modules/honox/dist/client/runtime.js": {
-    "file": "static/runtime-BluLGSYi.js",
+    "file": "static/runtime-DfRZTXEG.js",
     "name": "runtime",
     "src": "../../node_modules/.pnpm/honox@0.1.61_hono@4.13.12_supports-color@10.2.2_wrangler@4.145.0_@types+node@22.20.4_/node_modules/honox/dist/client/runtime.js",
     "isDynamicEntry": true,
@@ -8,23 +8,42 @@
       "app/client.ts"
     ]
   },
+  "_jsx-dev-runtime-DD7nnKIt.js": {
+    "file": "static/jsx-dev-runtime-DD7nnKIt.js",
+    "name": "jsx-dev-runtime",
+    "imports": [
+      "app/client.ts"
+    ]
+  },
   "app/client.ts": {
-    "file": "static/client-CItnRoHP.js",
+    "file": "static/client-BPsN6WUn.js",
     "name": "client",
     "src": "app/client.ts",
     "isEntry": true,
     "dynamicImports": [
+      "app/islands/copy-code.tsx",
       "app/islands/counter.tsx",
       "../../node_modules/.pnpm/honox@0.1.61_hono@4.13.12_supports-color@10.2.2_wrangler@4.145.0_@types+node@22.20.4_/node_modules/honox/dist/client/runtime.js"
     ]
   },
+  "app/islands/copy-code.tsx": {
+    "file": "static/copy-code-IKR9M6vH.js",
+    "name": "copy-code",
+    "src": "app/islands/copy-code.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "app/client.ts",
+      "_jsx-dev-runtime-DD7nnKIt.js"
+    ]
+  },
   "app/islands/counter.tsx": {
-    "file": "static/counter-CXbKpBId.js",
+    "file": "static/counter-pgwnFZ3H.js",
     "name": "counter",
     "src": "app/islands/counter.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "app/client.ts"
+      "app/client.ts",
+      "_jsx-dev-runtime-DD7nnKIt.js"
     ]
   }
 }

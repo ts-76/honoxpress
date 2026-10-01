@@ -8,7 +8,7 @@
     "lint": "vp lint --deny-warnings",
     "fmt": "vp fmt",
     "typecheck": "pnpm build:package && tsc --noEmit && pnpm --filter @honox-docs-poc/example typecheck",
-    "test:unit": "vp test run tests/core.test.ts tests/build-api.test.ts",
+    "test:unit": "vp test run tests/core.test.ts tests/build-api.test.ts tests/ui.test.ts",
     "test": "vp test run",
     "verify": "pnpm build:package && pnpm check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm --filter @honox-docs-poc/example verify",
     "dev": "pnpm --filter @honox-docs-poc/example dev",
@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@types/node": "22.20.4",
+    "hono": "4.13.12",
     "typescript": "^5.9.3",
     "vite-plus": "catalog:"
   },

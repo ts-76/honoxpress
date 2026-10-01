@@ -13,10 +13,12 @@ demo.get("/clock", (c) =>
   c.html(
     <html lang="en">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Dynamic Worker clock</title>
         <link rel="stylesheet" href="/style.css" />
       </head>
-      <body>
+      <body class="demo-document">
+        <p class="demo-eyebrow">Live response</p>
         <h1>Dynamic Worker clock</h1>
         <time data-testid="demo-time">{new Date().toISOString()}</time>
         <p>Generated for each request by Hono.</p>

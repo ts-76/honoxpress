@@ -1,24 +1,34 @@
 ---
-title: Getting started · HonoX Docs PoC
+title: Getting started
 description: Static English MDX with a HonoX island and dynamic Worker demo.
 ---
 
 import Counter from "../../islands/counter";
+import CopyCode from "../../islands/copy-code";
 import DemoFrame from "../../components/demo-frame";
 
 # Getting started
 
-This trusted local MDX page is generated as HTML before deployment.
-DOCS_BODY_EN_7f91 is a bundle exclusion sentinel.
+Write with MDX. Add an island when a page needs interaction, and keep your documentation fast and easy to own.
+
+<span data-doc-sentinel="DOCS_BODY_EN_7f91" hidden />
 
 [日本語を読む](/ja/docs/getting-started) · [Home](/)
 
+## Run locally
+
+Start the development server, then open your first document. Your routes, components, and styles stay in your project.
+
+<CopyCode code={"pnpm install\npnpm dev"} />
+
 ## Interactive counter
+
+This small island adds client-side state to an otherwise static page. Navigate away and back to start fresh.
 
 <Counter label="Increment" />
 
 ## Live demo
 
-The iframe below requests Hono dynamically; SSG never executes it.
+The preview makes a live request to the Worker. Document generation never executes this endpoint.
 
 <DemoFrame />

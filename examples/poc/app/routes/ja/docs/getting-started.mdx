@@ -1,24 +1,40 @@
 ---
-title: はじめに · HonoX Docs PoC
+title: はじめに
 description: HonoX Islandと動的Workerデモを含む静的な日本語MDX。
 ---
 
 import Counter from "../../../islands/counter";
+import CopyCode from "../../../islands/copy-code";
 import DemoFrame from "../../../components/demo-frame";
 
 # はじめに
 
-信頼済みのローカルMDXを、デプロイ前にHTMLへ静的生成します。
-DOCS_BODY_JA_8e42 はbundleへの混入を検知する文字列です。
+MDXで書き、必要な場所にIslandを添える。読みやすく、軽やかで、自分で育てられるドキュメントを作ります。
+
+<span data-doc-sentinel="DOCS_BODY_JA_8e42" hidden />
 
 [Read in English](/docs/getting-started) · [ホーム](/)
 
+## ローカルで起動
+
+開発サーバーを起動して、最初のページを開きましょう。ルートも部品もスタイルも、プロジェクト側で編集できます。
+
+<CopyCode
+  code={"pnpm install\npnpm dev"}
+  filename="ターミナル"
+  copyLabel="コードをコピー"
+  copiedLabel="コピーしました"
+  errorLabel="コピーできませんでした。コードを選択して手動でコピーしてください。"
+/>
+
 ## 操作できるカウンター
+
+静的なページに、小さなIslandで状態を持たせます。別のページから戻ると、カウンターは最初から始まります。
 
 <Counter label="増やす" />
 
 ## 動的デモ
 
-このiframeはHonoへリクエストします。SSG中にはデモを実行しません。
+このプレビューはWorkerへリクエストします。ドキュメントの生成中には、このエンドポイントを実行しません。
 
 <DemoFrame title="動的Workerデモ" />

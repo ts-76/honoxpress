@@ -2,6 +2,7 @@
   "loaded": [
     "\u0000virtual:build-entry-module",
     "\u0000virtual:honox-docs/catalog",
+    "./app/components/docs-ui.tsx",
     "./app/docs-catalog.ts",
     "./app/routes/_404.tsx",
     "./app/routes/_renderer.tsx",
@@ -89,6 +90,7 @@
         "\u0000rolldown/runtime.js",
         "\u0000virtual:build-entry-module",
         "\u0000virtual:honox-docs/catalog",
+        "./app/components/docs-ui.tsx",
         "./app/docs-catalog.ts",
         "./app/routes/_404.tsx",
         "./app/routes/_renderer.tsx",

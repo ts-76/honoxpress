@@ -5,7 +5,8 @@
   "description": "Local evaluation name for Hono JSX docs helpers; publication identity is undecided",
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "templates"
   ],
   "type": "module",
   "sideEffects": false,
@@ -17,7 +18,8 @@
     "./build": {
       "types": "./dist/build.d.ts",
       "import": "./dist/build.js"
-    }
+    },
+    "./templates/*": "./templates/*"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json"
