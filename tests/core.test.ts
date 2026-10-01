@@ -1,5 +1,5 @@
 import { test, expect } from "vite-plus/test";
-import { createDocsCatalog } from "@honox-docs-poc/docs";
+import { createDocsCatalog } from "honoxpress";
 
 const options = {
   locales: ["en", "ja"],
@@ -84,4 +84,43 @@ test("duplicate heading anchors fail rather than producing ambiguous TOC links",
       ],
     }),
   ).toThrow("duplicate heading");
+});
+
+test("Unicode lookups accept encoded or decoded paths without interpreting malformed or escaped paths", () => {
+  const docs = createDocsCatalog({
+    ...options,
+    entries: [
+      { route: "docs/日本語.mdx", title: "Unicode" },
+      { route: "ja/docs/日本語.mdx", title: "日本語" },
+    ],
+  });
+  const href = "/docs/" + encodeURIComponent("日本語");
+  for (const pathname of [href, href.toLowerCase(), "/docs/日本語", "/docs/日本語/"])
+    expect(docs.page(pathname)?.href).toBe(href);
+  expect(docs.translations("/docs/日本語")[1]?.href).toBe("/ja" + href);
+  for (const pathname of [
+    "/docs/%",
+    "/docs/%E6",
+    "/docs/guide%2Finstall",
+    href.replaceAll("%", "%25"),
+  ])
+    expect(docs.page(pathname)).toBeUndefined();
+});
+test("catalog rejects HonoX excluded MDX routes while allowing underscore directories", () => {
+  for (const route of [
+    "docs/_partial.mdx",
+    "docs/-hidden.mdx",
+    "docs/$loader.mdx",
+    "docs/-partials/a.mdx",
+    "docs/.hidden/a.mdx",
+  ])
+    expect(() =>
+      createDocsCatalog({ ...options, entries: [{ route, title: "Hidden" }] }),
+    ).toThrow();
+  expect(
+    createDocsCatalog({
+      ...options,
+      entries: [{ route: "docs/_group/visible.mdx", title: "Visible" }],
+    }).pages,
+  ).toHaveLength(1);
 });

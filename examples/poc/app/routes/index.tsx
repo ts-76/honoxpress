@@ -2,7 +2,7 @@ import { createRoute } from "honox/factory";
 export default createRoute((c) =>
   c.render(
     <>
-      <h1>HonoX Docs PoC</h1>
+      <h1>honoxpress</h1>
       <p>Static documentation with an interactive island and a live Worker demo.</p>
       <ul>
         <li>

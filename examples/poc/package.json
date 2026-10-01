@@ -1,5 +1,5 @@
 {
-  "name": "@honox-docs-poc/example",
+  "name": "honoxpress-example",
   "private": true,
   "type": "module",
   "scripts": {
@@ -21,12 +21,12 @@
     "build:cf": "cf build",
     "types:cf": "cf workers types",
     "evidence": "node build/snapshot-evidence.mjs",
-    "build:package": "pnpm --filter @honox-docs-poc/docs build"
+    "build:package": "pnpm --filter honoxpress build"
   },
   "dependencies": {
-    "@honox-docs-poc/docs": "workspace:*",
     "hono": "^4.13.12",
-    "honox": "^0.1.61"
+    "honox": "^0.1.61",
+    "honoxpress": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/config": "0.20.0",

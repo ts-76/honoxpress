@@ -57,10 +57,13 @@ await writeFile(path.join(root, "packages/docs/dist/obsolete.js"), "stale packag
 await run("pnpm", ["build:package"]);
 await assert.rejects(access(path.join(root, "packages/docs/dist/obsolete.js")));
 const packageRoot = path.join(root, "packages/docs");
-await run("pnpm", ["pack", "--pack-destination", artifacts], packageRoot);
-const packed = (await readdir(artifacts)).filter((file) => file.endsWith(".tgz"));
+const packageArtifacts = path.join(artifacts, "package");
+await rm(packageArtifacts, { recursive: true, force: true });
+await mkdir(packageArtifacts, { recursive: true });
+await run("pnpm", ["pack", "--pack-destination", packageArtifacts], packageRoot);
+const packed = (await readdir(packageArtifacts)).filter((file) => file.endsWith(".tgz"));
 assert.equal(packed.length, 1, "Keep a single evaluation tarball in artifacts");
-const tarball = path.join(artifacts, packed[0]);
+const tarball = path.join(packageArtifacts, packed[0]);
 const files = (await run("tar", ["-tzf", tarball])).trim().split("\n").sort();
 for (const file of files)
   assert.match(
@@ -78,9 +81,11 @@ for (const file of [
 ])
   assert.ok(files.includes(`package/${file}`), `Missing packed export: ${file}`);
 const pkg = await json(path.join(packageRoot, "package.json"));
+assert.equal(pkg.name, "honoxpress", "The chosen package name must reach the tarball");
+assert.equal(packed[0], `honoxpress-${pkg.version}.tgz`);
 assert.equal(pkg.private, true, "Publication decisions are pending");
 assert.equal(pkg.license, undefined, "Do not choose the user's license");
-const consumer = await mkdtemp(path.join(tmpdir(), "honox-docs-consumer-"));
+const consumer = await mkdtemp(path.join(tmpdir(), "honoxpress-consumer-"));
 assert.ok(!(await realpath(consumer)).startsWith(await realpath(root)));
 console.log(`External consumer: ${consumer}`);
 await copyFile(tarball, path.join(consumer, "docs.tgz"));
@@ -100,8 +105,8 @@ for (const file of [
 await cp(path.join(root, "fixtures/consumer/usage.ts"), path.join(consumer, "usage.ts"));
 await cp(path.join(root, "fixtures/consumer/smoke.mjs"), path.join(consumer, "smoke.mjs"));
 const manifest = await json(path.join(example, "package.json"));
-manifest.name = "honox-docs-external-consumer";
-manifest.dependencies["@honox-docs-poc/docs"] = "file:./docs.tgz";
+manifest.name = "honoxpress-external-consumer";
+manifest.dependencies["honoxpress"] = "file:./docs.tgz";
 manifest.scripts = Object.fromEntries(
   Object.entries(manifest.scripts)
     .filter(([name]) => name !== "build:package" && name !== "evidence")
@@ -113,7 +118,7 @@ manifest.scripts = Object.fromEntries(
 const dependencyVersions = {};
 for (const section of ["dependencies", "devDependencies"])
   for (const [name, value] of Object.entries(manifest[section])) {
-    if (name === "@honox-docs-poc/docs") continue;
+    if (name === "honoxpress") continue;
     const version = (await json(path.join(example, "node_modules", name, "package.json"))).version;
     dependencyVersions[name] = version;
     if (value !== "catalog:") manifest[section][name] = version;
@@ -143,7 +148,7 @@ await copyFile(
 );
 await copyFile(path.join(consumer, "package.json"), path.join(artifacts, "consumer-package.json"));
 await run(process.execPath, ["smoke.mjs"], consumer);
-const installedPackage = await realpath(path.join(consumer, "node_modules/@honox-docs-poc/docs"));
+const installedPackage = await realpath(path.join(consumer, "node_modules/honoxpress"));
 assert.ok(!installedPackage.startsWith(await realpath(packageRoot)));
 await run("pnpm", ["fmt"], consumer);
 await run("pnpm", ["verify"], consumer);
@@ -160,7 +165,7 @@ const graphs = {};
 for (const target of ["worker", "client"]) {
   const graph = await json(path.join(consumer, `dist/evidence/${target}-modules.json`));
   const leaked = graph.loaded.filter((id) =>
-    /\.mdx|@mdx-js|remark-|\/docs\/dist\/build\.js/.test(id),
+    /\.mdx|@mdx-js|remark-|\/(?:docs|honoxpress)\/dist\/build\.js/.test(id),
   );
   assert.deepEqual(leaked, [], `Consumer ${target} leaks docs/compiler/build entry`);
   graphs[target] = { loadedModules: graph.loaded.length, docsCompilerOrBuildModules: leaked };

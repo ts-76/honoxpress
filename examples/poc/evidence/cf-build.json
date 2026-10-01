@@ -2,7 +2,7 @@
   "passed": true,
   "staleOutputRemoved": true,
   "docsOrCompilerInBundle": false,
-  "bundleBytes": 165663,
+  "bundleBytes": 166207,
   "assets": [
     "docs/getting-started.html",
     "ja/docs/getting-started.html",

@@ -1,8 +1,8 @@
 {
-  "capturedAt": "2026-10-01T07:13:15.813Z",
+  "capturedAt": "2026-10-01T08:34:52.414Z",
   "node": "v24.12.0",
   "package": {
-    "name": "@honox-docs-poc/docs",
+    "name": "honoxpress",
     "version": "0.0.0",
     "private": true,
     "license": "undecided",
@@ -19,8 +19,8 @@
     }
   },
   "tarball": {
-    "filename": "honox-docs-poc-docs-0.0.0.tgz",
-    "sha256": "d503fdca4282518061fb56a4da043a686581a500d19501cb7fe2b6be5aa7888e",
+    "filename": "honoxpress-0.0.0.tgz",
+    "sha256": "6b65a003c1826a88f7dc98bbc0c301775a031271c2074d802a7f519bc1a55c54",
     "files": [
       "package/README.md",
       "package/dist/build.d.ts",
@@ -31,6 +31,8 @@
       "package/dist/client.js",
       "package/dist/index.d.ts",
       "package/dist/index.js",
+      "package/dist/route-files.d.ts",
+      "package/dist/route-files.js",
       "package/package.json",
       "package/templates/copy-code.tsx",
       "package/templates/demo-frame.tsx",
@@ -58,7 +60,7 @@
   },
   "graphs": {
     "worker": {
-      "loadedModules": 82,
+      "loadedModules": 83,
       "docsCompilerOrBuildModules": []
     },
     "client": {
@@ -81,7 +83,7 @@
     "vite-plus": "1.0.0",
     "wrangler": "4.145.0"
   },
-  "consumerLockfileSha256": "15ef52119a040e633c28bd272a415c449633bf52fac5bf2d36c715bead60d944",
+  "consumerLockfileSha256": "71151fe387d7adedb6a4579d3e7b35b706880449e9dbc18da6f9b73e3b588e7b",
   "npmPublish": "not executed",
   "cloudflareDeployment": "not executed"
 }

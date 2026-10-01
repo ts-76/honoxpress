@@ -1,4 +1,4 @@
-import type { DocsPage, Heading, LocaleLink } from "@honox-docs-poc/docs";
+import type { DocsPage, Heading, LocaleLink } from "honoxpress";
 
 // Copy into app/components; the consumer owns and can edit these Hono JSX views.
 export function DocsNavigation({

@@ -17,7 +17,7 @@ importers:
 
   .:
     dependencies:
-      '@honox-docs-poc/docs':
+      honoxpress:
         specifier: workspace:*
         version: link:packages/docs
     devDependencies:
@@ -36,15 +36,15 @@ importers:
 
   examples/poc:
     dependencies:
-      '@honox-docs-poc/docs':
-        specifier: workspace:*
-        version: link:../../packages/docs
       hono:
         specifier: ^4.13.12
         version: 4.13.12
       honox:
         specifier: ^0.1.61
         version: 0.1.61(hono@4.13.12)(supports-color@10.2.2)(wrangler@4.145.0(@types/node@22.20.4))
+      honoxpress:
+        specifier: workspace:*
+        version: link:../../packages/docs
     devDependencies:
       '@cloudflare/config':
         specifier: 0.20.0

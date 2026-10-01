@@ -1,8 +1,8 @@
 {
-  "name": "@honox-docs-poc/docs",
+  "name": "honoxpress",
   "version": "0.0.0",
   "private": true,
-  "description": "Local evaluation name for Hono JSX docs helpers; publication identity is undecided",
+  "description": "Hono JSX documentation metadata and build helpers with consumer-owned UI templates; private evaluation",
   "files": [
     "dist",
     "README.md",

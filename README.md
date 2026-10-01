@@ -1,4 +1,4 @@
-# HonoX docs PoC
+# honoxpress
 
 信頼済みローカルMDXをHono JSXで静的生成し、Counter Islandと動的Hono `/demo/*`を同じCloudflare Worker構成で共存させる最小PoCです。2026-10-01、MacBook Air（macOS / arm64）で検証しました。
 
@@ -48,7 +48,7 @@ Devbox管理のNode **24.12.0**（`.node-version`）、pnpm **11.22.0**（`packa
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm --filter @honox-docs-poc/example exec playwright install chromium
+pnpm --filter honoxpress-example exec playwright install chromium
 pnpm verify
 pnpm evidence
 ```
@@ -90,7 +90,7 @@ cfはbetaで、設定とBuild Output仕様が変わる可能性があります�
 | `pnpm install --frozen-lockfile`       | 成功、ポリシー適合                       |
 | `pnpm typecheck`                       | 成功                                     |
 | client / SSG / Workerの3段階ビルド     | 成功                                     |
-| package API/build/UI unit              | 11 / 11成功                              |
+| package API/build/UI unit              | 15 / 15成功                              |
 | ビルド自動検査                         | 5 / 5成功                                |
 | Playwright: Vite開発                   | 3 / 3成功                                |
 | Playwright: cf dev本番ローカル         | 3 / 3成功                                |
@@ -141,7 +141,7 @@ Macのghq checkoutは`~/ghq/github.com/ts-76/honox-docs-poc`です。ChatGPT Pro
 
 ## OSS化の成果順
 
-最終package名・ライセンス・repo公開化・npm公開は未決定です。packageは仮名`@honox-docs-poc/docs`のprivate workspaceとして評価し、利用者はHonoX標準routes/_rendererを所有します。runtimeの純粋metadata APIにcompiler/Node/build処理を混ぜません。
+package候補名はユーザー決定の`honoxpress`です。ライセンス・repo公開化・npm公開は未決定で、private workspaceとして評価し、利用者はHonoX標準routes/_rendererを所有します。runtimeの純粋metadata APIにcompiler/Node/build処理を混ぜません。
 
 1. [#1 package境界とmetadata API](https://github.com/ts-76/honox-docs-poc/issues/1)
 2. [#2 薄いMDX/SSG build連携](https://github.com/ts-76/honox-docs-poc/issues/2)
@@ -154,7 +154,7 @@ Macのghq checkoutは`~/ghq/github.com/ts-76/honox-docs-poc`です。ChatGPT Pro
 
 ## Workspace境界
 
-再利用packageは`packages/docs`、標準HonoXアプリは`examples/poc`です。cf beta6はworkspace rootでアプリ検出を拒否するため、rootのdev/build/preview/test/evidence scriptsはexampleへ委譲します。app/routesと_rendererの構造はexample内で保持し、URLは変えません。上のapp/build/dist相対パスはexampleのcwdを基準にしています。runtime/build/UIの11件のunit検査はrootで別途実行します。
+再利用packageは`packages/docs`、標準HonoXアプリは`examples/poc`です。cf beta6はworkspace rootでアプリ検出を拒否するため、rootのdev/build/preview/test/evidence scriptsはexampleへ委譲します。app/routesと_rendererの構造はexample内で保持し、URLは変えません。上のapp/build/dist相対パスはexampleのcwdを基準にしています。runtime/build/UIの15件のunit検査はrootで別途実行します。
 
 Issue #2 adds a separate build-only package entry. MDX frontmatter and generated TOC come from the actual route files in dev/SSG, eliminating the temporary duplicate catalog. Worker mode provides an empty metadata catalog and never discovers MDX. The explicit renderer uses the package's manifest resolver; the consumer still owns client→SSG→Worker ordering, cleaning and literal Worker route selection. Core/build helper unit coverage is 10 cases in addition to the 5 application build regressions.
 
@@ -168,12 +168,18 @@ Issue #2 adds a separate build-only package entry. MDX frontmatter and generated
 
 ## tarballと外部consumer
 
-`pnpm pack:docs`はprivate評価packageのtarballを`artifacts`へ作るだけで、公開しません。`pnpm test:consumer`はpackageの古い出力削除→pack files/exports/types検査→repo外の一時consumerへtarball install→凍結install→runtime/型/配布asset検査→standard HonoXの全受入を実行します。アプリ部分は既存exampleのコピーですが、package source/workspaceリンクやrepoのnode_modulesに依存しません。UI/CSSは実際にインストールしたpackageからコピーして上書きします。
+`pnpm pack:docs`はprivate評価packageのtarballを`artifacts/package`へ作るだけで、公開しません。`pnpm test:consumer`はpackageの古い出力削除→pack files/exports/types検査→repo外の一時consumerへtarball install→凍結install→runtime/型/配布asset検査→standard HonoXの全受入を実行します。アプリ部分は既存exampleのコピーですが、package source/workspaceリンクやrepoのnode_modulesに依存しません。UI/CSSは実際にインストールしたpackageからコピーして上書きします。
 
 検証スクリプトは[scripts/verify-consumer.mjs](scripts/verify-consumer.mjs)、型とruntime fixtureは[fixtures/consumer](fixtures/consumer)。成功時は一時consumerを削除し、失敗時は診断用に残します。ログとtarballはGit対象外の`artifacts`、確認結果は[consumer evidence](packages/docs/evidence/consumer.json)です。全`pnpm verify`にも外部consumer受入を含めています。npm publish/auth/tokenやhono-decks実ページへの導入は行いません。
 
 ## CIとOSS公開判断
 
-[Verify workflow](.github/workflows/verify.yml)はPRのhead commitを明示checkoutし、UbuntuのNode 22.23.3 / 24.12.0 / 24.21.0で凍結install、format・typed lint・tsc、package unit11件、3段build、build検査5件、browser検査6件、tarball外部consumerの同じ受入を実行します。cfはjob内だけglobalに用意し、実deploy・npm auth/publishはありません。公式Actionsはcommit SHA固定、repo権限はread-onlyです。各Nodeの証拠・tarball・診断は7日保持します。ローカル保存のsnapshotとCI run結果は別で、exact SHAとconclusionを確認して成功判定します。
+[Verify workflow](.github/workflows/verify.yml)はPRのhead commitを明示checkoutし、UbuntuのNode 22.23.3 / 24.12.0 / 24.21.0で凍結install、format・typed lint・tsc、package unit15件、3段build、build検査5件、browser検査6件、tarball外部consumerの同じ受入を実行します。cfはjob内だけglobalに用意し、実deploy・npm auth/publishはありません。公式Actionsはcommit SHA固定、repo権限はread-onlyです。各Nodeの証拠・tarball・診断は7日保持します。ローカル保存のsnapshotとCI run結果は別で、exact SHAとconclusionを確認して成功判定します。
 
-[API導入ガイド](docs/api.md)、[互換性と未検証範囲](docs/compatibility.md)、[貢献手順](CONTRIBUTING.md)、[公開判断・release gate](docs/release-decisions.md)を用意しました。Node24.21.0が確認時の最新LTS、Macは既存Devboxの24.12.0を保持し両方をCI対象にしています。26系はCurrentかつ未検証です。最終名・license・repo公開化・npm公開権限・version/release方針の判断は[#6](https://github.com/ts-76/honox-docs-poc/issues/6)で行い、その後にhono-decksの実ページpilotへ進めます。現時点でpackageはprivateのままです。
+[API導入ガイド](docs/api.md)、[互換性と未検証範囲](docs/compatibility.md)、[貢献手順](CONTRIBUTING.md)、[公開判断・release gate](docs/release-decisions.md)を用意しました。Node24.21.0が確認時の最新LTS、Macは既存Devboxの24.12.0を保持し両方をCI対象にしています。26系はCurrentかつ未検証です。名前`honoxpress`は反映済みです。license・repo公開化・npm公開権限・version/release方針の判断は[#6](https://github.com/ts-76/honox-docs-poc/issues/6)で行い、その後にhono-decksの実ページpilotへ進めます。現時点でpackageはprivateのままです。
+
+## honoxpress命名と累積レビュー
+
+ユーザー決定の候補名`honoxpress`をpackage/import/build virtual ID・UI・README・sample・配布tarballへ反映しました。npm registryのread-only確認は2026-10-01に404でしたが、名前の予約や公開はしていません。GitHub repoのURLとghqパスは`honox-docs-poc`のままです。privateとlicense未選択guardを保持しています。
+
+累積独立レビューでP2を2件修正しました。Unicode routeのencoded hrefとHono decoded pathの不一致はlookup正規化・raw URL pathname使用・解決済みhrefのactive navで修正。HonoX標準の補助MDX除外とmetadata discoveryの不一致は共有内部判定で修正しました。実Hono request＋実rendererのIsland script/nav/TOC/翻訳と、補助ファイル/ディレクトリの一時fixtureを含むpackage unitは15件です。レビューの詳細と残る判断は[review report](docs/review-honoxpress.md)に記録します。

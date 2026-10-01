@@ -13,7 +13,7 @@ test("English / Japanese: MDX, links, counter hydration and repeat navigation", 
   await page.getByRole("link", { name: "Get started", exact: true }).click();
   await expect(page).toHaveURL(/\/docs\/getting-started$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await expect(page).toHaveTitle("Getting started · HonoX Docs PoC");
+  await expect(page).toHaveTitle("Getting started · honoxpress");
   await expect(page.getByRole("heading", { name: "Getting started", exact: true })).toBeVisible();
   await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(2);
   await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
@@ -28,7 +28,7 @@ test("English / Japanese: MDX, links, counter hydration and repeat navigation", 
 
   await page.getByRole("link", { name: "日本語を読む", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
-  await expect(page).toHaveTitle("はじめに · HonoX Docs PoC");
+  await expect(page).toHaveTitle("はじめに · honoxpress");
   await expect(page.getByRole("heading", { name: "はじめに", exact: true })).toBeVisible();
   await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(2);
   await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");

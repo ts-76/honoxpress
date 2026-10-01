@@ -8,7 +8,7 @@ import ssg from "@hono/vite-ssg";
 import worker from "@hono/vite-build/cloudflare-workers";
 import { defaultPlugin } from "hono/ssg";
 import { mkdir, writeFile } from "node:fs/promises";
-import { docsMetadataPlugin, remarkDocsHeadings } from "@honox-docs-poc/docs/build";
+import { docsMetadataPlugin, remarkDocsHeadings } from "honoxpress/build";
 import { docsOnlyPlugin } from "./build/docs-only.ts";
 
 function audit(target: string): Plugin {

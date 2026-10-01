@@ -1,3 +1,4 @@
+import { isVisibleMdxRoute } from "./route-files.js";
 export interface Heading {
   readonly depth: number;
   readonly text: string;
@@ -46,6 +47,8 @@ export function createDocsCatalog(options: DocsOptions): DocsCatalog {
   const seen = new Set<string>();
   const pages = options.entries
     .map((entry): DocsPage => {
+      if (!isVisibleMdxRoute(entry.route))
+        throw new Error(`Excluded HonoX MDX route: ${entry.route}`);
       const parts = entry.route.split("/");
       const unprefixed = parts[0] === "docs";
       const locale = unprefixed ? options.defaultLocale : parts.shift();
@@ -98,9 +101,15 @@ export function createDocsCatalog(options: DocsOptions): DocsCatalog {
     })
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.href.localeCompare(b.href));
   const immutable = Object.freeze(pages);
-  const normalize = (pathname: string) => pathname.replace(/\/$/, "");
+  const normalize = (pathname: string) => {
+    try {
+      return decodeURI(pathname.replace(/\/$/, ""));
+    } catch {
+      return undefined;
+    }
+  };
   const page = (pathname: string) =>
-    immutable.find((candidate) => candidate.href === normalize(pathname));
+    immutable.find((candidate) => decodeURI(candidate.href) === normalize(pathname));
   return Object.freeze({
     pages: immutable,
     page,

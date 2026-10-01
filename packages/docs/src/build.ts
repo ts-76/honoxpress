@@ -1,3 +1,4 @@
+import { isVisibleMdxRoute } from "./route-files.js";
 import type { Plugin } from "vite-plus";
 import type { SSGPlugin } from "hono/ssg";
 import { readdir } from "node:fs/promises";
@@ -39,13 +40,13 @@ export function docsOnlyPlugin(
   } satisfies SSGPlugin;
 }
 
-const virtualId = "virtual:honox-docs/catalog";
+const virtualId = "virtual:honoxpress/catalog";
 const resolvedId = `\0${virtualId}`;
 export function docsMetadataPlugin(options: DocsBuildOptions): Plugin {
   let routeRoot = "";
   const config = { locales: options.locales, defaultLocale: options.defaultLocale };
   return {
-    name: "honox-docs-metadata",
+    name: "honoxpress-metadata",
     configResolved(vite) {
       routeRoot = resolve(vite.root, options.routeRoot ?? "app/routes");
     },
@@ -64,6 +65,7 @@ export function docsMetadataPlugin(options: DocsBuildOptions): Plugin {
           .sort((a, b) => `${a.parentPath}/${a.name}`.localeCompare(`${b.parentPath}/${b.name}`))) {
           const absolute = resolve(file.parentPath, file.name);
           const route = relative(routeRoot, absolute).replaceAll("\\", "/");
+          if (!isVisibleMdxRoute(route)) continue;
           if (
             !options.locales.some((locale) =>
               route.startsWith(`${locale === options.defaultLocale ? "" : `${locale}/`}docs/`),
@@ -79,7 +81,7 @@ export function docsMetadataPlugin(options: DocsBuildOptions): Plugin {
         }
       }
       return (
-        `import {createDocsCatalog} from "@honox-docs-poc/docs";\n${imports.join("\n")}\n` +
+        `import {createDocsCatalog} from "honoxpress";\n${imports.join("\n")}\n` +
         `export const docsCatalog=createDocsCatalog({...${JSON.stringify(config)},entries:[${entries.join(",")}]});`
       );
     },

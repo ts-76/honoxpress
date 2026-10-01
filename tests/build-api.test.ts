@@ -1,6 +1,9 @@
+import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { test, expect } from "vite-plus/test";
-import { docsOnlyPlugin, remarkDocsHeadings } from "@honox-docs-poc/docs/build";
-import { resolveClientScript } from "@honox-docs-poc/docs";
+import { docsMetadataPlugin, docsOnlyPlugin, remarkDocsHeadings } from "honoxpress/build";
+import { resolveClientScript } from "honoxpress";
 
 test("docs hook excludes dynamic routes before execution and supports caller locale prefixes", () => {
   const report = { accepted: [] as string[], skipped: [] as string[] };
@@ -50,4 +53,48 @@ test("client manifest helper rejects missing or unsafe assets", () => {
   for (const file of ["/absolute.js", "../escape.js", "https://remote/script.js", "static/a.css"])
     expect(() => resolveClientScript({ entry: { file } }, "entry")).toThrow();
   expect(() => resolveClientScript(undefined, "entry")).toThrow("Build client before SSG");
+});
+
+test("metadata discovery follows HonoX exclusions and Worker never discovers files", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "honoxpress-discovery-"));
+  try {
+    const routes = [
+      "docs/visible.mdx",
+      "docs/_partial.mdx",
+      "docs/-hidden.mdx",
+      "docs/$loader.mdx",
+      "docs/-partials/example.mdx",
+      "docs/.hidden/example.mdx",
+      "docs/_group/visible.mdx",
+    ];
+    for (const route of routes) {
+      const file = path.join(root, "app/routes", route);
+      await mkdir(path.dirname(file), { recursive: true });
+      await writeFile(file, "uncompiled fixture");
+    }
+    const load = async (worker: boolean) => {
+      const plugin = docsMetadataPlugin({ locales: ["en"], defaultLocale: "en", worker });
+      const resolved = plugin.configResolved as (config: { root: string }) => void;
+      resolved({ root });
+      const hook = plugin.load as (
+        this: { addWatchFile(file: string): void },
+        id: string,
+      ) => Promise<string>;
+      return hook.call(
+        {
+          addWatchFile() {
+            if (worker) throw new Error("Worker touched routes");
+          },
+        },
+        "\0virtual:honoxpress/catalog",
+      );
+    };
+    const source = await load(false);
+    expect(source).toContain("docs/visible.mdx");
+    expect(source).toContain("docs/_group/visible.mdx");
+    for (const route of routes.slice(1, 6)) expect(source).not.toContain(route);
+    expect(await load(true)).not.toContain(".mdx");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });

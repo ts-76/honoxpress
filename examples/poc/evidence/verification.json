@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-01T07:08:57.441Z",
+  "capturedAt": "2026-10-01T08:34:53.138Z",
   "environment": {
     "node": "v24.12.0",
     "nodeExecutable": "/nix/store/b1h0af3yb3z9jz048phclcqw6ihiww67-nodejs-24.12.0/bin/node",
@@ -23,21 +23,21 @@
   },
   "outputs": {
     "dist/worker/index.js": {
-      "bytes": 157974,
-      "sha256": "6fad9876cefc1c69c6ddd470509e238b6bc1a56c97480466035a79d8a867a71f"
+      "bytes": 158599,
+      "sha256": "1b00f231d6d4476cb9cde9510fe0103028a2c7a35157f5ed6902b7a13a599d6e"
     },
     "dist/public/docs/getting-started.html": {
-      "bytes": 4933,
-      "sha256": "51fec5eab1c4800d182b8ca80c41b14363041229eb8c67b27fb74f2b3dbc027e"
+      "bytes": 4929,
+      "sha256": "aff5d33e720764f9d8c2e9e5d474804c77c89d7e341a573197efe47154adc73b"
     },
     "dist/public/ja/docs/getting-started.html": {
-      "bytes": 5700,
-      "sha256": "cf3d93a8abda783081ef89e1c4b9af798f6664fae99df972adcd277d20a9a464"
+      "bytes": 5696,
+      "sha256": "2ae449b5f217f0975106d87c31c6dd6656cda1ff03f5fcd7d613fa2e3c47f7fa"
     }
   },
   "graphs": {
     "worker": {
-      "loadedModules": 82,
+      "loadedModules": 83,
       "docsOrCompilerModules": []
     },
     "client": {
@@ -79,7 +79,7 @@
   ],
   "typecheck": "passed",
   "packageTests": {
-    "passed": 11,
+    "passed": 15,
     "failed": 0
   },
   "buildTests": {
@@ -90,7 +90,7 @@
     "passed": true,
     "staleOutputRemoved": true,
     "docsOrCompilerInBundle": false,
-    "bundleBytes": 165663,
+    "bundleBytes": 166207,
     "assets": [
       "docs/getting-started.html",
       "ja/docs/getting-started.html",

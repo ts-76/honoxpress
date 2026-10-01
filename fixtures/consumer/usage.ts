@@ -1,5 +1,5 @@
-import { createDocsCatalog, resolveClientScript, type DocsCatalog } from "@honox-docs-poc/docs";
-import { docsMetadataPlugin, docsOnlyPlugin, remarkDocsHeadings } from "@honox-docs-poc/docs/build";
+import { createDocsCatalog, resolveClientScript, type DocsCatalog } from "honoxpress";
+import { docsMetadataPlugin, docsOnlyPlugin, remarkDocsHeadings } from "honoxpress/build";
 import type { Plugin } from "vite-plus";
 
 const docs: DocsCatalog = createDocsCatalog({

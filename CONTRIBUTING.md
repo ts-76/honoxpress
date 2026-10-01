@@ -1,12 +1,12 @@
 # Contributing to the evaluation
 
-The repository is currently private and the package is an unpublished evaluation. The final package identity, license, public repository and contribution/release policy require the owner's decision; no license grant is implied. Please resolve [Issue #6](https://github.com/ts-76/honox-docs-poc/issues/6) before soliciting public contributions or adopting this in hono-decks.
+The repository is currently private and the package is an unpublished evaluation. The package name is honoxpress. The license, public repository and contribution/release policy require the owner's decision; no license grant is implied. Please resolve [Issue #6](https://github.com/ts-76/honox-docs-poc/issues/6) before soliciting public contributions or adopting this in hono-decks.
 
 Use the existing Node environment manager. This Mac uses Devbox global Node 24.12.0/pnpm 11.22.0 and global cf 1.0.0-beta.6; do not add another manager or modify shell PATH to work around activation. Other machines can use their established manager to select a documented CI version. See [compatibility](docs/compatibility.md).
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm --filter @honox-docs-poc/example exec playwright install chromium
+pnpm --filter honoxpress-example exec playwright install chromium
 pnpm verify
 pnpm evidence
 ```

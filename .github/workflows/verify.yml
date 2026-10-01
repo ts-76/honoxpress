@@ -44,7 +44,7 @@ jobs:
       - name: Job-local global cf
         run: npm install --global cf@1.0.0-beta.6 --registry=https://registry.npmjs.org/
       - name: Chromium
-        run: pnpm --filter @honox-docs-poc/example exec playwright install --with-deps chromium
+        run: pnpm --filter honoxpress-example exec playwright install --with-deps chromium
       - name: Full acceptance including packed external consumer
         run: pnpm verify
       - name: Snapshot successful evidence

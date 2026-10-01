@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import { readFile, realpath, copyFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { createDocsCatalog, resolveClientScript } from "@honox-docs-poc/docs";
-import { docsMetadataPlugin, docsOnlyPlugin } from "@honox-docs-poc/docs/build";
+import { createDocsCatalog, resolveClientScript } from "honoxpress";
+import { docsMetadataPlugin, docsOnlyPlugin } from "honoxpress/build";
 
-const entry = fileURLToPath(import.meta.resolve("@honox-docs-poc/docs"));
+const entry = fileURLToPath(import.meta.resolve("honoxpress"));
 const root = path.dirname(path.dirname(entry));
 assert.ok((await realpath(root)).startsWith(await realpath(process.cwd())));
 for (const name of ["index", "catalog", "client"]) {
@@ -13,7 +13,7 @@ for (const name of ["index", "catalog", "client"]) {
   assert.doesNotMatch(code, /node:|@mdx-js|remark-|from ["']react/);
   await readFile(path.join(root, "dist", `${name}.d.ts`));
 }
-assert.throws(() => import.meta.resolve("@honox-docs-poc/docs/src/catalog.ts"), {
+assert.throws(() => import.meta.resolve("honoxpress/src/catalog.ts"), {
   code: "ERR_PACKAGE_PATH_NOT_EXPORTED",
 });
 const catalog = createDocsCatalog({
@@ -48,7 +48,7 @@ const virtual = await plugin.load.call(
       throw new Error("Worker must not discover MDX");
     },
   },
-  "\0virtual:honox-docs/catalog",
+  "\0virtual:honoxpress/catalog",
 );
 assert.match(virtual, /entries:\[\]/);
 assert.doesNotMatch(virtual, /frontmatter|\.mdx/);
@@ -59,10 +59,7 @@ for (const [name, target] of [
   ["docs.css", "public/style.css"],
 ]) {
   await mkdir(path.dirname(target), { recursive: true });
-  await copyFile(
-    fileURLToPath(import.meta.resolve(`@honox-docs-poc/docs/templates/${name}`)),
-    target,
-  );
+  await copyFile(fileURLToPath(import.meta.resolve(`honoxpress/templates/${name}`)), target);
 }
 console.log(
   "External package runtime, private exports, emitted types, Worker empty metadata and copied assets passed",

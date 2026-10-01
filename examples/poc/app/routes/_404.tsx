@@ -3,7 +3,7 @@ const notFound: NotFoundHandler = (c) =>
   c.html(
     <html lang="en">
       <head>
-        <title>404 · HonoX Docs PoC</title>
+        <title>404 · honoxpress</title>
       </head>
       <body>
         <h1>404 — Page not found</h1>

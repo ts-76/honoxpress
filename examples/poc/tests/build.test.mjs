@@ -127,7 +127,7 @@ test("positive control: standard eager router includes MDX bodies in a Worker bu
   const { default: remarkFrontmatter } = await import("remark-frontmatter");
   const { default: remarkMdxFrontmatter } = await import("remark-mdx-frontmatter");
   const { default: worker } = await import("@hono/vite-build/cloudflare-workers");
-  const { docsMetadataPlugin, remarkDocsHeadings } = await import("@honox-docs-poc/docs/build");
+  const { docsMetadataPlugin, remarkDocsHeadings } = await import("honoxpress/build");
   const result = await build({
     configFile: false,
     mode: "eager-control",

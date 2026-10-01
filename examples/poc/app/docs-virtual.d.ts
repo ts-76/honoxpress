@@ -1,3 +1,3 @@
-declare module "virtual:honox-docs/catalog" {
-  export const docsCatalog: import("@honox-docs-poc/docs").DocsCatalog;
+declare module "virtual:honoxpress/catalog" {
+  export const docsCatalog: import("honoxpress").DocsCatalog;
 }

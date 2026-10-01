@@ -1,4 +1,4 @@
-import { resolveClientScript } from "@honox-docs-poc/docs";
+import { resolveClientScript } from "honoxpress";
 import { jsxRenderer } from "hono/jsx-renderer";
 import { docsCatalog } from "../docs-catalog";
 import { DocsNavigation, TableOfContents, LanguageLinks } from "../components/docs-ui";
@@ -12,13 +12,14 @@ const manifest = Object.values(manifests)[0]?.default;
 export default jsxRenderer(({ children, frontmatter }, c) => {
   const ja = c.req.path.startsWith("/ja/");
   const locale = ja ? "ja" : "en";
-  const current = docsCatalog.page(c.req.path);
+  const pathname = new URL(c.req.url).pathname;
+  const current = docsCatalog.page(pathname);
   const docs = Boolean(current);
   const navLabel = ja ? "ドキュメント" : "Documentation";
   const tocLabel = ja ? "このページの内容" : "On this page";
   const pages = docsCatalog.navigation(locale);
   const translations = current
-    ? docsCatalog.translations(c.req.path)
+    ? docsCatalog.translations(pathname)
     : [
         { locale: "en", href: "/docs/getting-started" },
         { locale: "ja", href: "/ja/docs/getting-started" },
@@ -31,7 +32,7 @@ export default jsxRenderer(({ children, frontmatter }, c) => {
     : undefined;
   const footer = (
     <footer class="page-footer">
-      HonoX Docs <span aria-hidden="true"> / </span>{" "}
+      honoxpress <span aria-hidden="true"> / </span>{" "}
       {ja ? "自分で育てるドキュメント" : "Documentation you own"}
       <small>
         {ja ? "UIの参考・謝辞: " : "UI inspiration & thanks: "}
@@ -45,9 +46,7 @@ export default jsxRenderer(({ children, frontmatter }, c) => {
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>
-          {frontmatter?.title ? `${frontmatter.title} · HonoX Docs PoC` : "HonoX Docs PoC"}
-        </title>
+        <title>{frontmatter?.title ? `${frontmatter.title} · honoxpress` : "honoxpress"}</title>
         {frontmatter && <meta name="description" content={frontmatter.description} />}
         <link rel="stylesheet" href="/style.css" />
         {docs && <script type="module" src={clientSrc} />}
@@ -62,7 +61,7 @@ export default jsxRenderer(({ children, frontmatter }, c) => {
               <span class="brand-mark" aria-hidden="true">
                 H
               </span>
-              HonoX Docs
+              honoxpress
             </a>
             <span class="header-label">{navLabel}</span>
             <div class="header-right">
@@ -77,7 +76,11 @@ export default jsxRenderer(({ children, frontmatter }, c) => {
               {docs && (
                 <details class="mobile-nav">
                   <summary>{ja ? "メニュー" : "Menu"}</summary>
-                  <DocsNavigation pages={pages} pathname={c.req.path} label={navLabel} />
+                  <DocsNavigation
+                    pages={pages}
+                    pathname={current?.href ?? pathname}
+                    label={navLabel}
+                  />
                 </details>
               )}
             </div>
@@ -86,7 +89,7 @@ export default jsxRenderer(({ children, frontmatter }, c) => {
         {current ? (
           <div class="docs-layout">
             <aside class="docs-sidebar">
-              <DocsNavigation pages={pages} pathname={c.req.path} label={navLabel} />
+              <DocsNavigation pages={pages} pathname={current?.href ?? pathname} label={navLabel} />
               <p class="sidebar-note">
                 {ja
                   ? "Hono JSXとMDXで書く、軽やかなドキュメント。"
