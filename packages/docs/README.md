@@ -29,8 +29,8 @@ Navigation sorts by optional numeric `order`, then URL. All metadata results
 are immutable. Titles remain plain text and rendering must escape them.
 
 Compatibility currently follows the repository's tested HonoX/Vite Plus setup.
-Build entry, UI examples and packed external consumer verification follow in
-the dependent Issues; this first boundary does not promise an npm release.
+The build entry, copyable UI and packed external consumer are verified together;
+this evaluation does not promise an npm release.
 
 ## Build-only entry
 
@@ -62,3 +62,9 @@ Desktop (1440px) and mobile (390px) UI were observed on 2026-10-01. Nimbus is [M
 From the repository, run `pnpm test:consumer`. It cleans/builds the package, packs it without publishing, checks the files allowlist and exports, and installs it into a fresh directory outside the repo. Consumer type checks use emitted declarations and expected type failures. Runtime imports exclude Node/MDX/React/compiler modules; private source paths are not exported. Templates/CSS are copied from the installed tarball, then standard HonoX builds, 5 build regressions, 6 browser checks and global cf dry-run run independently. Successful temporary directories are removed. Failed directories and `artifacts/*.log` remain for diagnosis.
 
 `pnpm pack:docs` makes the evaluation tarball only. The package remains private, final identity/license are undecided, and no registry auth/token/publish step is run. The tarball includes compiled ESM/declarations, selected editable UI templates and this README; it excludes package source, tests, configs, internal evidence and application docs. Exported CSS is marked as a side effect for bundlers. Packed evidence is recorded in `packages/docs/evidence/consumer.json`; tarballs are local artifacts, not committed releases.
+
+## Compatibility and release gate
+
+Local acceptance uses macOS arm64 / Devbox Node 24.12.0. CI checks exact PR commits on Ubuntu / Node 22.23.3, 24.12.0 and 24.21.0; inspect each run result rather than treating a committed snapshot as CI proof. The newest observed LTS (2026-10-01) is 24.21.0; Node 26 is Current and unverified. Toolchain engines also admit untested combinations. No actual Cloudflare deployment, other browser/OS, arbitrary docs parameter routing, SPA state, exhaustive HMR or accessibility certification is promised.
+
+Before any release, the owner must choose the final name/scope, license/copyright, repo visibility, contribution/version/migration policy and npm maintainer/authentication approach. Add and verify the chosen license/notices in the tarball under that approval, then re-run the complete external consumer and exact-commit CI. Copied template updates require documented manual migration; they must not silently overwrite consumer files. The evaluation scripts intentionally keep the package private and perform no publish/auth/token/deploy. Integration, compatibility, contribution and release-decision guides are in the repository docs.

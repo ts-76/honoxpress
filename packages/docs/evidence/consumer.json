@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-01T07:00:47.134Z",
+  "capturedAt": "2026-10-01T07:08:56.703Z",
   "node": "v24.12.0",
   "package": {
     "name": "@honox-docs-poc/docs",
@@ -20,7 +20,7 @@
   },
   "tarball": {
     "filename": "honox-docs-poc-docs-0.0.0.tgz",
-    "sha256": "35991eab53460476c1588e18cd80de9923a738d2cd5b103e1e9c8a90d5f8f496",
+    "sha256": "d503fdca4282518061fb56a4da043a686581a500d19501cb7fe2b6be5aa7888e",
     "files": [
       "package/README.md",
       "package/dist/build.d.ts",

@@ -1,0 +1,14 @@
+# Integrating the evaluation package
+
+Read the [packed package README](../packages/docs/README.md) for public exports and copyable UI. This walkthrough uses the provisional evaluation name; no registry release is available yet. Consumers own their HonoX app and pipeline.
+
+1. Use `pnpm pack:docs` and install the resulting tarball in a separate app. Keep Hono/HonoX, Vite Plus, MDX and SSG adapters as explicit consumer dependencies. Include normal `.gitignore` entries for dependencies and generated output.
+2. Place trusted MDX under standard `app/routes/docs` and `app/routes/ja/docs`. Export frontmatter `title`, optional `description` and `order`; no id is required. File paths establish URL identity and matching translation slugs. Use static Markdown headings for generated TOC anchors.
+3. Register the build-only metadata plugin and heading transform in Vite config. See [example config](../examples/poc/vite.config.ts) for complete imports/options. `worker` is a required explicit boolean. Dev/SSG metadata imports actual route exports; Worker metadata imports none.
+4. Supply a declaration for `virtual:honox-docs/catalog` and import it from the owned renderer. Use `docsCatalog.page(pathname)`, `.navigation(locale)` and `.translations(pathname)` with owned components. Do not create a second manual catalog beside the route frontmatter.
+5. Copy the four template exports as files into consumer `app/components`, `app/islands` and public CSS. `import.meta.resolve('@honox-docs-poc/docs/templates/docs.css')` resolves the source file for copying. Package-importing an island does not give it a consumer HonoX island route.
+6. Keep client→SSG→Worker builds explicit. Resolve the production client script from the generated manifest using `resolveClientScript`; keep it available through renderer builds and remove metadata from public assets afterward. Clean stale outputs at the start of the complete pipeline, preserving earlier stage output during later stages.
+7. Use the ordinary HonoX eager server for dev/SSG. Use `honox/server/base` with literal globs that include only the owned dynamic routes/layout for Worker. `docsOnlyPlugin` filters pre-request SSG discovery; it does not change Worker imports. Keep a positive-control build proving that the default eager router leaks the sample body.
+8. Verify the actual tarball in an independent consumer and exercise both dev and production local URLs. Changing Worker route coverage requires updating the owned literal globs and tests.
+
+The concrete app files and [consumer fixture](../fixtures/consumer) are the reference implementation. The packed runtime contains `createDocsCatalog`, metadata types and `resolveClientScript`; `./build` contains `docsMetadataPlugin`, `remarkDocsHeadings`, `docsOnlyPlugin` and their build option/report types. There is no mount API, router CLI, runtime compiler or React dependency.

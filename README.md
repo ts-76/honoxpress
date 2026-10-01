@@ -48,7 +48,7 @@ Devbox管理のNode **24.12.0**（`.node-version`）、pnpm **11.22.0**（`packa
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm exec playwright install chromium
+pnpm --filter @honox-docs-poc/example exec playwright install chromium
 pnpm verify
 pnpm evidence
 ```
@@ -84,21 +84,21 @@ cfはbetaで、設定とBuild Output仕様が変わる可能性があります�
 
 最終確認はDevbox Node 24.12.0・pnpm 11.22.0と既存グローバルcfで成功しました。通常の対話ログインシェルとrepo内の双方でNode/pnpmがDevbox profileを解決し、chezmoiのsource/targetは一致しています。shellenvが制限付き実行で止まるとNodebrewの旧Nodeが選ばれるため、確認は通常シェルで行いました。chezmoi管理元・配置先、Devbox package設定の変更は不要でした。
 
-| 検査                                   | 結果                 |
-| -------------------------------------- | -------------------- |
-| 通常シェル / repo内: Devbox Node・pnpm | 成功                 |
-| `pnpm install --frozen-lockfile`       | 成功、ポリシー適合   |
-| `pnpm typecheck`                       | 成功                 |
-| client / SSG / Workerの3段階ビルド     | 成功                 |
-| package API/build/UI unit              | 11 / 11成功          |
-| ビルド自動検査                         | 5 / 5成功            |
-| Playwright: Vite開発                   | 3 / 3成功            |
-| Playwright: cf dev本番ローカル         | 3 / 3成功            |
-| cf workers types                       | 成功                 |
-| cf build / prebuilt dry-run            | 成功、実デプロイなし |
-| Vite Plus format / Oxlint・tsgo / tsc  | 成功                 |
-| GitHub Actions CI                      | 未設置               |
-| Cloudflare実デプロイ                   | 未実行（依頼範囲外） |
+| 検査                                   | 結果                                     |
+| -------------------------------------- | ---------------------------------------- |
+| 通常シェル / repo内: Devbox Node・pnpm | 成功                                     |
+| `pnpm install --frozen-lockfile`       | 成功、ポリシー適合                       |
+| `pnpm typecheck`                       | 成功                                     |
+| client / SSG / Workerの3段階ビルド     | 成功                                     |
+| package API/build/UI unit              | 11 / 11成功                              |
+| ビルド自動検査                         | 5 / 5成功                                |
+| Playwright: Vite開発                   | 3 / 3成功                                |
+| Playwright: cf dev本番ローカル         | 3 / 3成功                                |
+| cf workers types                       | 成功                                     |
+| cf build / prebuilt dry-run            | 成功、実デプロイなし                     |
+| Vite Plus format / Oxlint・tsgo / tsc  | 成功                                     |
+| GitHub Actions CI                      | 3 Node matrixを設置。結果は該当runで確認 |
+| Cloudflare実デプロイ                   | 未実行（依頼範囲外）                     |
 
 ビルド検査では、日英HTML、CounterのIsland識別子、client manifestの実ファイル、iframeパス、Worker/clientの読み込まれたmodule graph、bundle本文を検査しています。旧HTML・旧client JS・旧Worker出力を意図的に作り、後続の全ビルドで削除され、新しい日英HTMLとassetsが残ることも確認しています。
 
@@ -115,7 +115,7 @@ SSGの実行前hookが`/`、`/demo/clock`、`/demo/status`を除外した記録�
 3. **MDXのIsland検出には注意が必要。** HonoX 0.1.61ではこのMDXを`honox-island`へ変換できましたが、raw MDX依存の自動追跡が`__importing_islands`を付けず、`Script/HasIslands`はSSGでscriptを出しませんでした。標準Renderer内でdocsのclient scriptをmanifestから直接出力することで解決しています。未生成manifestではSSGを失敗させます。全ページがCounterを持つ今回の最小構成に適した対応です。
 4. **hydration属性は完了通知ではない。** HonoXは`data-hono-hydrated`を動的import前に設定します。ブラウザー検査は`createClient()`のPromise完了を待ちます。通常のdocument navigationを使い、再遷移時のCounterは0から始まります。SPA遷移・永続stateは実装していません。
 5. **MDXはコードです。** ビルド時に実行する信頼済みローカルファイルのみを対象にします。外部投稿MDXの実行、runtime compile、検索・draft機能は対象外です。動的Workerのrouteを増やす場合は`app/worker.ts`の入力globとテストを更新します。
-6. **現行依存との互換性。** HonoX 0.1.61はclient設定に非推奨`esbuild`オプションを使い、Vite Plus同梱Vite 8.3.1が警告します。今回のビルドとブラウザー操作は成功しました。Cloudflareの実サービス、他ブラウザー、CI、性能負荷試験は検証していません。
+6. **現行依存との互換性。** HonoX 0.1.61はclient設定に非推奨`esbuild`オプションを使い、Vite Plus同梱Vite 8.3.1が警告します。今回のビルドとブラウザー操作は成功しました。Cloudflareの実サービス、他ブラウザー、性能負荷試験、実Cloudflareサービスは検証していません。CIの実行結果は各runのSHA/conclusionで確認します。
 
 ## 確認した公式資料
 
@@ -154,7 +154,7 @@ Macのghq checkoutは`~/ghq/github.com/ts-76/honox-docs-poc`です。ChatGPT Pro
 
 ## Workspace境界
 
-再利用packageは`packages/docs`、標準HonoXアプリは`examples/poc`です。cf beta6はworkspace rootでアプリ検出を拒否するため、rootのdev/build/preview/test/evidence scriptsはexampleへ委譲します。app/routesと_rendererの構造はexample内で保持し、URLは変えません。上のapp/build/dist相対パスはexampleのcwdを基準にしています。core APIの6件のunit検査はrootで別途実行します。
+再利用packageは`packages/docs`、標準HonoXアプリは`examples/poc`です。cf beta6はworkspace rootでアプリ検出を拒否するため、rootのdev/build/preview/test/evidence scriptsはexampleへ委譲します。app/routesと_rendererの構造はexample内で保持し、URLは変えません。上のapp/build/dist相対パスはexampleのcwdを基準にしています。runtime/build/UIの11件のunit検査はrootで別途実行します。
 
 Issue #2 adds a separate build-only package entry. MDX frontmatter and generated TOC come from the actual route files in dev/SSG, eliminating the temporary duplicate catalog. Worker mode provides an empty metadata catalog and never discovers MDX. The explicit renderer uses the package's manifest resolver; the consumer still owns client→SSG→Worker ordering, cleaning and literal Worker route selection. Core/build helper unit coverage is 10 cases in addition to the 5 application build regressions.
 
@@ -171,3 +171,9 @@ Issue #2 adds a separate build-only package entry. MDX frontmatter and generated
 `pnpm pack:docs`はprivate評価packageのtarballを`artifacts`へ作るだけで、公開しません。`pnpm test:consumer`はpackageの古い出力削除→pack files/exports/types検査→repo外の一時consumerへtarball install→凍結install→runtime/型/配布asset検査→standard HonoXの全受入を実行します。アプリ部分は既存exampleのコピーですが、package source/workspaceリンクやrepoのnode_modulesに依存しません。UI/CSSは実際にインストールしたpackageからコピーして上書きします。
 
 検証スクリプトは[scripts/verify-consumer.mjs](scripts/verify-consumer.mjs)、型とruntime fixtureは[fixtures/consumer](fixtures/consumer)。成功時は一時consumerを削除し、失敗時は診断用に残します。ログとtarballはGit対象外の`artifacts`、確認結果は[consumer evidence](packages/docs/evidence/consumer.json)です。全`pnpm verify`にも外部consumer受入を含めています。npm publish/auth/tokenやhono-decks実ページへの導入は行いません。
+
+## CIとOSS公開判断
+
+[Verify workflow](.github/workflows/verify.yml)はPRのhead commitを明示checkoutし、UbuntuのNode 22.23.3 / 24.12.0 / 24.21.0で凍結install、format・typed lint・tsc、package unit11件、3段build、build検査5件、browser検査6件、tarball外部consumerの同じ受入を実行します。cfはjob内だけglobalに用意し、実deploy・npm auth/publishはありません。公式Actionsはcommit SHA固定、repo権限はread-onlyです。各Nodeの証拠・tarball・診断は7日保持します。ローカル保存のsnapshotとCI run結果は別で、exact SHAとconclusionを確認して成功判定します。
+
+[API導入ガイド](docs/api.md)、[互換性と未検証範囲](docs/compatibility.md)、[貢献手順](CONTRIBUTING.md)、[公開判断・release gate](docs/release-decisions.md)を用意しました。Node24.21.0が確認時の最新LTS、Macは既存Devboxの24.12.0を保持し両方をCI対象にしています。26系はCurrentかつ未検証です。最終名・license・repo公開化・npm公開権限・version/release方針の判断は[#6](https://github.com/ts-76/honox-docs-poc/issues/6)で行い、その後にhono-decksの実ページpilotへ進めます。現時点でpackageはprivateのままです。

@@ -41,6 +41,13 @@ if (!versions.cf) throw new Error("Unable to read global cf version");
 const unit = await json("dist/evidence/unit-tests.json");
 if (unit.numPassedTests !== 5 || unit.numFailedTests !== 0 || !unit.success)
   throw new Error("Unit verification is incomplete");
+const packageTests = await json("../../artifacts/package-tests.json");
+if (
+  packageTests.numPassedTests !== 11 ||
+  packageTests.numFailedTests !== 0 ||
+  !packageTests.success
+)
+  throw new Error("Package verification is incomplete");
 const cfBuild = await json("dist/evidence/cf-build.json");
 if (!cfBuild.passed) throw new Error("cf verification is incomplete");
 const browser = await json("dist/evidence/browser-tests.json");
@@ -108,6 +115,7 @@ await writeFile(
       graphs,
       browserTests: tests,
       typecheck: "passed",
+      packageTests: { passed: packageTests.numPassedTests, failed: packageTests.numFailedTests },
       buildTests: { passed: unit.numPassedTests, failed: unit.numFailedTests },
       cfBuild,
       cfDryRun: "passed; prebuilt; no upload or deployment",
@@ -119,7 +127,7 @@ await writeFile(
         tsc: "passed",
       },
       packageManager: "pnpm@11.22.0",
-      ci: "not configured",
+      ci: "configured: exact-commit 22.23.3 / 24.12.0 / 24.21.0 matrix; inspect run conclusion separately",
       cloudflareDeployment: "not executed (out of scope)",
     },
     null,
