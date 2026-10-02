@@ -27,7 +27,7 @@ jobs:
       - name: Retrieve the accepted tarball without rebuilding
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          name: acceptance-node-24.12.0-${{ github.sha }}
+          name: acceptance-node-24.12.0-${{ github.sha }}-attempt-${{ github.run_attempt }}
           path: accepted
       - name: Verify candidate and report pending decisions
         id: plan
@@ -35,7 +35,7 @@ jobs:
           node --input-type=module -e 'import { createPlan } from "./scripts/release/release-gate.mjs"; import { writeFileSync, appendFileSync } from "node:fs"; const p = await createPlan({commit:process.env.GITHUB_SHA,ref:process.env.GITHUB_REF,artifactRoot:"accepted"}); writeFileSync("release-plan.json",JSON.stringify(p,null,2)); appendFileSync(process.env.GITHUB_OUTPUT,`ready=${p.status === "ready"}\n`); console.log(JSON.stringify(p,null,2));'
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: npm-release-plan-${{ github.sha }}
+          name: npm-release-plan-${{ github.sha }}-attempt-${{ github.run_attempt }}
           path: release-plan.json
           retention-days: 7
   stage:
@@ -60,7 +60,7 @@ jobs:
           package-manager-cache: false
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          name: acceptance-node-24.12.0-${{ github.sha }}
+          name: acceptance-node-24.12.0-${{ github.sha }}-attempt-${{ github.run_attempt }}
           path: accepted
       - name: Isolated pinned npm CLI only
         run: npm install --prefix "$RUNNER_TEMP/release-cli" --ignore-scripts --no-audit --no-fund npm@11.21.0 --registry=https://registry.npmjs.org/
@@ -75,7 +75,7 @@ jobs:
       - name: Retain stage receipt for manual npm review and 2FA
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: npm-stage-receipt-${{ github.sha }}
+          name: npm-stage-receipt-${{ github.sha }}-attempt-${{ github.run_attempt }}
           path: stage-receipt.json
           retention-days: 7
           if-no-files-found: error
