@@ -9,6 +9,7 @@ import {
   createPlan,
   inspectArtifact,
   metadataBlockers,
+  approvedMetadataBlockers,
   registryPreflight,
   requireEnvironmentReview,
   stageArguments,
@@ -131,6 +132,10 @@ await test("only matching release tag and byte-identical consumer artifact becom
 await test("modified bytes, stale commit and unsuccessful quality evidence fail closed", async (t) => {
   const input = await fixture(t);
   await assert.rejects(inspectArtifact({ ...input, commit: "other-commit" }), /different commit/);
+  await writeFile(path.join(input.root, "packages/docs/LICENSE"), "changed license");
+  await assert.rejects(inspectArtifact(input), /Packed license differs/);
+  await writeFile(path.join(input.root, "packages/docs/LICENSE"), texts.licenseText);
+
   await writeFile(
     path.join(input.root, "artifacts/package-tests.json"),
     JSON.stringify({ success: false }),
@@ -216,5 +221,33 @@ await test("stage receipt must identify the approved package and exact verified 
       JSON.stringify({ unrelated: { integrity: "sha512-test", stageId: "test-stage-id" } }),
       plan,
     ),
+  );
+});
+
+await test("approved MIT 0.1.0 candidate remains private and staging-disabled", async () => {
+  const approvedPackage = JSON.parse(await readFile("packages/docs/package.json", "utf8"));
+  const approvedPolicy = JSON.parse(await readFile("release-policy.json", "utf8"));
+  const licenseText = await readFile("packages/docs/LICENSE", "utf8");
+  const changelog = await readFile("CHANGELOG.md", "utf8");
+  assert.equal(approvedPackage.name, "honoxpress");
+  assert.equal(approvedPackage.version, "0.1.0");
+  assert.equal(approvedPackage.license, "MIT");
+  assert.equal(approvedPolicy.npmOwner, "ts-76");
+  assert.equal(approvedPackage.private, true);
+  assert.equal(approvedPolicy.stageEnabled, false);
+  assert.equal(approvedPolicy.provenance, null);
+  assert.equal(licenseText, await readFile("LICENSE", "utf8"));
+  assert.deepEqual(
+    approvedMetadataBlockers(approvedPackage, approvedPolicy, { licenseText, changelog }),
+    [],
+  );
+  const blockers = metadataBlockers(approvedPackage, approvedPolicy, { licenseText, changelog });
+  assert.deepEqual(
+    blockers.sort(),
+    ["staging-disabled", "package-private", "provenance-decision"].sort(),
+  );
+  assert.throws(
+    () => stageArguments({ status: "blocked", blockers }, "honoxpress-0.1.0.tgz"),
+    /Release blocked/,
   );
 });

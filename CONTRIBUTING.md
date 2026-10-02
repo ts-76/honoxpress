@@ -1,6 +1,6 @@
 # Contributing to the evaluation
 
-The repository is currently private and the package is an unpublished evaluation. The package name is honoxpress. The license, public repository and contribution/release policy require the owner's decision; no license grant is implied. Please resolve [Issue #6](https://github.com/ts-76/honox-docs-poc/issues/6) before soliciting public contributions or adopting this in hono-decks.
+The repository is currently private and the package is an unpublished evaluation. The package name is honoxpress. The owner approved MIT, honoxpress@0.1.0 and npm owner ts-76 on 2026-10-02; see [LICENSE](LICENSE). Repository visibility, contribution/support policy and actual stage/publish still require authorization. Please resolve [Issue #6](https://github.com/ts-76/honox-docs-poc/issues/6) before soliciting public contributions or adopting this in hono-decks.
 
 Use the existing Node environment manager. This Mac uses Devbox global Node 24.12.0/pnpm 11.22.0 and global cf 1.0.0-beta.6; do not add another manager or modify shell PATH to work around activation. Other machines can use their established manager to select a documented CI version. See [compatibility](docs/compatibility.md).
 

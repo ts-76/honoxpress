@@ -12,7 +12,7 @@ import {
   access,
 } from "node:fs/promises";
 import { spawn, execFileSync } from "node:child_process";
-import { metadataBlockers } from "./release/release-gate.mjs";
+import { metadataBlockers, approvedMetadataBlockers } from "./release/release-gate.mjs";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -85,19 +85,36 @@ const pkg = await json(path.join(packageRoot, "package.json"));
 assert.equal(pkg.name, "honoxpress", "The chosen package name must reach the tarball");
 assert.equal(packed[0], `honoxpress-${pkg.version}.tgz`);
 const policy = await json(path.join(root, "release-policy.json"));
+const texts = {
+  licenseText: await readFile(path.join(packageRoot, "LICENSE"), "utf8"),
+  changelog: await readFile(path.join(root, "CHANGELOG.md"), "utf8"),
+};
+assert.deepEqual(
+  approvedMetadataBlockers(pkg, policy, texts),
+  [],
+  "Approved candidate metadata is incomplete",
+);
+assert.ok(files.includes("package/LICENSE"), "Approved MIT license must be packed");
+assert.equal(
+  texts.licenseText,
+  await readFile(path.join(root, "LICENSE"), "utf8"),
+  "Root and package license differ",
+);
+assert.equal(
+  await run("tar", ["-xOzf", tarball, "package/LICENSE"]),
+  texts.licenseText,
+  "Packed license differs from approved source",
+);
+const packedMetadata = JSON.parse(await run("tar", ["-xOzf", tarball, "package/package.json"]));
+assert.deepEqual(packedMetadata, pkg, "Packed metadata differs from approved source");
 if (policy.stageEnabled === true) {
   assert.deepEqual(
-    metadataBlockers(pkg, policy, {
-      licenseText: await readFile(path.join(packageRoot, "LICENSE"), "utf8"),
-      changelog: await readFile(path.join(root, "CHANGELOG.md"), "utf8"),
-    }),
+    metadataBlockers(pkg, policy, texts),
     [],
-    "Approved release metadata is incomplete",
+    "Release staging metadata is incomplete",
   );
-  assert.ok(files.includes("package/LICENSE"), "Approved license must be packed");
 } else {
-  assert.equal(pkg.private, true, "Publication decisions are pending");
-  assert.equal(pkg.license, undefined, "Do not choose the user's license");
+  assert.equal(pkg.private, true, "Preparation does not authorize staging");
 }
 const consumer = await mkdtemp(path.join(tmpdir(), "honoxpress-consumer-"));
 assert.ok(!(await realpath(consumer)).startsWith(await realpath(root)));

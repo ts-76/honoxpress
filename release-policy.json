@@ -1,8 +1,8 @@
 {
   "stageEnabled": false,
-  "npmOwner": null,
-  "version": null,
-  "license": null,
-  "distTag": null,
+  "npmOwner": "ts-76",
+  "version": "0.1.0",
+  "license": "MIT",
+  "distTag": "latest",
   "provenance": null
 }

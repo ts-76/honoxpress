@@ -12,11 +12,9 @@ const semver =
 export const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 export const json = async (file) => JSON.parse(await readFile(file, "utf8"));
 
-export function metadataBlockers(pkg, policy, { licenseText = "", changelog = "" } = {}) {
+export function approvedMetadataBlockers(pkg, policy, { licenseText = "", changelog = "" } = {}) {
   const blockers = [];
-  if (policy.stageEnabled !== true) blockers.push("staging-disabled");
   if (pkg.name !== "honoxpress") blockers.push("package-name");
-  if (pkg.private !== false) blockers.push("package-private");
   if (!semver.test(pkg.version) || pkg.version === "0.0.0" || pkg.version !== policy.version)
     blockers.push("owner-version");
   if (
@@ -32,11 +30,18 @@ export function metadataBlockers(pkg, policy, { licenseText = "", changelog = ""
     blockers.push("dist-tag");
   if (semver.test(pkg.version) && pkg.version.includes("-") && policy.distTag === "latest")
     blockers.push("prerelease-latest");
-  if (typeof policy.provenance !== "boolean") blockers.push("provenance-decision");
   if (pkg.repository?.url !== repository) blockers.push("repository-url");
   if (pkg.publishConfig && Object.keys(pkg.publishConfig).length)
     blockers.push("publish-config-override");
   if (!changelog.split("\n").includes(`## ${pkg.version}`)) blockers.push("release-notes");
+  return blockers;
+}
+
+export function metadataBlockers(pkg, policy, texts = {}) {
+  const blockers = approvedMetadataBlockers(pkg, policy, texts);
+  if (policy.stageEnabled !== true) blockers.push("staging-disabled");
+  if (pkg.private !== false) blockers.push("package-private");
+  if (typeof policy.provenance !== "boolean") blockers.push("provenance-decision");
   return blockers;
 }
 
