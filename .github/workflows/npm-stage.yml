@@ -1,0 +1,81 @@
+name: Prepare and stage npm release
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: npm-stage-${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  quality:
+    uses: ./.github/workflows/verify.yml
+  prepare:
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ready: ${{ steps.plan.outputs.ready }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.12.0"
+          package-manager-cache: false
+      - name: Retrieve the accepted tarball without rebuilding
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: acceptance-node-24.12.0-${{ github.sha }}
+          path: accepted
+      - name: Verify candidate and report pending decisions
+        id: plan
+        run: |
+          node --input-type=module -e 'import { createPlan } from "./scripts/release/release-gate.mjs"; import { writeFileSync, appendFileSync } from "node:fs"; const p = await createPlan({commit:process.env.GITHUB_SHA,ref:process.env.GITHUB_REF,artifactRoot:"accepted"}); writeFileSync("release-plan.json",JSON.stringify(p,null,2)); appendFileSync(process.env.GITHUB_OUTPUT,`ready=${p.status === "ready"}\n`); console.log(JSON.stringify(p,null,2));'
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: npm-release-plan-${{ github.sha }}
+          path: release-plan.json
+          retention-days: 7
+  stage:
+    needs: [quality, prepare]
+    if: needs.prepare.outputs.ready == 'true' && github.ref_type == 'tag' && vars.NPM_STAGING_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: npm-stage
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.12.0"
+          package-manager-cache: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: acceptance-node-24.12.0-${{ github.sha }}
+          path: accepted
+      - name: Isolated pinned npm CLI only
+        run: npm install --prefix "$RUNNER_TEMP/release-cli" --ignore-scripts --no-audit --no-fund npm@11.21.0 --registry=https://registry.npmjs.org/
+      - name: Submit exact verified bytes; never approve or directly publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NPM_STAGE_AUTHORIZATION: protected-environment
+        run: |
+          export NPM_RELEASE_CLI="$RUNNER_TEMP/release-cli/node_modules/npm/bin/npm-cli.js"
+          export RELEASE_ARTIFACT_ROOT="$GITHUB_WORKSPACE/accepted"
+          node scripts/release/stage-release.mjs
+      - name: Retain stage receipt for manual npm review and 2FA
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: npm-stage-receipt-${{ github.sha }}
+          path: stage-receipt.json
+          retention-days: 7
+          if-no-files-found: error

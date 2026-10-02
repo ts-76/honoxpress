@@ -10,7 +10,7 @@
     "typecheck": "pnpm build:package && tsc --noEmit && pnpm --filter honoxpress-example typecheck",
     "test:unit": "vp test run tests/core.test.ts tests/build-api.test.ts tests/ui.test.ts --reporter=default --reporter=json --outputFile=artifacts/package-tests.json",
     "test": "vp test run",
-    "verify": "pnpm build:package && pnpm check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm --filter honoxpress-example verify && pnpm test:consumer",
+    "verify": "pnpm build:package && pnpm check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm --filter honoxpress-example verify && pnpm test:consumer && pnpm test:release && pnpm release:plan && pnpm release:dry-run",
     "dev": "pnpm --filter honoxpress-example dev",
     "build": "pnpm --filter honoxpress-example build",
     "build:client": "pnpm --filter honoxpress-example build:client",
@@ -24,7 +24,10 @@
     "test:browser": "pnpm --filter honoxpress-example test:browser",
     "evidence": "pnpm --filter honoxpress-example evidence",
     "test:consumer": "node scripts/verify-consumer.mjs",
-    "pack:docs": "pnpm build:package && pnpm --dir packages/docs pack --pack-destination ../../artifacts/package"
+    "pack:docs": "pnpm build:package && pnpm --dir packages/docs pack --pack-destination ../../artifacts/package",
+    "test:release": "node --test scripts/release/release.test.mjs",
+    "release:plan": "node scripts/release/release-plan.mjs",
+    "release:dry-run": "node scripts/release/release-dry-run.mjs"
   },
   "dependencies": {
     "honoxpress": "workspace:*"
@@ -32,6 +35,7 @@
   "devDependencies": {
     "@types/node": "22.20.4",
     "hono": "4.13.12",
+    "npm": "11.21.0",
     "typescript": "^5.9.3",
     "vite-plus": "catalog:"
   },

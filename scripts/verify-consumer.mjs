@@ -11,7 +11,8 @@ import {
   writeFile,
   access,
 } from "node:fs/promises";
-import { spawn } from "node:child_process";
+import { spawn, execFileSync } from "node:child_process";
+import { metadataBlockers } from "./release/release-gate.mjs";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -68,7 +69,7 @@ const files = (await run("tar", ["-tzf", tarball])).trim().split("\n").sort();
 for (const file of files)
   assert.match(
     file,
-    /^package\/(?:package\.json|README\.md|dist\/[a-z-]+\.(?:js|d\.ts)|templates\/(?:docs-ui\.tsx|copy-code\.tsx|demo-frame\.tsx|docs\.css))$/,
+    /^package\/(?:package\.json|README\.md|LICENSE|dist\/[a-z-]+\.(?:js|d\.ts)|templates\/(?:docs-ui\.tsx|copy-code\.tsx|demo-frame\.tsx|docs\.css))$/,
   );
 for (const file of [
   "dist/index.js",
@@ -83,8 +84,21 @@ for (const file of [
 const pkg = await json(path.join(packageRoot, "package.json"));
 assert.equal(pkg.name, "honoxpress", "The chosen package name must reach the tarball");
 assert.equal(packed[0], `honoxpress-${pkg.version}.tgz`);
-assert.equal(pkg.private, true, "Publication decisions are pending");
-assert.equal(pkg.license, undefined, "Do not choose the user's license");
+const policy = await json(path.join(root, "release-policy.json"));
+if (policy.stageEnabled === true) {
+  assert.deepEqual(
+    metadataBlockers(pkg, policy, {
+      licenseText: await readFile(path.join(packageRoot, "LICENSE"), "utf8"),
+      changelog: await readFile(path.join(root, "CHANGELOG.md"), "utf8"),
+    }),
+    [],
+    "Approved release metadata is incomplete",
+  );
+  assert.ok(files.includes("package/LICENSE"), "Approved license must be packed");
+} else {
+  assert.equal(pkg.private, true, "Publication decisions are pending");
+  assert.equal(pkg.license, undefined, "Do not choose the user's license");
+}
 const consumer = await mkdtemp(path.join(tmpdir(), "honoxpress-consumer-"));
 assert.ok(!(await realpath(consumer)).startsWith(await realpath(root)));
 console.log(`External consumer: ${consumer}`);
@@ -174,12 +188,13 @@ await rm(consumer, { recursive: true, force: true });
 await assert.rejects(access(consumer));
 const evidence = {
   capturedAt: new Date().toISOString(),
+  commit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
   node: process.version,
   package: {
     name: pkg.name,
     version: pkg.version,
     private: pkg.private,
-    license: "undecided",
+    license: pkg.license ?? "undecided",
     exports: pkg.exports,
   },
   tarball: {

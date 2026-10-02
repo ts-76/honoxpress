@@ -178,6 +178,8 @@ Issue #2 adds a separate build-only package entry. MDX frontmatter and generated
 
 [API導入ガイド](docs/api.md)、[互換性と未検証範囲](docs/compatibility.md)、[貢献手順](CONTRIBUTING.md)、[公開判断・release gate](docs/release-decisions.md)を用意しました。Node24.21.0が確認時の最新LTS、Macは既存Devboxの24.12.0を保持し両方をCI対象にしています。26系はCurrentかつ未検証です。名前`honoxpress`は反映済みです。license・repo公開化・npm公開権限・version/release方針の判断は[#6](https://github.com/ts-76/honox-docs-poc/issues/6)で行い、その後にhono-decksの実ページpilotへ進めます。現時点でpackageはprivateのままです。
 
+[stage型release CIの準備](docs/npm-release.md)を追加しました。品質検証済みtarballとcommit・版/tag・SHA256を照合し、npm 11.21.0のstage dry-runを認証なしのloopback registryで検証します。公開gateはdisabledで、license・version・npm ownerなどが未決定ならblockedとして報告します。初回stageは公開placeholderを作り、既存packageが必要なTrusted Publishingのbootstrapとは別の承認対象です。実stage・publish・OIDC登録・main統合は行っていません。
+
 ## honoxpress命名と累積レビュー
 
 ユーザー決定の候補名`honoxpress`をpackage/import/build virtual ID・UI・README・sample・配布tarballへ反映しました。npm registryのread-only確認は2026-10-01に404でしたが、名前の予約や公開はしていません。GitHub repoのURLとghqパスは`honox-docs-poc`のままです。privateとlicense未選択guardを保持しています。
