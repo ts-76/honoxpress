@@ -29,11 +29,13 @@
         },
         {
           "type": "docs",
-          "section": "Documentation"
+          "section": "Documentation",
+          "hidden": true
         },
         {
           "type": "chore",
-          "section": "Maintenance"
+          "section": "Maintenance",
+          "hidden": true
         }
       ]
     }
