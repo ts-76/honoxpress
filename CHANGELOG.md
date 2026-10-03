@@ -6,7 +6,6 @@
 ### Bug Fixes
 
 * **ci:** generate release PRs from main and verify bot branches ([347f1f8](https://github.com/ts-76/honoxpress/commit/347f1f8b95650149be52b0330a26be42ef959aaa))
-* **ci:** generate release PRs from main and verify bot branches ([a54e27d](https://github.com/ts-76/honoxpress/commit/a54e27d8125255d7e02fa7e269bc5c517fbe1a00))
 * **ci:** preserve generated release changelog formatting ([530f34d](https://github.com/ts-76/honoxpress/commit/530f34dd76c3eb17af9037b8a332f26c449b0417))
 
 
