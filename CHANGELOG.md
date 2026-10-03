@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/ts-76/honoxpress/compare/v0.1.1...v0.1.2) (2026-10-03)
+
+
+### Bug Fixes
+
+* **ci:** enable owner-approved npm staging with provenance ([095b758](https://github.com/ts-76/honoxpress/commit/095b75806f14104e24f1e8cec8ad0716070f2d72))
+
 ## [0.1.1](https://github.com/ts-76/honoxpress/compare/v0.1.0...v0.1.1) (2026-10-03)
 
 
