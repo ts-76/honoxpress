@@ -63,6 +63,8 @@ Open the displayed npm authentication URL in your own browser and complete 2FA; 
 
 pnpm verify runs unchanged full acceptance plus isolated npm dry-run. Dry-run uses temporary HOME/config/cache, no inherited credentials/OIDC, and a loopback tripwire accepting GET only. It does not contact the official registry or submit a stage. Current plan stays blocked by disabled staging/unset provenance and, outside a matching tag, version-tag.
 
+The disabled workflow was actually dispatched on v0.1.0 in [run 37100696508](https://github.com/ts-76/honoxpress/actions/runs/37100696508): all three quality jobs and prepare passed; the exact same-run artifact was retrieved, its plan was blocked by staging-disabled/provenance-decision, and stage was skipped with zero steps. Environments and activation variables remained absent. This proves orchestration while disabled, not live OIDC or stage permission.
+
 CI concurrency serializes attempts per tag without cancelling an in-flight stage. Artifact/receipt names contain run attempt and preserve evidence. Retry the whole quality flow; downstream-only rerun cannot silently use an earlier artifact. Other maintainers' local actions are outside that concurrency.
 
 An earlier f09963d CI run timed out at external-consumer Vitest startup on Node 24.21.0 without an assertion failure. Cause was not established; diagnostics were retained and later accepted CI passed. Dependencies, timeout and protections were not relaxed.
