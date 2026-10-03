@@ -65,6 +65,8 @@ export default defineConfig(({ mode }) => {
     };
   const ssgReport = { accepted: [] as string[], skipped: [] as string[] };
   return {
+    // HonoX adds ./app/**; preserve glob interpretation during initial watching.
+    server: { watch: { disableGlobbing: false } },
     fmt: {
       ignorePatterns: [
         "app/generated/**",

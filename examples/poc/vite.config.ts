@@ -62,6 +62,9 @@ export default defineConfig(({ mode }) => {
     };
   const ssgReport = { accepted: [] as string[], skipped: [] as string[] };
   return {
+    // HonoX registers ./app/**. Vite's default disableGlobbing treats it as a
+    // missing literal path, which can omit app descendants during initial scan.
+    server: { watch: { disableGlobbing: false } },
     fmt: {
       ignorePatterns: [
         "dist/**",
