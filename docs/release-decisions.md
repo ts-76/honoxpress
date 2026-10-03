@@ -1,26 +1,24 @@
-# Decisions before an OSS release
+# Release state and remaining decisions
 
-The owner approved MIT, honoxpress@0.1.0 and npm owner ts-76 on 2026-10-02. On 2026-10-03 the owner approved public GitHub visibility; the canonical repository is [ts-76/honoxpress](https://github.com/ts-76/honoxpress), already renamed on GitHub when checked. Its public visibility was confirmed. The existing local ghq path remains honox-docs-poc.
+MIT, honoxpress@0.1.0 and owner ts-76 were approved on 2026-10-02. Public GitHub visibility, main integration/tag and the exact initial local stage were approved on 2026-10-03. The owner completed final npm approval with 2FA. [npm latest](https://www.npmjs.com/package/honoxpress) is 0.1.0; published bytes/metadata/LICENSE match the accepted CI and stage.
 
-Read-only npm checks after owner login confirmed exactly ts-76 and active auth-and-writes 2FA. The agent did not create/change credentials. Registry GET for honoxpress returned 404 on 2026-10-03; this does not reserve the name or prove future publishing access.
+The accepted source is a3ddd9e070274d9fbc2e3ea5611799fdbc0ec646 at [v0.1.0](https://github.com/ts-76/honoxpress/tree/v0.1.0). [Three-Node CI](https://github.com/ts-76/honoxpress/actions/runs/37095700185), Mac full acceptance and public registry consumer smoke passed. The initial PR stack is integrated. GitHub uses ts-76/honoxpress; local ghq path remains honox-docs-poc. Root workspace remains private, package metadata private:false.
 
-| Decision                | Current state                                                                                                                                         |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Package/version/channel | Approved honoxpress@0.1.0; stable channel latest. No registry dist-tag changed.                                                                       |
-| License                 | MIT, Copyright (c) 2026 ts-76; root/package/packed LICENSE must match.                                                                                |
-| GitHub visibility       | Public by explicit owner approval; canonical URLs and release checks use ts-76/honoxpress.                                                            |
-| npm identity and 2FA    | Existing owner session verified as ts-76, auth-and-writes.                                                                                            |
-| Candidate               | private:false source metadata; requires new exact-commit acceptance, not the earlier private tarball. Root workspace remains private.                 |
-| Provenance              | Unset. A local first stage cannot generate provenance. Future CI provenance is supported by the public repository but still requires explicit policy. |
-| Publishing controls     | stageEnabled:false, no activation, main merge, tag, stage/publish or trust/environment registration. Self-review prevention retained.                 |
-| Support/pilot           | Contribution/support/template migration policy and hono-decks real-page pilot remain pending.                                                         |
+| Decision                     | Current state                                                                                                                                          |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Initial name/version/channel | honoxpress@0.1.0 published; latest=0.1.0. Do not reuse its immutable version.                                                                          |
+| License/ownership            | MIT, copyright 2026 ts-76; authenticated maintainer ts-76 with auth-and-writes 2FA.                                                                    |
+| Initial provenance           | Explicitly false for owner-approved local bootstrap; CI provenance needs a cloud runner.                                                               |
+| Next version/trigger         | Pending. PR merge alone currently does not start a release; manual tag/workflow dispatch remains configured.                                           |
+| Future CI provenance         | Pending explicit choice; public repository supports true.                                                                                              |
+| Protected environment        | Not created. Need a named independent reviewer; only ts-76 currently has repository access. prevent_self_review:true remains required.                 |
+| Stage-only trust/activation  | Settings lookup requires owner 2FA; registration unverified/unperformed. stageEnabled:false and absent repository activation variable keep CI stopped. |
+| Support/pilot                | Contribution/support/template migration and a selected hono-decks real-page pilot remain pending.                                                      |
 
-The candidate consumer checks approved metadata, actual tarball bytes, exports/types/templates/LICENSE and full application acceptance while requiring the disabled staging gate. private:false enables evaluation of a publishable-format tarball; it is not permission to submit it. The actual publication gate still checks explicit stage activation, provenance and matching release tag.
+Concrete setup, review, retry and terminal-attached 2FA commands are in [npm release guide](npm-release.md). [Issue #6](https://github.com/ts-76/honoxpress/issues/6) tracks remaining pilot/support decisions. Do not weaken self-review protection to activate a solo CI stage; retain manual local stage while no independent reviewer exists.
 
-Review the final exact-commit CI and tarball before authorizing main integration and the initial authenticated stage. Initial staging creates a public 0.0.0-stage placeholder; final npm approval with 2FA remains manual. See [release preparation](npm-release.md) for concrete setup and [Issue #6](https://github.com/ts-76/honoxpress/issues/6) for remaining decisions.
+Retain exact [Cloudflare Nimbus](https://nimbus-docs.com/philosophy/) and [Fumapress](https://press.fumadocs.dev/docs) acknowledgements/license sources. UI is independently written; later copied upstream assets/code require exact notices.
 
-Retain the exact [Cloudflare Nimbus](https://nimbus-docs.com/philosophy/) and [Fumapress](https://press.fumadocs.dev/docs) acknowledgements and source/license links in the root and packed README. UI is independently written; later copied upstream code/assets require their exact notices.
-
-For later releases preserve consumer-owned customization and document template migration. Breaking API, routes/anchors or build behavior require a version decision. Re-check cf beta compatibility and the HonoX positive eager-router control on upgrades. Keep docs/compiler out of Worker/client and prove stale output removal.
+Later changes must preserve consumer-owned customization and document template migration. Breaking API, route/anchor or build behavior requires a version decision. Re-check cf beta and the positive HonoX eager-import control on upgrades; keep docs/compiler out of Worker/client and prove stale output removal.
 
 Pilot acceptance remains English/Japanese routes/links/404, language availability, islands after navigation, copy success/failure, demo/iframe/no-store, no demo execution during SSG, manifest/assets and graph isolation. Real deployment, production load and exhaustive HMR remain unverified.

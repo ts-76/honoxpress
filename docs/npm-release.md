@@ -1,61 +1,74 @@
-# npm release preparation and approval boundaries
+# npm releases after 0.1.0
 
-MIT, honoxpress@0.1.0 and npm owner ts-76 were approved on 2026-10-02. GitHub public visibility was explicitly approved on 2026-10-03 and confirmed at [ts-76/honoxpress](https://github.com/ts-76/honoxpress). The repository had already been renamed when checked; local ghq checkout remains honox-docs-poc. Canonical package URLs and CI repository checks now use honoxpress.
+## Published release
 
-The owner logged in. Read-only whoami and selected profile checks confirmed exactly ts-76 with active auth-and-writes 2FA on 2026-10-03; no credentials were printed/created/changed by the agent. Registry GET returned 404 for honoxpress. These observations do not authorize an actual registry write.
+[honoxpress@0.1.0](https://www.npmjs.com/package/honoxpress) was published on 2026-10-03. latest resolves to 0.1.0, the license is MIT and the maintainer is ts-76. main and v0.1.0 resolved to accepted commit a3ddd9e070274d9fbc2e3ea5611799fdbc0ec646 at publication. The local ghq path remains honox-docs-poc; GitHub and origin use ts-76/honoxpress.
 
-## Public candidate and current checks
+The owner approved public GitHub visibility, main integration/tag and the exact initial local stage. The owner completed final npm approval through terminal/browser 2FA. The agent did not approve the stage. Initial provenance was explicitly false; Mac cannot generate cloud CI provenance.
 
-packages/docs/package.json now has private:false for the unpublished distribution candidate; root workspace remains private. The earlier private tarball is not reused or edited. release-policy.json retains stageEnabled:false and provenance:null. main, release tags, repository variables, environment and Trusted Publisher settings are untouched.
+The public registry tarball, downloaded stage and accepted CI artifact have identical bytes:
+
+- SHA256: 53dbf0b92d6a60857370e1b9b58b967c0fde91bff9ffcb7b2e986f37c4d3a2e4.
+- SHA512: sha512-3Ygcwwy6nRIg1tEdTUKxaR/thIqifY5n94yv/q/DpC4Mpk+7fvkU+V4xaTH1xk1BV1ZD7DwL0M2y27ceYzijPA==.
+- CI: [run 37095700185](https://github.com/ts-76/honoxpress/actions/runs/37095700185), Node 22.23.3 / 24.12.0 / 24.21.0 all passed. Mac full acceptance also passed.
+- Accepted checks: 15 package tests, 5 build tests, 6 development/production browser tests, packed external consumer and 10 release regressions. Public-registry install/frozen install and runtime/build exports, type files, private exports, copied templates and Worker-empty metadata smoke also passed.
+
+Mac and Linux gzip bytes differ, while decompressed tar bytes and all 17 files/modes match. Stage only the original downloaded CI tgz; never repack it on Mac. Root/package/packed LICENSE and metadata were checked. An optional offline install probe lacked cached hono policy metadata; normal online frozen install passed with standard policy checks intact. Failed diagnostics are retained locally.
+
+The initial public 0.0.0-stage placeholder remains in registry history; latest is the approved 0.1.0. Do not remove registry history or restage the published version. The immutable npm artifact/README reflect the release candidate at its accepted commit; current repository documentation records the completed release.
+
+## What happens when a PR is merged
+
+Merging a PR does not start a release. Verify runs on PR events and workflow dispatch/call; npm-stage.yml is workflow_dispatch only. Current source policy is stageEnabled:false and provenance:null, no NPM_STAGING_ENABLED repository variable is configured, and npm-stage environment is not created. No live CI stage is enabled.
+
+The current manual release flow is:
+
+1. Decide a new version and release notes; review/integrate its source. 0.1.0 is already published and cannot be reused.
+2. Create a matching v<version> tag on the reviewed commit reachable from origin/main.
+3. Manually dispatch npm-stage.yml on that tag. The quality job calls the existing three-Node Verify workflow. Preparation downloads the Node 24.12.0 artifact from that same run/attempt, without rebuilding it, and verifies commit/metadata/LICENSE/consumer/graphs/SHA.
+4. With all setup gates enabled, the stage job waits for the protected environment review, then uses stage-only OIDC to submit exact bytes. If setup is incomplete, it stays skipped or fails closed.
+5. The owner reviews/downloads the stage, compares hashes and approves it with 2FA. Final approval is never automated.
+
+PR-merge-triggered stage automation is a separate trigger/version/tag design choice; it has not been implemented. Stage and final public approval remain distinct operations.
+
+## Future CI setup targets
+
+Prepare these concrete settings before activation; registration and new grants need owner authorization:
+
+- Choose a new release version and explicit CI provenance. The now-public repository supports provenance:true. Current policy remains unset.
+- GitHub environment npm-stage on ts-76/honoxpress: named required reviewer(s), prevent_self_review:true, approved v* tag deployment rules. Only ts-76 currently has repository access, so a separate reviewer must be identified. A workflow initiator cannot approve their own deployment. Keep this protection; if no independent reviewer is available, use the approved local manual-stage path while CI remains disabled.
+- npm Trusted Publisher for honoxpress: GitHub owner ts-76, repository honoxpress, workflow filename npm-stage.yml, environment npm-stage; allow stage publish only, no direct publish or dist-tag changes. Package now exists, so initial-bootstrap dependency is resolved. Reading trust settings can itself require owner 2FA; no configured relationship is assumed without inspection.
+- After these settings are authorized/registered, set release-policy.json.stageEnabled:true and NPM_STAGING_ENABLED=true and re-run exact-commit acceptance. The job alone receives contents:read, actions:read and id-token:write. No permanent npm token is stored in CI.
+
+The script checks actual environment protections, tag/commit/main ancestry, explicit metadata/provenance, existing package/owner and version absence. Registry outage and duplicates stop the operation. Naming an environment is not approval. GitHub Free/Pro/Team support required reviewers for public repositories.
+
+## Local owner review and 2FA
+
+Use reviewed npm 11.21.0 with the established Node environment. Commands below read existing owner authentication; never post auth URLs, done URLs, tokens or OTP codes into chat/logs. Replace STAGE_ID with the actual ID and REVIEW_REPO_PATH with the local checkout path.
 
 ```sh
-pnpm install --frozen-lockfile
-pnpm verify
-cat artifacts/release/plan.json
-cat artifacts/release/dry-run.json
+pnpm --dir REVIEW_REPO_PATH exec npm stage view STAGE_ID --registry=https://registry.npmjs.org/
+pnpm --dir REVIEW_REPO_PATH exec npm stage download STAGE_ID --registry=https://registry.npmjs.org/
 ```
 
-Full verification checks format, warning-free typed lint, tsc, 15 package tests, 5 build tests, 6 development/production browser tests, packed external consumer and 10 release regressions. Consumer checks bind source commit, tarball SHA256/SHA512, packed metadata, root/package/packed LICENSE, exports/types/templates, outside-repo installation, stale output cleaning and empty Worker/client docs/compiler graphs.
+RTK proxy makes child stdout non-TTY. npm 11.21.0 refuses its interactive web-OTP flow when stdin or stdout is not a TTY and reports EOTP. Attach the interactive approval command to the terminal explicitly; replace STAGE_ID before running:
 
-The public candidate retains a blocked plan: staging-disabled, provenance-decision and version-tag. Removing the package-private blocker does not activate publication. Pinned npm 11.21.0 dry-run uses isolated HOME/config/cache/environment and a loopback HTTP tripwire with no inherited credentials/OIDC. Only GET is allowed; any network write or changed bytes fails. No official-registry dry-run or stage runs here. Mac Devbox/chezmoi/global cf/pnpm choices remain intact.
+```sh
+rtk proxy zsh -lic 'pnpm --dir /Users/toma_7698/ghq/github.com/ts-76/honox-docs-poc exec npm stage approve STAGE_ID --registry=https://registry.npmjs.org/ </dev/tty >/dev/tty 2>/dev/tty'
+```
 
-## Initial authenticated stage
+Open the displayed npm authentication URL in your own browser and complete 2FA; the command then retries approval. Approval publishes the version. If a prior submission/approval outcome is unknown, inspect stage and registry state before retrying. OIDC short-lived credentials cannot list/view/approve pending stages.
 
-Trusted Publisher registration requires an existing package. For the currently nonexistent name, an initial authenticated stage is needed before pure OIDC can be configured. npm stage publish creates a publicly visible 0.0.0-stage placeholder; candidate contents remain unavailable until npm maintainer approval.
+## Verification and retry behavior
 
-A stage from the logged-in Mac cannot generate npm provenance, which requires a supported cloud CI runner. The recommended initial bootstrap is the exact newly CI-accepted tarball with explicit public access, latest channel, ignored lifecycle scripts and provenance:false. This exception needs owner approval of the concrete artifact and public placeholder; it is separate from future CI provenance. No direct npm publish fallback or new permanent token is proposed.
+pnpm verify runs unchanged full acceptance plus isolated npm dry-run. Dry-run uses temporary HOME/config/cache, no inherited credentials/OIDC, and a loopback tripwire accepting GET only. It does not contact the official registry or submit a stage. Current plan stays blocked by disabled staging/unset provenance and, outside a matching tag, version-tag.
 
-After an authorized stage, inspect the actual stage ID and download its tarball to compare SHA256/SHA512 against the accepted bytes. A missing receipt is not proof that npm received nothing: inspect pending stages before any retry. Final npm stage approve requires owner review and 2FA and is never automated. OIDC credentials cannot list/view/approve pending stages.
+The disabled workflow was actually dispatched on v0.1.0 in [run 37100696508](https://github.com/ts-76/honoxpress/actions/runs/37100696508): all three quality jobs and prepare passed; the exact same-run artifact was retrieved, its plan was blocked by staging-disabled/provenance-decision, and stage was skipped with zero steps. Environments and activation variables remained absent. This proves orchestration while disabled, not live OIDC or stage permission.
 
-## Future CI staging and controls
+CI concurrency serializes attempts per tag without cancelling an in-flight stage. Artifact/receipt names contain run attempt and preserve evidence. Retry the whole quality flow; downstream-only rerun cannot silently use an earlier artifact. Other maintainers' local actions are outside that concurrency.
 
-.github/workflows/npm-stage.yml is manually dispatched on a matching v0.1.0 tag. Its quality job calls the same three-Node Verify workflow. Every job must succeed before preparation retrieves the Node 24.12.0 accepted tarball from that same run and attempt. The staging job never rebuilds/repackages the package.
+An earlier f09963d CI run timed out at external-consumer Vitest startup on Node 24.21.0 without an assertion failure. Cause was not established; diagnostics were retained and later accepted CI passed. Dependencies, timeout and protections were not relaxed.
 
-Before activating it, separately authorize these concrete settings:
+Live CI OIDC/environment/trust activation and future CI provenance remain unexecuted. Cloudflare deployment and hono-decks pilot remain separate tasks. Review exact-head Actions and downloaded artifacts; committed snapshots are historical, not proof for a later commit.
 
-- Review/integrate the Draft PR stack into main and create v0.1.0 on the reviewed main commit. Source commit, tag and package/policy version must match, and the tagged commit must be reachable from origin/main.
-- Choose explicit future CI provenance. The now-public repository supports provenance:true; policy remains unset until chosen.
-- Create npm-stage environment on ts-76/honoxpress with named required reviewer(s), prevent_self_review:true and deployment tag rules for approved v* tags. The workflow initiator cannot approve their own deployment. GitHub Free/Pro/Team allow required reviewers for public repositories; choose an independent reviewer before activation. Protection is never weakened to accommodate a solo release.
-- After initial placeholder creation, configure honoxpress Trusted Publisher: GitHub owner ts-76, repository honoxpress, workflow filename npm-stage.yml, environment npm-stage. Grant stage publish only; no direct publish or dist-tag changes.
-- Only after these controls are authorized/registered, set release-policy.json.stageEnabled:true and repository variable NPM_STAGING_ENABLED=true, then verify the activation commit again.
-
-The stage job alone receives contents:read, actions:read and id-token:write. It installs pinned npm 11.21.0 job-locally without lifecycle scripts, validates actual environment protections/repository visibility, checks existing package/approved maintainer/version absence, and submits exact accepted bytes to the official registry with explicit access/tag/provenance. There are no CI npm tokens.
-
-Concurrency serializes this repository's attempts for a tag without cancelling an in-flight stage. Artifact/receipt names contain run attempt and preserve failed evidence. Retry the whole quality flow; a downstream-only rerun cannot silently use an earlier attempt's artifact. Outages fail closed. npm's shared version uniqueness also covers pending stages. Other maintainers' local actions are outside workflow concurrency.
-
-## Evidence and limits
-
-Earlier private-source commit 068fe78d4415feaf4a41db4c5b1fb6553b5119eb passed all three Node jobs in [run 36957944342](https://github.com/ts-76/honoxpress/actions/runs/36957944342). That success does not accept this changed public candidate; inspect its new exact-head CI and artifacts. The current final acceptance result belongs in the PR and local handoff evidence.
-
-An earlier f09963d run (36956721250) timed out at external-consumer Vitest startup on Node 24.21.0 without an assertion failure. Its cause was not established and diagnostics were retained. Revalidation on 068fe78 passed all three versions. Timeouts/dependencies/protections were not relaxed.
-
-Release workflow orchestration is statically checked with actionlint and its prepare helper is exercised on accepted artifacts. Actual dispatch, environment approval, OIDC exchange, stage receipt, final npm 2FA approval, registry installation and provenance remain unexecuted. Cloudflare deployment and the hono-decks real-page pilot remain separate tasks.
-
-Official specifications checked on 2026-10-03:
-
-- [npm staged publishing](https://docs.npmjs.com/staged-publishing/): public first placeholder, Node/npm prerequisites and manual 2FA approval.
-- [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/): hosted runners, exact workflow/environment binding, stage-only permission and public-repository provenance.
-- [npm trust prerequisites](https://docs.npmjs.com/cli/v11/commands/npm-trust/): existing package required.
-- [npm provenance](https://docs.npmjs.com/generating-provenance-statements/): supported cloud CI runner required; local stage cannot generate it.
-- [npm stage CLI](https://docs.npmjs.com/cli/v11/commands/npm-stage/): tarball specs and staged-package review commands. Local loopback verification uses the pinned official npm 11.21.0 CLI.
-- [GitHub environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments): required reviewers, self-review prevention and plan/visibility requirements.
+Official references checked 2026-10-03: [staged publishing](https://docs.npmjs.com/staged-publishing/), [trusted publishers](https://docs.npmjs.com/trusted-publishers/), [npm trust](https://docs.npmjs.com/cli/v11/commands/npm-trust/), [provenance](https://docs.npmjs.com/generating-provenance-statements/), [npm stage](https://docs.npmjs.com/cli/v11/commands/npm-stage/), [GitHub environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments).
