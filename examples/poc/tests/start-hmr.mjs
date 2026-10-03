@@ -2,8 +2,10 @@ import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/pr
 import { tmpdir } from "node:os";
 import { resolve, join } from "node:path";
 import { spawn } from "node:child_process";
+import { randomUUID } from "node:crypto";
 
 // Tests edit only this disposable app. The installed registry package stays intact.
+const id = randomUUID();
 const root = await mkdtemp(join(tmpdir(), "honoxpress-hmr-"));
 for (const name of ["app", "build", "public", "vite.config.ts", "tsconfig.json"])
   await cp(name, join(root, name), { recursive: true });
@@ -23,8 +25,14 @@ config = config.replace(
   "plugins: lazyPlugins(async () => [",
   `plugins: lazyPlugins(async () => [
   { name: "hmr-test-readiness", configureServer(server) {
+    server.watcher.on("all", (event, file) => {
+      if (file.endsWith(".mdx")) console.info("[hmr-fixture]", JSON.stringify({ id: ${JSON.stringify(id)}, event, file }));
+    });
     server.ws.on("honoxpress:test-ready", (data, client) => {
-      client.send({ type: "custom", event: "honoxpress:test-ready-ack", data });
+      const suffix = "/app/routes" + data.pathname + ".mdx";
+      const watching = Object.entries(server.watcher.getWatched()).some(([dir, names]) =>
+        names.some((name) => (dir + "/" + name).split(String.fromCharCode(92)).join("/").endsWith(suffix)));
+      client.send({ type: "custom", event: "honoxpress:test-ready-ack", data: { id: ${JSON.stringify(id)}, watching } });
     });
   } },`,
 );
@@ -34,7 +42,7 @@ pkg.scripts.dev = pkg.scripts.dev.replace(/--port \d+/, "--port 5195");
 await writeFile(join(root, "package.json"), JSON.stringify(pkg));
 await symlink(resolve("node_modules"), join(root, "node_modules"), "dir");
 await mkdir("dist/evidence", { recursive: true });
-await writeFile("dist/evidence/hmr-root.json", JSON.stringify({ root }));
+await writeFile("dist/evidence/hmr-root.json", JSON.stringify({ root, id }));
 // Remain in Playwright's process group so teardown also stops Vite descendants.
 const child = spawn("pnpm", ["dev"], { cwd: root, stdio: "inherit" });
 let stopping = false;
