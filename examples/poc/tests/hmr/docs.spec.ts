@@ -71,7 +71,7 @@ test("Japanese MDX add/unlink refreshes navigation, routing and real 404", async
     await expect(
       page.locator(".docs-sidebar").getByRole("link", { name: "追加したガイド", exact: true }),
     ).toHaveCount(0);
-    expect((await request.get("/ja/docs/追加ページ")).status()).toBe(404);
+    await expect.poll(async () => (await request.get("/ja/docs/追加ページ")).status()).toBe(404);
     await page.goto("/docs/getting-started");
     await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
     await page.getByRole("button", { name: "Increment", exact: true }).click();
