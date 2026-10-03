@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFile, writeFile, unlink } from "node:fs/promises";
 import { join } from "node:path";
+import { gotoConnected, routeStatus } from "./ready";
 
 test("MDX save updates body, title, nav and TOC, then rehydrates the island", async ({ page }) => {
   const { root } = JSON.parse(await readFile("dist/evidence/hmr-root.json", "utf8")) as {
@@ -14,7 +15,7 @@ test("MDX save updates body, title, nav and TOC, then rehydrates the island", as
     const heading = locale === "ja" ? "更新された見出し" : "Updated heading";
     const button = locale === "ja" ? "増やす" : "Increment";
     try {
-      await page.goto(`${prefix}/docs/getting-started`);
+      await gotoConnected(page, `${prefix}/docs/getting-started`);
       await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
       await page.getByRole("button", { name: button, exact: true }).click();
       await expect(page.getByTestId("count")).toHaveText("1");
@@ -49,7 +50,7 @@ test("Japanese MDX add/unlink refreshes navigation, routing and real 404", async
   };
   const file = join(root, "app/routes/ja/docs/追加ページ.mdx");
   try {
-    await page.goto("/ja/docs/getting-started");
+    await gotoConnected(page, "/ja/docs/getting-started");
     await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
     await writeFile(
       file,
@@ -59,20 +60,20 @@ test("Japanese MDX add/unlink refreshes navigation, routing and real 404", async
       page.locator(".docs-sidebar").getByRole("link", { name: "追加したガイド", exact: true }),
     ).toBeVisible();
     // HonoX restarts on route addition; wait until the new route is serving.
-    await expect.poll(async () => (await request.get("/ja/docs/追加ページ")).status()).toBe(200);
+    await expect.poll(() => routeStatus(request, "/ja/docs/追加ページ")).toBe(200);
     await page
       .locator(".docs-sidebar")
       .getByRole("link", { name: "追加したガイド", exact: true })
       .click();
     await expect.poll(() => decodeURI(new URL(page.url()).pathname)).toBe("/ja/docs/追加ページ");
     await expect(page.getByRole("heading", { name: "追加したガイド", exact: true })).toBeVisible();
-    await page.goto("/ja/docs/getting-started");
+    await gotoConnected(page, "/ja/docs/getting-started");
     await unlink(file);
     await expect(
       page.locator(".docs-sidebar").getByRole("link", { name: "追加したガイド", exact: true }),
     ).toHaveCount(0);
-    await expect.poll(async () => (await request.get("/ja/docs/追加ページ")).status()).toBe(404);
-    await page.goto("/docs/getting-started");
+    await expect.poll(() => routeStatus(request, "/ja/docs/追加ページ")).toBe(404);
+    await gotoConnected(page, "/docs/getting-started");
     await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
     await page.getByRole("button", { name: "Increment", exact: true }).click();
     await expect(page.getByTestId("count")).toHaveText("1");

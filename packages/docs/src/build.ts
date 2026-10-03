@@ -87,16 +87,18 @@ export function docsMetadataPlugin(options: DocsBuildOptions): Plugin {
     },
     configureServer(server) {
       if (options.worker) return;
-      const invalidate = (file: string) => {
+      const reloadAfterRouteChange = async (file: string) => {
         if (!file.startsWith(`${routeRoot}/`) || !file.endsWith(".mdx")) return;
-        const module = server.moduleGraph.getModuleById(resolvedId);
-        if (module) server.moduleGraph.invalidateModule(module);
+        // HonoX also restarts for route additions/removals. Await the same public
+        // restart promise before reloading so requests use the new SSR transport.
+        await server.restart();
         server.ws.send({ type: "full-reload" });
       };
-      server.watcher.on("add", invalidate).on("unlink", invalidate);
+      server.watcher.on("add", reloadAfterRouteChange).on("unlink", reloadAfterRouteChange);
     },
-    handleHotUpdate({ file, server }) {
+    async handleHotUpdate({ file, server, read }) {
       if (options.worker || !file.startsWith(`${routeRoot}/`) || !file.endsWith(".mdx")) return;
+      await read(); // Editors can emit a filesystem event before a save completes.
       // HonoX suppresses the dev server's default reload hook. MDX is SSR content,
       // so updating its module alone does not replace the browser document.
       const module = server.moduleGraph.getModuleById(resolvedId);
