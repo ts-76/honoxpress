@@ -24,21 +24,26 @@ export async function gotoConnected(page: Page, pathname: string) {
       const clientUrl = "/@vite/client";
       const { createHotContext } = await import(clientUrl);
       const hot = createHotContext("/honoxpress-hmr-readiness");
-      return new Promise<{ id: string; watching: boolean }>((resolve, reject) => {
-        const deadline = setTimeout(() => {
-          hot.off("honoxpress:test-ready-ack", ready);
-          reject(new Error("HMR readiness acknowledgement timed out"));
-        }, 3000);
-        const ready = (data: { id: string; watching: boolean }) => {
-          clearTimeout(deadline);
-          hot.off("honoxpress:test-ready-ack", ready);
-          resolve(data);
-        };
-        hot.on("honoxpress:test-ready-ack", ready);
-        hot.send("honoxpress:test-ready", { pathname: route });
-      });
+      return new Promise<{ id: string; watching: boolean; diagnostics: unknown }>(
+        (resolve, reject) => {
+          const deadline = setTimeout(() => {
+            hot.off("honoxpress:test-ready-ack", ready);
+            reject(new Error("HMR readiness acknowledgement timed out"));
+          }, 3000);
+          const ready = (data: { id: string; watching: boolean; diagnostics: unknown }) => {
+            clearTimeout(deadline);
+            hot.off("honoxpress:test-ready-ack", ready);
+            resolve(data);
+          };
+          hot.on("honoxpress:test-ready-ack", ready);
+          hot.send("honoxpress:test-ready", { pathname: route });
+        },
+      );
     }, decodeURI(pathname));
     expect(ack.id, "HMR browser must connect to the disposable app being edited").toBe(id);
-    expect(ack.watching, "The current MDX must be watched before editing").toBe(true);
+    expect(
+      ack.watching,
+      `The current MDX must be watched before editing: ${JSON.stringify(ack.diagnostics)}`,
+    ).toBe(true);
   }).toPass({ timeout: 15000 });
 }

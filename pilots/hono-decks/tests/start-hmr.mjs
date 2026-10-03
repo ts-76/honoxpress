@@ -37,7 +37,7 @@ config = config.replace(
       if (!watching) console.info("[hmr-watch-not-ready]", JSON.stringify({ id: ${JSON.stringify(id)}, root: server.config.root,
         suffix, mdx: paths.filter((file) => file.endsWith(".mdx")), directories: watched.length,
         sample: watched.slice(0, 8).map(([dir]) => dir), options: { cwd: server.config.server.watch?.cwd, usePolling: server.config.server.watch?.usePolling } }));
-      client.send({ type: "custom", event: "honoxpress:test-ready-ack", data: { id: ${JSON.stringify(id)}, watching } });
+      client.send({ type: "custom", event: "honoxpress:test-ready-ack", data: { id: ${JSON.stringify(id)}, watching, diagnostics: { root: server.config.root, suffix, mdx: paths.filter((file) => file.endsWith(".mdx")), directories: watched.length, sample: watched.slice(0, 8).map(([dir]) => dir), watchOptions: server.config.server.watch, bundledDev: server.config.experimental.bundledDev } } });
     });
   } },`,
 );
