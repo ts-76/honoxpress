@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.1](https://github.com/ts-76/honoxpress/compare/v0.1.0...v0.1.1) (2026-10-03)
+
+
+### Bug Fixes
+
+* **ci:** generate release PRs from main and verify bot branches ([347f1f8](https://github.com/ts-76/honoxpress/commit/347f1f8b95650149be52b0330a26be42ef959aaa))
+* **ci:** preserve generated release changelog formatting ([530f34d](https://github.com/ts-76/honoxpress/commit/530f34dd76c3eb17af9037b8a332f26c449b0417))
+
+
+### Documentation
+
+* record published 0.1.0 and owner release flow ([c588dcc](https://github.com/ts-76/honoxpress/commit/c588dcc6be7057bd5f5688fc033a325154b8ab48))
+
 ## 0.1.0
 
 Published on 2026-10-03 after owner-reviewed CI tarball staging and manual owner 2FA approval.
