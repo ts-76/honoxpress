@@ -11,7 +11,7 @@
     "typecheck": "pnpm build:package && tsc --noEmit",
     "test:build": "vp test run tests/build.test.mjs --reporter=default --reporter=json --outputFile=dist/evidence/unit-tests.json",
     "test:browser": "playwright test",
-    "verify": "pnpm build:package && pnpm check && pnpm lint && pnpm typecheck && pnpm build && pnpm types:cf && pnpm test:build && pnpm test:browser && pnpm preview:dry-run",
+    "verify": "pnpm build:package && pnpm check && pnpm lint && pnpm typecheck && pnpm build && pnpm types:cf && pnpm test:build && pnpm test:browser && pnpm test:hmr && pnpm preview:dry-run",
     "preview": "cf dev",
     "preview:dry-run": "cf deploy --dry-run --prebuilt",
     "check": "vp check",
@@ -21,7 +21,8 @@
     "build:cf": "cf build",
     "types:cf": "cf workers types",
     "evidence": "node build/snapshot-evidence.mjs",
-    "build:package": "pnpm --filter honoxpress build"
+    "build:package": "pnpm --filter honoxpress build",
+    "test:hmr": "playwright test --config playwright.hmr.config.ts"
   },
   "dependencies": {
     "hono": "^4.13.12",
