@@ -28,6 +28,8 @@ Navigation sorts by optional numeric `order`, then URL. All metadata results
 are immutable. Titles remain plain text and rendering must escape them.
 
 Compatibility currently follows the repository's tested HonoX/Vite Plus setup.
+
+For the pinned HonoX 0.1.61 / Vite Plus 1.0.0 development setup, use the consumer's `examples/poc/build/honox-watch.ts` adapter in place of the direct `honox/vite` config import. It registers an absolute `app` directory instead of HonoX's relative `./app/**` glob, keeping its add/unlink restart behavior. See `docs/hmr-regression.md` for the initial Linux watcher failure and pinned-version limitations.
 The build entry, copyable UI and packed external consumer are verified together;
 this evaluation does not promise an npm release.
 
