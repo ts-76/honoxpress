@@ -31,8 +31,12 @@ config = config.replace(
     });
     server.ws.on("honoxpress:test-ready", (data, client) => {
       const suffix = "/app/routes" + data.pathname + ".mdx";
-      const watching = Object.entries(server.watcher.getWatched()).some(([dir, names]) =>
-        names.some((name) => (dir + "/" + name).split(String.fromCharCode(92)).join("/").endsWith(suffix)));
+      const watched = Object.entries(server.watcher.getWatched());
+      const paths = watched.flatMap(([dir, names]) => names.map((name) => (dir + "/" + name).split(String.fromCharCode(92)).join("/")));
+      const watching = paths.some((file) => file.endsWith(suffix));
+      if (!watching) console.info("[hmr-watch-not-ready]", JSON.stringify({ id: ${JSON.stringify(id)}, root: server.config.root,
+        suffix, mdx: paths.filter((file) => file.endsWith(".mdx")), directories: watched.length,
+        sample: watched.slice(0, 8).map(([dir]) => dir), options: { cwd: server.config.server.watch?.cwd, usePolling: server.config.server.watch?.usePolling } }));
       client.send({ type: "custom", event: "honoxpress:test-ready-ack", data: { id: ${JSON.stringify(id)}, watching } });
     });
   } },`,
