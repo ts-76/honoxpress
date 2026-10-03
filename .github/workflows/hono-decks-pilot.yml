@@ -1,0 +1,50 @@
+name: hono-decks pilot
+on:
+  pull_request:
+    paths:
+      - "pilots/hono-decks/**"
+      - ".github/workflows/hono-decks-pilot.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hono-decks-pilot-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: pilots/hono-decks
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.12.0"
+          package-manager-cache: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 11.22.0
+          run_install: false
+          cache: false
+      - name: Install independent registry consumer
+        run: pnpm install --frozen-lockfile
+      - name: Job-local cf and Chromium
+        run: |
+          npm install --global cf@1.0.0-beta.6 --registry=https://registry.npmjs.org/
+          pnpm exec playwright install --with-deps chromium
+      - name: Verify published package, builds, browsers and HMR
+        run: pnpm verify
+      - name: Keep evidence and diagnostics
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: hono-decks-pilot-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            pilots/hono-decks/dist/evidence/
+            pilots/hono-decks/test-results/
+          retention-days: 7

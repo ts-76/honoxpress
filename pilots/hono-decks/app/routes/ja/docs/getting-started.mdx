@@ -1,0 +1,103 @@
+---
+title: 導入
+description: パッケージを追加し、最初のデッキをHonoアプリで表示するまでの手順です。
+order: 1
+---
+
+import { decks } from "../../../decks";
+import Counter from "../../../islands/counter";
+import CopyCode from "../../../islands/copy-code";
+import DemoFrame from "../../../components/demo-frame";
+
+# 導入
+
+パッケージを追加し、最初のデッキをHonoアプリで表示するまでの手順です。
+
+<span data-doc-sentinel="DOCS_BODY_JA_8e42" hidden />
+
+[Read in English](/docs/getting-started) · [ホーム](/)
+
+## Honoアプリを用意する
+
+npm、pnpm、Yarn、Bunのいずれかと、起動できるHonoアプリが必要です。この手順が終わると、2枚のスライドを表示できます。MDXの変換はローカルの開発・ビルド環境で行い、Workerは生成済みモジュールを読み込みます。
+
+## パッケージを追加し設定ファイルを作る
+
+`init`はCLIと実行時の共通設定と、生成コードをアプリにつなぐファサードを作成します。既存ファイルは上書きされません。このpilotは設定済みです。
+
+<CopyCode
+  code={"pnpm add hono-decks\npnpm exec hono-decks init"}
+  copyLabel="コードをコピー"
+  copiedLabel="コピーしました"
+  errorLabel="コピーできませんでした。コードを選択してコピーしてください。"
+/>
+
+## 最初のデッキを作ってコンパイルする
+
+`decks/welcome/deck.mdx`を作成します。先頭のフロントマターはデッキ全体の情報、その次の区切りからが1枚目のスライドです。
+
+```mdx
+---
+title: Welcome
+description: My first hono-decks presentation
+---
+
+---
+
+## layout: cover
+
+# Welcome
+
+This deck is served from my Hono app.
+
+---
+
+## Next slide
+
+- Write slides in MDX
+- Serve them with Hono
+```
+
+`pnpm exec hono-decks compile`でMDXをHono JSXモジュールへ変換します。ソースとファサードは編集できますが、生成先は直接編集しないでください。
+
+## 生成したルーターをHonoに登録する
+
+```ts
+import { Hono } from "hono";
+import { decks } from "./decks";
+const app = new Hono();
+app.route(decks.mountPath, decks.router());
+export default app;
+```
+
+`decks.mountPath`は共通設定から取得します。このpilotでは`/demo`を使います。
+
+## ブラウザで表示を確認する
+
+以下は動的Honoルーターが配信する、実際にコンパイルしたWelcomeデッキです。ビューアーで右矢印を押して2枚目へ進めます。
+
+<DemoFrame src={decks.paths("welcome").embed} title="Welcomeデッキ" linkLabel="埋め込みを開く" />
+
+<a href={decks.paths("welcome").viewer}>デッキビューアーを開く</a>
+
+## うまくいかないとき
+
+- 生成したモジュールがない: コンパイラーを再実行し、`build.root`と`build.outDir`を確認します。
+- デッキが404になる: `decks.mountPath`で`decks.router()`を登録します。
+- WorkerにNodeモジュールが入る: 実行時APIは`hono-decks`から読み込み、`hono-decks/node`はビルド専用にします。
+
+## インタラクティブカウンター
+
+この追加Islandでハイドレーションと再遷移を確認します。
+
+<Counter label="増やす" />
+
+## 動的デモ
+
+時計はリクエストごとに生成されます。ドキュメントSSGはデモのルーターを実行しません。
+
+<DemoFrame title="動的Workerデモ" linkLabel="デモを開く" />
+
+## 次に読む
+
+[スライドの書き方](/ja/docs/スライドを書く)
