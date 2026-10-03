@@ -168,6 +168,8 @@ for (const [file, from, to] of [
   ["playwright.config.ts", "5173", "5177"],
   ["playwright.config.ts", "8787", "8789"],
   ["wrangler.config.ts", "8787", "8789"],
+  ["playwright.hmr.config.ts", "5195", "5197"],
+  ["tests/start-hmr.mjs", "5195", "5197"],
 ]) {
   const target = path.join(consumer, file);
   await writeFile(target, (await readFile(target, "utf8")).replaceAll(from, to));
@@ -185,8 +187,33 @@ await copyFile(path.join(consumer, "package.json"), path.join(artifacts, "consum
 await run(process.execPath, ["smoke.mjs"], consumer);
 const installedPackage = await realpath(path.join(consumer, "node_modules/honoxpress"));
 assert.ok(!installedPackage.startsWith(await realpath(packageRoot)));
+const installedFiles = [];
+for (const file of files) {
+  const relative = file.slice("package/".length);
+  const expected = createHash("sha256")
+    .update(execFileSync("tar", ["-xOzf", tarball, file]))
+    .digest("hex");
+  const actual = createHash("sha256")
+    .update(await readFile(path.join(installedPackage, relative)))
+    .digest("hex");
+  assert.equal(actual, expected, `Installed ${relative} differs from the evaluated tarball`);
+  installedFiles.push({ file: relative, sha256: actual });
+}
+await writeFile(
+  path.join(artifacts, "installed-package-files.json"),
+  JSON.stringify(installedFiles, null, 2) + "\n",
+);
 await run("pnpm", ["fmt"], consumer);
-await run("pnpm", ["verify"], consumer);
+try {
+  await run("pnpm", ["verify"], consumer);
+} catch (error) {
+  // Keep browser traces and the fixture identity when an external check fails.
+  for (const directory of ["test-results", "dist/evidence"])
+    await cp(path.join(consumer, directory), path.join(artifacts, "consumer-failure", directory), {
+      recursive: true,
+    }).catch(() => {});
+  throw error;
+}
 const unit = await json(path.join(consumer, "dist/evidence/unit-tests.json"));
 const browser = await json(path.join(consumer, "dist/evidence/browser-tests.json"));
 const hmr = await json(path.join(consumer, "dist/evidence/hmr-tests.json"));
@@ -231,6 +258,7 @@ const evidence = {
   externalConsumer: {
     outsideRepository: true,
     packageInstalledFromTarball: true,
+    installedPackageBytesMatchTarball: true,
     packageStaleOutputRemoved: true,
     workspaceOrSourceLinks: false,
     successfulDirectoryRemoved: true,

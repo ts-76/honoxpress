@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { expect, type Page, type APIRequestContext } from "@playwright/test";
 
 export async function routeStatus(request: APIRequestContext, pathname: string) {
@@ -9,6 +10,9 @@ export async function routeStatus(request: APIRequestContext, pathname: string) 
 }
 
 export async function gotoConnected(page: Page, pathname: string) {
+  const { id } = JSON.parse(await readFile("dist/evidence/hmr-root.json", "utf8")) as {
+    id: string;
+  };
   // Only explicit navigation retries here. Assertions after edits never issue
   // a navigation or reload, so a failed automatic update remains a failure.
   await expect(async () => {
@@ -16,23 +20,30 @@ export async function gotoConnected(page: Page, pathname: string) {
     // full load also waits on demo iframes unrelated to the parent's HMR channel.
     const response = await page.goto(pathname, { waitUntil: "domcontentloaded", timeout: 3000 });
     expect(response?.status()).toBe(200);
-    await page.evaluate(async () => {
+    const ack = await page.evaluate(async (route) => {
       const clientUrl = "/@vite/client";
       const { createHotContext } = await import(clientUrl);
       const hot = createHotContext("/honoxpress-hmr-readiness");
-      await new Promise<void>((resolve, reject) => {
-        const deadline = setTimeout(() => {
-          hot.off("honoxpress:test-ready-ack", ready);
-          reject(new Error("HMR readiness acknowledgement timed out"));
-        }, 3000);
-        const ready = () => {
-          clearTimeout(deadline);
-          hot.off("honoxpress:test-ready-ack", ready);
-          resolve();
-        };
-        hot.on("honoxpress:test-ready-ack", ready);
-        hot.send("honoxpress:test-ready", {});
-      });
-    });
+      return new Promise<{ id: string; watching: boolean; diagnostics: unknown }>(
+        (resolve, reject) => {
+          const deadline = setTimeout(() => {
+            hot.off("honoxpress:test-ready-ack", ready);
+            reject(new Error("HMR readiness acknowledgement timed out"));
+          }, 3000);
+          const ready = (data: { id: string; watching: boolean; diagnostics: unknown }) => {
+            clearTimeout(deadline);
+            hot.off("honoxpress:test-ready-ack", ready);
+            resolve(data);
+          };
+          hot.on("honoxpress:test-ready-ack", ready);
+          hot.send("honoxpress:test-ready", { pathname: route });
+        },
+      );
+    }, decodeURI(pathname));
+    expect(ack.id, "HMR browser must connect to the disposable app being edited").toBe(id);
+    expect(
+      ack.watching,
+      `The current MDX must be watched before editing: ${JSON.stringify(ack.diagnostics)}`,
+    ).toBe(true);
   }).toPass({ timeout: 15000 });
 }

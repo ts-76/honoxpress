@@ -1,5 +1,5 @@
 import { defineConfig, type Plugin, lazyPlugins } from "vite-plus";
-import honox from "honox/vite";
+import honox from "./build/honox-watch.ts";
 import client from "honox/vite/client";
 import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";

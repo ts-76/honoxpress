@@ -44,6 +44,8 @@ For a production local preview, run `pnpm build:cf`, then `pnpm preview`. No dep
 
 Development is at `http://127.0.0.1:5183`; Worker local preview is at `http://127.0.0.1:8793`. The isolated HMR test server uses port 5185. Tests use disposable application copies under the system temporary directory, preserve the tracked MDX, and stop their process group on exit.
 
+The consumer's `build/honox-watch.ts` adapter registers an absolute `app` directory instead of HonoX 0.1.61's relative `./app/**` glob, retaining its restart callbacks and other plugins. The original registration can leave routes absent from the initial Linux watcher; simply enabling relative globs also failed save invalidation. Fixture identity and the current MDX's watched path are checked before any test edit. This pinned-version setup fix does not resolve published 0.1.1's save reload failure; recheck the adapter when upgrading dependencies.
+
 ## Verification and known HMR failure
 
 Local results with Node 24.12.0:
