@@ -39,7 +39,12 @@ const envResponse = await fetch(
   { headers, signal: AbortSignal.timeout(15000) },
 );
 assert.equal(envResponse.status, 200, "Cannot verify protected environment");
-requireEnvironmentReview(await envResponse.json());
+const policyResponse = await fetch(
+  "https://api.github.com/repos/ts-76/honoxpress/environments/npm-stage/deployment-branch-policies",
+  { headers, signal: AbortSignal.timeout(15000) },
+);
+assert.equal(policyResponse.status, 200, "Cannot verify environment tag restrictions");
+requireEnvironmentReview(await envResponse.json(), await policyResponse.json());
 const repoResponse = await fetch("https://api.github.com/repos/ts-76/honoxpress", {
   headers,
   signal: AbortSignal.timeout(15000),

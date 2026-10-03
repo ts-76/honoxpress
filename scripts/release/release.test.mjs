@@ -169,21 +169,76 @@ await test("published duplicate, new-package bootstrap and registry outage stop 
   assert.equal(existing.maintainers[0].name, policy.npmOwner);
   assert.ok(urls.every((url) => url.startsWith("https://registry.npmjs.org/")));
 });
-await test("environment names cannot substitute for an independent approval gate", () => {
-  assert.throws(
-    () => requireEnvironmentReview({ name: "npm-stage", protection_rules: [] }),
-    /required reviewers/,
-  );
-  assert.throws(() =>
-    requireEnvironmentReview({
-      protection_rules: [
-        { type: "required_reviewers", reviewers: [{}], prevent_self_review: false },
-      ],
-    }),
-  );
-  requireEnvironmentReview({
-    protection_rules: [{ type: "required_reviewers", reviewers: [{}], prevent_self_review: true }],
-  });
+const ownerEnvironment = {
+  name: "npm-stage",
+  can_admins_bypass: false,
+  deployment_branch_policy: { custom_branch_policies: true, protected_branches: false },
+  protection_rules: [
+    {
+      type: "required_reviewers",
+      prevent_self_review: false,
+      reviewers: [{ type: "User", reviewer: { login: "ts-76", id: 108617014 } }],
+    },
+  ],
+};
+const ownerTagPolicies = { branch_policies: [{ name: "v*", type: "tag" }] };
+
+await test("solo staging requires the named owner approval and forbids bypass", () => {
+  requireEnvironmentReview(ownerEnvironment, ownerTagPolicies);
+  for (const environment of [
+    { ...ownerEnvironment, name: "other-environment" },
+    { ...ownerEnvironment, can_admins_bypass: true },
+    { ...ownerEnvironment, can_admins_bypass: undefined },
+    { ...ownerEnvironment, protection_rules: [] },
+    ...[
+      { ...ownerEnvironment.protection_rules[0], prevent_self_review: true },
+      { ...ownerEnvironment.protection_rules[0], prevent_self_review: undefined },
+      { ...ownerEnvironment.protection_rules[0], reviewers: [] },
+      {
+        ...ownerEnvironment.protection_rules[0],
+        reviewers: [{ type: "Team", reviewer: { login: "ts-76", id: 108617014 } }],
+      },
+      {
+        ...ownerEnvironment.protection_rules[0],
+        reviewers: [{ type: "User", reviewer: { login: "other-owner", id: 108617014 } }],
+      },
+      {
+        ...ownerEnvironment.protection_rules[0],
+        reviewers: [{ type: "User", reviewer: { login: "ts-76", id: 1 } }],
+      },
+      {
+        ...ownerEnvironment.protection_rules[0],
+        reviewers: [
+          ...ownerEnvironment.protection_rules[0].reviewers,
+          { type: "User", reviewer: { login: "other-owner", id: 1 } },
+        ],
+      },
+    ].map((rule) => ({ ...ownerEnvironment, protection_rules: [rule] })),
+  ])
+    assert.throws(() => requireEnvironmentReview(environment, ownerTagPolicies));
+});
+await test("solo staging fails closed for missing, branch or broader deployment rules", () => {
+  for (const policies of [
+    undefined,
+    {},
+    { branch_policies: [] },
+    { branch_policies: [{ name: "v*", type: "branch" }] },
+    { branch_policies: [{ name: "*", type: "tag" }] },
+    { branch_policies: [...ownerTagPolicies.branch_policies, { name: "main", type: "branch" }] },
+  ])
+    assert.throws(() => requireEnvironmentReview(ownerEnvironment, policies), /only v\* tags/);
+  for (const deployment_branch_policy of [
+    null,
+    { custom_branch_policies: false, protected_branches: true },
+  ])
+    assert.throws(
+      () =>
+        requireEnvironmentReview(
+          { ...ownerEnvironment, deployment_branch_policy },
+          ownerTagPolicies,
+        ),
+      /only v\* tags/,
+    );
 });
 await test("pinned npm stage dry-run uses exact tarball and makes no registry writes", async (t) => {
   const input = await fixture(t);
@@ -225,7 +280,7 @@ await test("stage receipt must identify the approved package and exact verified 
   );
 });
 
-await test("current public MIT candidate remains staging-disabled with provenance undecided", async () => {
+await test("owner-approved public MIT policy enables staging with explicit provenance", async () => {
   const approvedPackage = JSON.parse(await readFile("packages/docs/package.json", "utf8"));
   const approvedPolicy = JSON.parse(await readFile("release-policy.json", "utf8"));
   const licenseText = await readFile("packages/docs/LICENSE", "utf8");
@@ -235,19 +290,20 @@ await test("current public MIT candidate remains staging-disabled with provenanc
   assert.equal(approvedPackage.license, "MIT");
   assert.equal(approvedPolicy.npmOwner, "ts-76");
   assert.equal(approvedPackage.private, false);
-  assert.equal(approvedPolicy.stageEnabled, false);
-  assert.equal(approvedPolicy.provenance, null);
+  assert.equal(approvedPolicy.stageEnabled, true);
+  assert.equal(approvedPolicy.provenance, true);
   assert.equal(licenseText, await readFile("LICENSE", "utf8"));
   assert.deepEqual(
     approvedMetadataBlockers(approvedPackage, approvedPolicy, { licenseText, changelog }),
     [],
   );
   const blockers = metadataBlockers(approvedPackage, approvedPolicy, { licenseText, changelog });
-  assert.deepEqual(blockers.sort(), ["staging-disabled", "provenance-decision"].sort());
-  assert.throws(
-    () =>
-      stageArguments({ status: "blocked", blockers }, `honoxpress-${approvedPackage.version}.tgz`),
-    /Release blocked/,
+  assert.deepEqual(blockers, []);
+  assert.ok(
+    stageArguments(
+      { ...approvedPolicy, status: "ready", blockers },
+      `honoxpress-${approvedPackage.version}.tgz`,
+    ).includes("--provenance=true"),
   );
 });
 
