@@ -95,6 +95,14 @@ export function docsMetadataPlugin(options: DocsBuildOptions): Plugin {
       };
       server.watcher.on("add", invalidate).on("unlink", invalidate);
     },
+    handleHotUpdate({ file, server }) {
+      if (options.worker || !file.startsWith(`${routeRoot}/`) || !file.endsWith(".mdx")) return;
+      // HonoX suppresses the dev server's default reload hook. MDX is SSR content,
+      // so updating its module alone does not replace the browser document.
+      const module = server.moduleGraph.getModuleById(resolvedId);
+      if (module) server.moduleGraph.invalidateModule(module);
+      server.ws.send({ type: "full-reload" });
+    },
   };
 }
 

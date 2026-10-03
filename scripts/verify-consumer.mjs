@@ -134,6 +134,7 @@ for (const file of [
   "cloudflare.config.ts",
   "wrangler.config.ts",
   "playwright.config.ts",
+  "playwright.hmr.config.ts",
 ])
   await cp(path.join(example, file), path.join(consumer, file), { recursive: true });
 await cp(path.join(root, "fixtures/consumer/usage.ts"), path.join(consumer, "usage.ts"));
@@ -188,12 +189,15 @@ await run("pnpm", ["fmt"], consumer);
 await run("pnpm", ["verify"], consumer);
 const unit = await json(path.join(consumer, "dist/evidence/unit-tests.json"));
 const browser = await json(path.join(consumer, "dist/evidence/browser-tests.json"));
+const hmr = await json(path.join(consumer, "dist/evidence/hmr-tests.json"));
 const cf = await json(path.join(consumer, "dist/evidence/cf-build.json"));
 assert.equal(unit.numPassedTests, 5);
 assert.equal(unit.numFailedTests, 0);
 assert.equal(unit.success, true);
 assert.equal(browser.stats.expected, 6);
 assert.equal(browser.stats.unexpected, 0);
+assert.equal(hmr.stats.expected, 2);
+assert.equal(hmr.stats.unexpected, 0);
 assert.equal(cf.passed, true);
 const graphs = {};
 for (const target of ["worker", "client"]) {
@@ -239,6 +243,7 @@ const evidence = {
     clientSSGWorker: "passed",
     buildTests: unit.numPassedTests,
     browserTests: browser.stats.expected,
+    hmrTests: hmr.stats.expected,
     cfBuild: "passed",
     cfDryRun: "passed; no deployment",
   },
