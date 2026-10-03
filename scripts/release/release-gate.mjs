@@ -157,15 +157,28 @@ export async function registryPreflight(pkg, fetchImpl = fetch) {
   return existing;
 }
 
-export function requireEnvironmentReview(environment) {
+export function requireEnvironmentReview(environment, deploymentPolicies) {
+  assert.equal(environment.name, "npm-stage", "Expected the npm-stage environment");
+  assert.equal(environment.can_admins_bypass, false, "Environment approval must not be bypassable");
   assert.ok(
     environment.protection_rules?.some(
       (rule) =>
         rule.type === "required_reviewers" &&
-        rule.reviewers?.length > 0 &&
-        rule.prevent_self_review === true,
+        rule.prevent_self_review === false &&
+        rule.reviewers?.length === 1 &&
+        rule.reviewers[0].type === "User" &&
+        rule.reviewers[0].reviewer?.login === "ts-76" &&
+        rule.reviewers[0].reviewer?.id === 108617014,
     ),
-    "npm-stage must have required reviewers and prevent self-review; an environment name alone is insufficient",
+    "npm-stage must require owner ts-76 approval and allow self-review",
+  );
+  assert.ok(
+    environment.deployment_branch_policy?.custom_branch_policies === true &&
+      environment.deployment_branch_policy?.protected_branches === false &&
+      deploymentPolicies?.branch_policies?.length === 1 &&
+      deploymentPolicies.branch_policies[0].type === "tag" &&
+      deploymentPolicies.branch_policies[0].name === "v*",
+    "npm-stage must permit only v* tags",
   );
 }
 
