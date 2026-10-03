@@ -47,9 +47,15 @@ test("Japanese MDX add/unlink refreshes navigation, routing and real 404", async
     root: string;
   };
   const file = join(root, "app/routes/ja/docs/追加ページ.mdx");
+  let automaticReloads = 0;
+  page.on("framenavigated", (frame) => {
+    if (frame === page.mainFrame() && new URL(frame.url()).pathname === "/ja/docs/getting-started")
+      automaticReloads++;
+  });
   try {
     await gotoConnected(page, "/ja/docs/getting-started");
     await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
+    automaticReloads = 0;
     await writeFile(
       file,
       "---\ntitle: 追加したガイド\ndescription: HMR追加確認\n---\n\n# 追加したガイド\n\n## 追加した節\n\n追加本文。\n",
@@ -65,13 +71,16 @@ test("Japanese MDX add/unlink refreshes navigation, routing and real 404", async
       .click();
     await expect.poll(() => decodeURI(new URL(page.url()).pathname)).toBe("/ja/docs/追加ページ");
     await expect(page.getByRole("heading", { name: "追加したガイド", exact: true })).toBeVisible();
+    expect(automaticReloads).toBe(1);
     await gotoConnected(page, "/ja/docs/getting-started");
+    automaticReloads = 0;
     await unlink(file);
     await expect(
       page.locator(".docs-sidebar").getByRole("link", { name: "追加したガイド", exact: true }),
     ).toHaveCount(0);
     await expect.poll(() => routeStatus(request, "/ja/docs/追加ページ")).toBe(404);
     await gotoConnected(page, "/docs/getting-started");
+    expect(automaticReloads).toBe(1);
     await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
     await page.getByRole("button", { name: "Increment", exact: true }).click();
     await expect(page.getByTestId("count")).toHaveText("1");

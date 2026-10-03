@@ -89,10 +89,10 @@ export function docsMetadataPlugin(options: DocsBuildOptions): Plugin {
       if (options.worker) return;
       const reloadAfterRouteChange = async (file: string) => {
         if (!file.startsWith(`${routeRoot}/`) || !file.endsWith(".mdx")) return;
-        // HonoX also restarts for route additions/removals. Await the same public
-        // restart promise before reloading so requests use the new SSR transport.
+        // HonoX also restarts for route additions/removals. The shared restart
+        // closes Vite's websocket; its client reloads after reconnecting. Sending
+        // full-reload as well schedules a second navigation that can abort links.
         await server.restart();
-        server.ws.send({ type: "full-reload" });
       };
       server.watcher.on("add", reloadAfterRouteChange).on("unlink", reloadAfterRouteChange);
     },
