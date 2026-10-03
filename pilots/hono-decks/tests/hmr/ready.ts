@@ -12,14 +12,21 @@ export async function gotoConnected(page: Page, pathname: string) {
   // Only explicit navigation retries here. Assertions after edits never issue
   // a navigation or reload, so a failed automatic update remains a failure.
   await expect(async () => {
-    const response = await page.goto(pathname);
+    // A single navigation must time out inside the retry budget. Waiting for the
+    // full load also waits on demo iframes unrelated to the parent's HMR channel.
+    const response = await page.goto(pathname, { waitUntil: "domcontentloaded", timeout: 3000 });
     expect(response?.status()).toBe(200);
     await page.evaluate(async () => {
       const clientUrl = "/@vite/client";
       const { createHotContext } = await import(clientUrl);
       const hot = createHotContext("/honoxpress-hmr-readiness");
-      await new Promise<void>((resolve) => {
+      await new Promise<void>((resolve, reject) => {
+        const deadline = setTimeout(() => {
+          hot.off("honoxpress:test-ready-ack", ready);
+          reject(new Error("HMR readiness acknowledgement timed out"));
+        }, 3000);
         const ready = () => {
+          clearTimeout(deadline);
           hot.off("honoxpress:test-ready-ack", ready);
           resolve();
         };
