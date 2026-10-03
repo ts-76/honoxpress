@@ -20,3 +20,7 @@ Tests protect module graphs (including a positive eager-import control), pre-exe
 Copyable template changes must be synchronized with the example's owned files. Retain Nimbus and Fumapress acknowledgements in the packed README and public documentation. Independently written UI is recorded separately from any future copied source/assets; copied materials require their exact upstream license and notices.
 
 CI runs on the exact proposed commit with read-only repository access, pinned official Actions and no deploy/publish step or external-service credentials. It retains evaluation diagnostics for seven days. Failed external consumers remain locally for diagnosis; successful ones are removed. Do not commit tarballs, credentials or generated service types. Report bugs with versions, reproduction, failing route/mode and relevant sanitized output; avoid secrets in logs.
+
+## Release PRs
+
+Use Conventional Commit titles for squash merges (`fix:`, `feat:`, and `!` for breaking changes). With a merge commit, ensure a Conventional Commit appears in the merged history. main push runs release-please to maintain a version/changelog PR. Review and pass its exact-head CI before merging; that merge creates a tag/GitHub Release and prepares accepted artifacts. npm stage/2FA is a separate step described in [the release guide](docs/npm-release.md). Only the package in packages/docs is published; the root remains private. Existing v0.1.0 is the immutable bootstrap baseline.

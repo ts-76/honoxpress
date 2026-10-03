@@ -19,17 +19,19 @@ The initial public 0.0.0-stage placeholder remains in registry history; latest i
 
 ## What happens when a PR is merged
 
-Merging a PR does not start a release. Verify runs on PR events and workflow dispatch/call; npm-stage.yml is workflow_dispatch only. Current source policy is stageEnabled:false and provenance:null, no NPM_STAGING_ENABLED repository variable is configured, and npm-stage environment is not created. No live CI stage is enabled.
+The owner requested release-please on 2026-10-03. The configured flow is:
 
-The current manual release flow is:
+1. Merge reviewed feature/fix PRs into main. release-please.yml runs on push to main and creates/updates a release PR from Conventional Commits. A fix bumps patch, a feat bumps minor, and breaking changes bump major. Documentation/maintenance appear in notes when there is a releasable change; a docs-only merge does not require an npm release.
+2. Review the generated version, CHANGELOG, package metadata and release-policy version. The root private workspace tracks the same version as packages/docs; only honoxpress is published. Merge the release PR after its exact-source Verify checks pass.
+3. The subsequent main push creates v<version> and a GitHub Release. The release workflow explicitly dispatches npm-stage.yml on that tag. Its quality job calls the three-Node Verify workflow, and preparation retrieves the Node 24.12.0 artifact from the same run/attempt without rebuilding. It validates source/metadata/LICENSE/consumer/graphs/SHA.
+4. CI stage remains disabled: stageEnabled:false, provenance:null, no NPM_STAGING_ENABLED variable and no npm-stage environment. Download the original accepted CI tgz for local manual stage, after owner release authorization. Never repack it on Mac. With separately configured CI stage gates, the stage job instead waits for an independent protected-environment reviewer and uses stage-only OIDC.
+5. The owner reviews/downloads the npm stage, compares hashes and approves with 2FA. Final npm publication is never automated by release-please.
 
-1. Decide a new version and release notes; review/integrate its source. 0.1.0 is already published and cannot be reused.
-2. Create a matching v<version> tag on the reviewed commit reachable from origin/main.
-3. Manually dispatch npm-stage.yml on that tag. The quality job calls the existing three-Node Verify workflow. Preparation downloads the Node 24.12.0 artifact from that same run/attempt, without rebuilding it, and verifies commit/metadata/LICENSE/consumer/graphs/SHA.
-4. With all setup gates enabled, the stage job waits for the protected environment review, then uses stage-only OIDC to submit exact bytes. If setup is incomplete, it stays skipped or fails closed.
-5. The owner reviews/downloads the stage, compares hashes and approves it with 2FA. Final approval is never automated.
+The manifest starts at 0.1.0 and bootstrap-sha points to the existing published v0.1.0 source. Tag format remains v<version>; the published tag and npm version are not replaced. JSON extra-files keep the package and release-policy version in sync. No permanent release-as or last-release-sha is set, so subsequent releases progress normally.
 
-PR-merge-triggered stage automation is a separate trigger/version/tag design choice; it has not been implemented. Stage and final public approval remain distinct operations.
+The pinned official Release Please Action uses the built-in GITHUB_TOKEN. The repository must allow GitHub Actions to create pull requests; default workflow permissions remain read-only, with write scopes only in the release-please job. No PAT/npm token is introduced. Bot-created events do not reliably start ordinary CI without approval; the workflow explicitly dispatches Verify on the PR branch with its API head SHA. Verify rejects a head that changed between dispatch and checkout. GitHub release tags likewise use explicit dispatch rather than relying on a token-generated tag event. Dispatch validates the repository, main base, release-please branch and tag before writes.
+
+Manual recovery remains available: dispatch release-please.yml on main to refresh a release PR or finish tagging a merged release PR, then inspect existing state before retrying. To re-prepare a tagged artifact, dispatch npm-stage.yml on the existing matching tag. A GitHub Release confirms source/tag/notes; check npm separately for package publication.
 
 ## Future CI setup targets
 

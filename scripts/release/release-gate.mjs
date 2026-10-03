@@ -12,6 +12,15 @@ const semver =
 export const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 export const json = async (file) => JSON.parse(await readFile(file, "utf8"));
 
+export function hasReleaseNotes(changelog, version) {
+  return changelog.split("\n").some((line) => {
+    const heading = line.match(
+      /^## (?:\[([^\]]+)\]\([^)]+\)|([^\s]+))(?: \(\d{4}-\d{2}-\d{2}\))?$/,
+    );
+    return heading && (heading[1] || heading[2]) === version;
+  });
+}
+
 export function approvedMetadataBlockers(pkg, policy, { licenseText = "", changelog = "" } = {}) {
   const blockers = [];
   if (pkg.name !== "honoxpress") blockers.push("package-name");
@@ -33,7 +42,7 @@ export function approvedMetadataBlockers(pkg, policy, { licenseText = "", change
   if (pkg.repository?.url !== repository) blockers.push("repository-url");
   if (pkg.publishConfig && Object.keys(pkg.publishConfig).length)
     blockers.push("publish-config-override");
-  if (!changelog.split("\n").includes(`## ${pkg.version}`)) blockers.push("release-notes");
+  if (!hasReleaseNotes(changelog, pkg.version)) blockers.push("release-notes");
   return blockers;
 }
 
