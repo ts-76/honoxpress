@@ -1,0 +1,49 @@
+{
+  "name": "honoxpress-hono-decks-pilot",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm decks:compile && vp dev --host 127.0.0.1 --port 5183 --strictPort",
+    "build": "pnpm decks:compile && node build/build.mjs",
+    "build:client": "vp build --mode client",
+    "build:ssg": "vp build --mode ssg",
+    "build:worker": "vp build --mode worker",
+    "typecheck": "pnpm decks:compile && tsc --noEmit",
+    "test:build": "vp test run tests/build.test.mjs --reporter=default --reporter=json --outputFile=dist/evidence/unit-tests.json",
+    "test:browser": "playwright test",
+    "verify": "node tests/installed-package.mjs && pnpm typecheck && pnpm check && pnpm lint && pnpm build && pnpm types:cf && pnpm test:build && pnpm test:browser && pnpm test:hmr && pnpm preview:dry-run && node tests/report-evidence.mjs",
+    "preview": "cf dev",
+    "preview:dry-run": "cf deploy --dry-run --prebuilt",
+    "check": "vp check",
+    "lint": "vp lint --deny-warnings",
+    "fmt": "vp fmt",
+    "test": "vp test run",
+    "build:cf": "cf build",
+    "types:cf": "cf workers types",
+    "decks:compile": "hono-decks compile",
+    "test:hmr": "playwright test --config playwright.hmr.config.ts"
+  },
+  "dependencies": {
+    "hono": "4.13.12",
+    "hono-decks": "1.0.0",
+    "honox": "0.1.61",
+    "honoxpress": "0.1.1"
+  },
+  "devDependencies": {
+    "@cloudflare/config": "0.20.0",
+    "@hono/vite-build": "1.11.1",
+    "@hono/vite-ssg": "0.3.3",
+    "@mdx-js/rollup": "3.1.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "22.20.4",
+    "remark-frontmatter": "5.0.0",
+    "remark-mdx-frontmatter": "6.0.0",
+    "typescript": "5.9.3",
+    "vite-plus": "catalog:",
+    "wrangler": "4.145.0"
+  },
+  "engines": {
+    "node": "^22.20.0 || ^24.12.0 || >=26.0.0"
+  },
+  "packageManager": "pnpm@11.22.0"
+}

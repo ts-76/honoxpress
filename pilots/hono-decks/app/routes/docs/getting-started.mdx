@@ -1,0 +1,98 @@
+---
+title: Get started
+description: Compile an MDX deck, mount the generated router in Hono, and verify it in your browser.
+order: 1
+---
+
+import { decks } from "../../decks";
+import Counter from "../../islands/counter";
+import CopyCode from "../../islands/copy-code";
+import DemoFrame from "../../components/demo-frame";
+
+# Get started
+
+Compile an MDX deck, mount the generated router in an existing Hono application, and verify it in your browser.
+
+<span data-doc-sentinel="DOCS_BODY_EN_7f91" hidden />
+
+[日本語を読む](/ja/docs/getting-started) · [Home](/)
+
+## Prepare a Hono app
+
+Use npm, pnpm, Yarn, or Bun and an existing Hono app. This guide ends with a two-slide deck. MDX compilation runs locally at build time; the Worker imports generated modules.
+
+## Install the package
+
+`init` creates `hono-decks.config.ts` and an app-owned facade without overwriting existing files. The pilot itself is already configured.
+
+<CopyCode code={"pnpm add hono-decks\npnpm exec hono-decks init"} />
+
+## Create and compile the first deck
+
+Create `decks/welcome/deck.mdx`. Opening frontmatter describes the deck; subsequent separators start slides.
+
+```text
+---
+title: Welcome
+description: My first hono-decks presentation
+---
+
+---
+layout: cover
+---
+
+# Welcome
+
+This deck is served from my Hono app.
+
+---
+
+## Next slide
+
+- Write slides in MDX
+- Serve them with Hono
+```
+
+Run `pnpm exec hono-decks compile`. Edit source decks and the facade, and leave generated modules to the compiler.
+
+## Mount the generated router
+
+```ts
+import { Hono } from "hono";
+import { decks } from "./decks";
+const app = new Hono();
+app.route(decks.mountPath, decks.router());
+export default app;
+```
+
+Use the configured mount path for both compilation and runtime. In this pilot it is `/demo`.
+
+## Verify it in the browser
+
+The following frame serves the actual compiled Welcome deck from the dynamic Hono router. Open the viewer and use the right arrow to reach the second slide.
+
+<DemoFrame src={decks.paths("welcome").embed} title="Welcome deck" linkLabel="Open deck embed" />
+
+<a href={decks.paths("welcome").viewer}>Open the deck viewer</a>
+
+## Troubleshooting
+
+- Missing generated modules: run the compiler and check `build.root` and `build.outDir`.
+- A deck returns 404: mount `decks.router()` at `decks.mountPath`.
+- Node modules enter the Worker: use `hono-decks` at runtime and keep `hono-decks/node` in build scripts.
+
+## Interactive counter
+
+This additional pilot island checks hydration and repeat navigation.
+
+<Counter label="Increment" />
+
+## Live demo
+
+The clock is generated per request. Documentation SSG never executes the demo router.
+
+<DemoFrame />
+
+## Next steps
+
+[Author an MDX deck](/docs/スライドを書く)
