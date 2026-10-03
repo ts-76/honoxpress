@@ -17,6 +17,7 @@
     "tests",
     "vite.config.ts",
     "playwright.config.ts",
+    "playwright.hmr.config.ts",
     "cloudflare.config.ts",
     "wrangler.config.ts",
     ".cloudflare/types"
