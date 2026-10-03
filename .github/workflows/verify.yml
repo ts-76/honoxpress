@@ -3,6 +3,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
+    inputs:
+      expected-sha:
+        description: Expected exact commit for a bot release PR; empty for ordinary manual runs
+        type: string
+        required: false
   workflow_call:
 permissions:
   contents: read
@@ -36,7 +41,12 @@ jobs:
           run_install: false
           cache: true
       - name: Record commit and runtime
+        env:
+          EXPECTED_SHA: ${{ inputs.expected-sha }}
         run: |
+          if [ -n "$EXPECTED_SHA" ]; then
+            test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          fi
           git rev-parse HEAD
           node --version
           pnpm --version

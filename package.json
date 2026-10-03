@@ -1,5 +1,6 @@
 {
   "name": "honoxpress-workspace",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -25,7 +26,7 @@
     "evidence": "pnpm --filter honoxpress-example evidence",
     "test:consumer": "node scripts/verify-consumer.mjs",
     "pack:docs": "pnpm build:package && pnpm --dir packages/docs pack --pack-destination ../../artifacts/package",
-    "test:release": "node --test scripts/release/release.test.mjs",
+    "test:release": "node --test scripts/release/release.test.mjs scripts/release/dispatch-release.test.mjs",
     "release:plan": "node scripts/release/release-plan.mjs",
     "release:dry-run": "node scripts/release/release-dry-run.mjs"
   },

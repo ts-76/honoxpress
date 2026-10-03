@@ -10,7 +10,7 @@ pnpm add honoxpress@0.1.0 hono
 導入時は[APIガイド](docs/api.md)と[package README](packages/docs/README.md)を参照してください。標準HonoXのroutes/renderer/islands/CSSは利用者が所有します。
 初回の公開tarballはCI・stageと完全一致し、公開registryからの新規consumer導入も成功しました。詳細と次回releaseの操作は[npm release手順](docs/npm-release.md)に記録しています。
 
-PRのマージだけではnpm releaseは始まりません。現在のrelease workflowはtagを選んで手動起動する構成で、CI stageは停止のままです。最終公開は本人の2FA承認で行います。
+mainへのPRマージでrelease-pleaseがバージョン・CHANGELOGを更新するリリースPRを作成・更新します。リリースPRをマージすると`v<version>`タグとGitHub Releaseが作成され、タグの品質検証・配布物準備が起動します。npmへのCI stageは停止のままです。npm公開は検証済み配布物を手動stageし、本人の2FA承認で行います。詳細は[npm release手順](docs/npm-release.md)を参照してください。
 
 信頼済みローカルMDXをHono JSXで静的生成し、Counter Islandと動的Hono `/demo/*`を同じCloudflare Worker構成で共存させる最小PoCです。2026-10-01、MacBook Air（macOS / arm64）で検証しました。
 
@@ -190,7 +190,7 @@ Issue #2 adds a separate build-only package entry. MDX frontmatter and generated
 
 [API導入ガイド](docs/api.md)、[互換性と未検証範囲](docs/compatibility.md)、[貢献手順](CONTRIBUTING.md)、[公開判断・release gate](docs/release-decisions.md)を用意しました。Node24.21.0が確認時の最新LTS、Macは既存Devboxの24.12.0を保持し両方をCI対象にしています。26系はCurrentかつ未検証です。名前`honoxpress`は反映済みです。MIT・honoxpress・初回0.1.0・npm owner ts-76は承認済みです。GitHub公開とnpm ts-76/2FA確認は2026-10-03に完了しました。後続CIのprovenance・次回stage/publishなどの判断は[#6](https://github.com/ts-76/honoxpress/issues/6)で行い、その後にhono-decksの実ページpilotへ進めます。初回0.1.0はprivate:falseのCI配布物をstageし、本人2FAで公開済みです。hono-decks実ページpilotは未実行です。
 
-[stage型release CIの準備](docs/npm-release.md)を追加しました。品質検証済みtarballとcommit・版/tag・SHA256を照合し、npm 11.21.0のstage dry-runを認証なしのloopback registryで検証します。MIT・0.1.0・npm owner ts-76をpolicyへ反映し、LICENSEの同梱と同一性を検証します。正式なGitHub URLに合わせたprivate:falseの配布候補を検証します。stageEnabled:falseとprovenance未設定によりCI stageはblockedです。公開済みv0.1.0 tagは作成済みで、通常PRのrefはrelease tag条件を満たしません。初回stageは公開placeholderを作り、既存packageが必要なTrusted Publishingのbootstrapとは別の承認対象です。初回stage・本人によるpublish・main統合は完了しました。後続CIのOIDC登録・環境設定・activationは未実行です。
+[stage型release CIの準備](docs/npm-release.md)を追加しました。品質検証済みtarballとcommit・版/tag・SHA256を照合し、npm 11.21.0のstage dry-runを認証なしのloopback registryで検証します。MIT・0.1.0・npm owner ts-76をpolicyへ反映し、LICENSEの同梱と同一性を検証します。正式なGitHub URLに合わせたprivate:falseの配布候補を検証します。stageEnabled:falseとprovenance未設定によりCI stageはblockedです。公開済みv0.1.0 tagをrelease-pleaseの基準に設定しました。通常PRのrefはrelease tag条件を満たしません。リリースPRの生成とGitHub Release作成はmain pushから自動起動し、bot PRのCIとタグの配布物準備は明示的なworkflow dispatchで実行します。初回stageは公開placeholderを作り、既存packageが必要なTrusted Publishingのbootstrapとは別の承認対象です。初回stage・本人によるpublish・main統合は完了しました。後続CIのOIDC登録・環境設定・activationは未実行です。
 
 ## honoxpress命名と累積レビュー
 

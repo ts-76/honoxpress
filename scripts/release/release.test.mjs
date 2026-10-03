@@ -16,6 +16,7 @@ import {
   sha256,
   repository,
   stageReceipt,
+  hasReleaseNotes,
 } from "./release-gate.mjs";
 import { dryRunTarball } from "./release-dry-run.mjs";
 
@@ -224,13 +225,13 @@ await test("stage receipt must identify the approved package and exact verified 
   );
 });
 
-await test("public MIT 0.1.0 candidate remains staging-disabled with provenance undecided", async () => {
+await test("current public MIT candidate remains staging-disabled with provenance undecided", async () => {
   const approvedPackage = JSON.parse(await readFile("packages/docs/package.json", "utf8"));
   const approvedPolicy = JSON.parse(await readFile("release-policy.json", "utf8"));
   const licenseText = await readFile("packages/docs/LICENSE", "utf8");
   const changelog = await readFile("CHANGELOG.md", "utf8");
   assert.equal(approvedPackage.name, "honoxpress");
-  assert.equal(approvedPackage.version, "0.1.0");
+  assert.equal(approvedPackage.version, approvedPolicy.version);
   assert.equal(approvedPackage.license, "MIT");
   assert.equal(approvedPolicy.npmOwner, "ts-76");
   assert.equal(approvedPackage.private, false);
@@ -244,7 +245,24 @@ await test("public MIT 0.1.0 candidate remains staging-disabled with provenance 
   const blockers = metadataBlockers(approvedPackage, approvedPolicy, { licenseText, changelog });
   assert.deepEqual(blockers.sort(), ["staging-disabled", "provenance-decision"].sort());
   assert.throws(
-    () => stageArguments({ status: "blocked", blockers }, "honoxpress-0.1.0.tgz"),
+    () =>
+      stageArguments({ status: "blocked", blockers }, `honoxpress-${approvedPackage.version}.tgz`),
     /Release blocked/,
   );
+});
+
+await test("release notes accept release-please compare headings and reject another version", () => {
+  for (const heading of [
+    "## 0.1.1",
+    "## 0.1.1 (2026-10-03)",
+    "## [0.1.1](https://github.com/ts-76/honoxpress/compare/v0.1.0...v0.1.1) (2026-10-03)",
+  ])
+    assert.equal(hasReleaseNotes(heading, "0.1.1"), true);
+  for (const heading of [
+    "## 0.1.10",
+    "## [0.1.10](https://example.invalid) (2026-10-03)",
+    "A sentence mentions 0.1.1",
+    "### 0.1.1",
+  ])
+    assert.equal(hasReleaseNotes(heading, "0.1.1"), false);
 });
