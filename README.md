@@ -141,16 +141,16 @@ Macのghq checkoutは`~/ghq/github.com/ts-76/honox-docs-poc`です。ChatGPT Pro
 
 ## OSS化の成果順
 
-package候補名はユーザー決定の`honoxpress`です。ライセンス・repo公開化・npm公開は未決定で、private workspaceとして評価し、利用者はHonoX標準routes/_rendererを所有します。runtimeの純粋metadata APIにcompiler/Node/build処理を混ぜません。
+package候補名はユーザー決定の`honoxpress`です。MITとGitHub公開は承認済みで、npm未公開のworkspaceとして評価し、利用者はHonoX標準routes/_rendererを所有します。runtimeの純粋metadata APIにcompiler/Node/build処理を混ぜません。
 
-1. [#1 package境界とmetadata API](https://github.com/ts-76/honox-docs-poc/issues/1)
-2. [#2 薄いMDX/SSG build連携](https://github.com/ts-76/honox-docs-poc/issues/2)
-3. [#3 nav/TOC/言語リンク・コピーUI](https://github.com/ts-76/honox-docs-poc/issues/3)
-4. [#4 tarballと外部consumer](https://github.com/ts-76/honox-docs-poc/issues/4)
-5. [#5 CIと公開判断ガイド](https://github.com/ts-76/honox-docs-poc/issues/5)
-6. [#6 判断後のhono-decks実ページpilot](https://github.com/ts-76/honox-docs-poc/issues/6)（ユーザー判断待ち）
+1. [#1 package境界とmetadata API](https://github.com/ts-76/honoxpress/issues/1)
+2. [#2 薄いMDX/SSG build連携](https://github.com/ts-76/honoxpress/issues/2)
+3. [#3 nav/TOC/言語リンク・コピーUI](https://github.com/ts-76/honoxpress/issues/3)
+4. [#4 tarballと外部consumer](https://github.com/ts-76/honoxpress/issues/4)
+5. [#5 CIと公開判断ガイド](https://github.com/ts-76/honoxpress/issues/5)
+6. [#6 判断後のhono-decks実ページpilot](https://github.com/ts-76/honoxpress/issues/6)（ユーザー判断待ち）
 
-各成果は作業branchのDraft PRでレビューします。mainへのmerge、npm publish/auth/token作成、公開化、実deployは実行しません。パッケージの利用者APIは[package README](packages/docs/README.md)を参照してください。
+各成果は作業branchのDraft PRでレビューします。GitHub公開化は2026-10-03の承認で実施済みです。mainへのmerge、npm stage/publish、token作成、実deployは未実行です。パッケージの利用者APIは[package README](packages/docs/README.md)を参照してください。
 
 ## Workspace境界
 
@@ -168,7 +168,7 @@ Issue #2 adds a separate build-only package entry. MDX frontmatter and generated
 
 ## tarballと外部consumer
 
-`pnpm pack:docs`はprivate評価packageのtarballを`artifacts/package`へ作るだけで、公開しません。`pnpm test:consumer`はpackageの古い出力削除→pack files/exports/types検査→repo外の一時consumerへtarball install→凍結install→runtime/型/配布asset検査→standard HonoXの全受入を実行します。アプリ部分は既存exampleのコピーですが、package source/workspaceリンクやrepoのnode_modulesに依存しません。UI/CSSは実際にインストールしたpackageからコピーして上書きします。
+`pnpm pack:docs`は未公開candidateのtarballを`artifacts/package`へ作るだけで、公開しません。`pnpm test:consumer`はpackageの古い出力削除→pack files/exports/types検査→repo外の一時consumerへtarball install→凍結install→runtime/型/配布asset検査→standard HonoXの全受入を実行します。アプリ部分は既存exampleのコピーですが、package source/workspaceリンクやrepoのnode_modulesに依存しません。UI/CSSは実際にインストールしたpackageからコピーして上書きします。
 
 検証スクリプトは[scripts/verify-consumer.mjs](scripts/verify-consumer.mjs)、型とruntime fixtureは[fixtures/consumer](fixtures/consumer)。成功時は一時consumerを削除し、失敗時は診断用に残します。ログとtarballはGit対象外の`artifacts`、確認結果は[consumer evidence](packages/docs/evidence/consumer.json)です。全`pnpm verify`にも外部consumer受入を含めています。npm publish/auth/tokenやhono-decks実ページへの導入は行いません。
 
@@ -176,12 +176,12 @@ Issue #2 adds a separate build-only package entry. MDX frontmatter and generated
 
 [Verify workflow](.github/workflows/verify.yml)はPRのhead commitを明示checkoutし、UbuntuのNode 22.23.3 / 24.12.0 / 24.21.0で凍結install、format・typed lint・tsc、package unit15件、3段build、build検査5件、browser検査6件、tarball外部consumerの同じ受入を実行します。cfはjob内だけglobalに用意し、実deploy・npm auth/publishはありません。公式Actionsはcommit SHA固定、repo権限はread-onlyです。各Nodeの証拠・tarball・診断は7日保持します。ローカル保存のsnapshotとCI run結果は別で、exact SHAとconclusionを確認して成功判定します。
 
-[API導入ガイド](docs/api.md)、[互換性と未検証範囲](docs/compatibility.md)、[貢献手順](CONTRIBUTING.md)、[公開判断・release gate](docs/release-decisions.md)を用意しました。Node24.21.0が確認時の最新LTS、Macは既存Devboxの24.12.0を保持し両方をCI対象にしています。26系はCurrentかつ未検証です。名前`honoxpress`は反映済みです。MIT・honoxpress・初回0.1.0・npm owner ts-76は承認済みです。repo公開化・認証/2FA・provenance・実stage/publishなどの判断は[#6](https://github.com/ts-76/honox-docs-poc/issues/6)で行い、その後にhono-decksの実ページpilotへ進めます。現時点でpackageはprivateのままです。
+[API導入ガイド](docs/api.md)、[互換性と未検証範囲](docs/compatibility.md)、[貢献手順](CONTRIBUTING.md)、[公開判断・release gate](docs/release-decisions.md)を用意しました。Node24.21.0が確認時の最新LTS、Macは既存Devboxの24.12.0を保持し両方をCI対象にしています。26系はCurrentかつ未検証です。名前`honoxpress`は反映済みです。MIT・honoxpress・初回0.1.0・npm owner ts-76は承認済みです。GitHub公開とnpm ts-76/2FA確認は2026-10-03に完了しました。provenance・実stage/publishなどの判断は[#6](https://github.com/ts-76/honoxpress/issues/6)で行い、その後にhono-decksの実ページpilotへ進めます。配布候補はprivate:falseですが、実stage/publishは未実行です。
 
-[stage型release CIの準備](docs/npm-release.md)を追加しました。品質検証済みtarballとcommit・版/tag・SHA256を照合し、npm 11.21.0のstage dry-runを認証なしのloopback registryで検証します。MIT・0.1.0・npm owner ts-76をpolicyへ反映し、LICENSEの同梱と同一性を検証します。private:true・stageEnabled:falseを維持し、provenanceとtagも未設定なので公開gateはblockedです。初回stageは公開placeholderを作り、既存packageが必要なTrusted Publishingのbootstrapとは別の承認対象です。実stage・publish・OIDC登録・main統合は行っていません。
+[stage型release CIの準備](docs/npm-release.md)を追加しました。品質検証済みtarballとcommit・版/tag・SHA256を照合し、npm 11.21.0のstage dry-runを認証なしのloopback registryで検証します。MIT・0.1.0・npm owner ts-76をpolicyへ反映し、LICENSEの同梱と同一性を検証します。正式なGitHub URLに合わせたprivate:falseの配布候補を検証します。stageEnabled:falseを維持し、provenanceとtagも未設定なので公開gateはblockedです。初回stageは公開placeholderを作り、既存packageが必要なTrusted Publishingのbootstrapとは別の承認対象です。実stage・publish・OIDC登録・main統合は行っていません。
 
 ## honoxpress命名と累積レビュー
 
-ユーザー決定の候補名`honoxpress`をpackage/import/build virtual ID・UI・README・sample・配布tarballへ反映しました。npm registryのread-only確認は2026-10-01に404でしたが、名前の予約や公開はしていません。GitHub repoのURLとghqパスは`honox-docs-poc`のままです。2026-10-02のユーザー承認を受けてMIT・0.1.0・owner ts-76を反映し、private:trueとstage停止guardを保持しています。
+ユーザー決定の候補名`honoxpress`をpackage/import/build virtual ID・UI・README・sample・配布tarballへ反映しました。npm registryのread-only確認は2026-10-01に404でしたが、名前の予約や公開はしていません。GitHubの正式URLは`ts-76/honoxpress`へ変更済みで、ローカルghqパスは`honox-docs-poc`を保持しています。2026-10-03の公開承認を反映し、配布候補はprivate:false、stage停止guardは保持しています。MIT・0.1.0・owner ts-76は承認済みです。
 
 累積独立レビューでP2を2件修正しました。Unicode routeのencoded hrefとHono decoded pathの不一致はlookup正規化・raw URL pathname使用・解決済みhrefのactive navで修正。HonoX標準の補助MDX除外とmetadata discoveryの不一致は共有内部判定で修正しました。実Hono request＋実rendererのIsland script/nav/TOC/翻訳と、補助ファイル/ディレクトリの一時fixtureを含むpackage unitは15件です。レビューの詳細と残る判断は[review report](docs/review-honoxpress.md)に記録します。

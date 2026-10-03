@@ -114,7 +114,10 @@ if (policy.stageEnabled === true) {
     "Release staging metadata is incomplete",
   );
 } else {
-  assert.equal(pkg.private, true, "Preparation does not authorize staging");
+  assert.ok(
+    metadataBlockers(pkg, policy, texts).includes("staging-disabled"),
+    "A public release candidate must retain the disabled staging gate",
+  );
 }
 const consumer = await mkdtemp(path.join(tmpdir(), "honoxpress-consumer-"));
 assert.ok(!(await realpath(consumer)).startsWith(await realpath(root)));

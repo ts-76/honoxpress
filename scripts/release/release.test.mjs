@@ -224,7 +224,7 @@ await test("stage receipt must identify the approved package and exact verified 
   );
 });
 
-await test("approved MIT 0.1.0 candidate remains private and staging-disabled", async () => {
+await test("public MIT 0.1.0 candidate remains staging-disabled with provenance undecided", async () => {
   const approvedPackage = JSON.parse(await readFile("packages/docs/package.json", "utf8"));
   const approvedPolicy = JSON.parse(await readFile("release-policy.json", "utf8"));
   const licenseText = await readFile("packages/docs/LICENSE", "utf8");
@@ -233,7 +233,7 @@ await test("approved MIT 0.1.0 candidate remains private and staging-disabled", 
   assert.equal(approvedPackage.version, "0.1.0");
   assert.equal(approvedPackage.license, "MIT");
   assert.equal(approvedPolicy.npmOwner, "ts-76");
-  assert.equal(approvedPackage.private, true);
+  assert.equal(approvedPackage.private, false);
   assert.equal(approvedPolicy.stageEnabled, false);
   assert.equal(approvedPolicy.provenance, null);
   assert.equal(licenseText, await readFile("LICENSE", "utf8"));
@@ -242,10 +242,7 @@ await test("approved MIT 0.1.0 candidate remains private and staging-disabled", 
     [],
   );
   const blockers = metadataBlockers(approvedPackage, approvedPolicy, { licenseText, changelog });
-  assert.deepEqual(
-    blockers.sort(),
-    ["staging-disabled", "package-private", "provenance-decision"].sort(),
-  );
+  assert.deepEqual(blockers.sort(), ["staging-disabled", "provenance-decision"].sort());
   assert.throws(
     () => stageArguments({ status: "blocked", blockers }, "honoxpress-0.1.0.tgz"),
     /Release blocked/,

@@ -14,7 +14,7 @@ import {
 
 assert.equal(process.env.GITHUB_ACTIONS, "true", "Staging is restricted to the reviewed workflow");
 assert.equal(process.env.NPM_STAGE_AUTHORIZATION, "protected-environment");
-assert.equal(process.env.GITHUB_REPOSITORY, "ts-76/honox-docs-poc");
+assert.equal(process.env.GITHUB_REPOSITORY, "ts-76/honoxpress");
 assert.equal(process.env.GITHUB_REF_TYPE, "tag");
 const commit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
 assert.equal(commit, process.env.GITHUB_SHA);
@@ -35,12 +35,12 @@ const headers = {
   Accept: "application/vnd.github+json",
 };
 const envResponse = await fetch(
-  "https://api.github.com/repos/ts-76/honox-docs-poc/environments/npm-stage",
+  "https://api.github.com/repos/ts-76/honoxpress/environments/npm-stage",
   { headers, signal: AbortSignal.timeout(15000) },
 );
 assert.equal(envResponse.status, 200, "Cannot verify protected environment");
 requireEnvironmentReview(await envResponse.json());
-const repoResponse = await fetch("https://api.github.com/repos/ts-76/honox-docs-poc", {
+const repoResponse = await fetch("https://api.github.com/repos/ts-76/honoxpress", {
   headers,
   signal: AbortSignal.timeout(15000),
 });
