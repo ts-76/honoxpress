@@ -1,4 +1,4 @@
-import type { Page, APIRequestContext } from "@playwright/test";
+import { expect, type Page, type APIRequestContext } from "@playwright/test";
 
 export async function routeStatus(request: APIRequestContext, pathname: string) {
   // Route addition/removal temporarily closes the dev listener during restart.
@@ -9,18 +9,23 @@ export async function routeStatus(request: APIRequestContext, pathname: string) 
 }
 
 export async function gotoConnected(page: Page, pathname: string) {
-  await page.goto(pathname);
-  await page.evaluate(async () => {
-    const clientUrl = "/@vite/client";
-    const { createHotContext } = await import(clientUrl);
-    const hot = createHotContext("/honoxpress-hmr-readiness");
-    await new Promise<void>((resolve) => {
-      const ready = () => {
-        hot.off("honoxpress:test-ready-ack", ready);
-        resolve();
-      };
-      hot.on("honoxpress:test-ready-ack", ready);
-      hot.send("honoxpress:test-ready", {});
+  // Only explicit navigation retries here. Assertions after edits never issue
+  // a navigation or reload, so a failed automatic update remains a failure.
+  await expect(async () => {
+    const response = await page.goto(pathname);
+    expect(response?.status()).toBe(200);
+    await page.evaluate(async () => {
+      const clientUrl = "/@vite/client";
+      const { createHotContext } = await import(clientUrl);
+      const hot = createHotContext("/honoxpress-hmr-readiness");
+      await new Promise<void>((resolve) => {
+        const ready = () => {
+          hot.off("honoxpress:test-ready-ack", ready);
+          resolve();
+        };
+        hot.on("honoxpress:test-ready-ack", ready);
+        hot.send("honoxpress:test-ready", {});
+      });
     });
-  });
+  }).toPass({ timeout: 15000 });
 }

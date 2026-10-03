@@ -14,30 +14,28 @@ test("MDX save updates body, title, nav and TOC, then rehydrates the island", as
     const title = locale === "ja" ? "更新されたガイド" : "Updated guide";
     const heading = locale === "ja" ? "更新された見出し" : "Updated heading";
     const button = locale === "ja" ? "増やす" : "Increment";
-    try {
-      await gotoConnected(page, `${prefix}/docs/getting-started`);
-      await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
-      await page.getByRole("button", { name: button, exact: true }).click();
-      await expect(page.getByTestId("count")).toHaveText("1");
-      await writeFile(
-        file,
-        original.replace(/^title:.*$/m, `title: ${title}`).replace(/^# .*$/m, `# ${title}`) +
-          `\n## ${heading}\n\nHMR ${locale} body revision.\n`,
-      );
-      // Deliberately no page.reload/goto: Vite must notify the open browser.
-      await expect(page.getByText(`HMR ${locale} body revision.`, { exact: true })).toBeVisible();
-      await expect(page).toHaveTitle(`${title} · honoxpress`);
-      await expect(page.locator(".docs-sidebar a[aria-current=page]")).toHaveText(title);
-      await expect(
-        page.locator(".toc-rail").getByRole("link", { name: heading, exact: true }),
-      ).toHaveAttribute("href", `#${heading.toLowerCase().replaceAll(" ", "-")}`);
-      await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
-      await expect(page.getByTestId("count")).toHaveText("0");
-      await page.getByRole("button", { name: button, exact: true }).click();
-      await expect(page.getByTestId("count")).toHaveText("1");
-    } finally {
-      await writeFile(file, original);
-    }
+    // The disposable app is removed by teardown. Restoring here would emit
+    // another reload while the next locale is navigating.
+    await gotoConnected(page, `${prefix}/docs/getting-started`);
+    await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
+    await page.getByRole("button", { name: button, exact: true }).click();
+    await expect(page.getByTestId("count")).toHaveText("1");
+    await writeFile(
+      file,
+      original.replace(/^title:.*$/m, `title: ${title}`).replace(/^# .*$/m, `# ${title}`) +
+        `\n## ${heading}\n\nHMR ${locale} body revision.\n`,
+    );
+    // Deliberately no page.reload/goto: Vite must notify the open browser.
+    await expect(page.getByText(`HMR ${locale} body revision.`, { exact: true })).toBeVisible();
+    await expect(page).toHaveTitle(`${title} · honoxpress`);
+    await expect(page.locator(".docs-sidebar a[aria-current=page]")).toHaveText(title);
+    await expect(
+      page.locator(".toc-rail").getByRole("link", { name: heading, exact: true }),
+    ).toHaveAttribute("href", `#${heading.toLowerCase().replaceAll(" ", "-")}`);
+    await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
+    await expect(page.getByTestId("count")).toHaveText("0");
+    await page.getByRole("button", { name: button, exact: true }).click();
+    await expect(page.getByTestId("count")).toHaveText("1");
   }
 });
 
