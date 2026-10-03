@@ -121,10 +121,12 @@ test("HTTP: exact Unicode routes, assets, real 404 and per-request demo", async 
   }
 });
 
-test("actual compiled deck: viewer advances to slide two", async ({ page }) => {
+test("actual compiled deck: viewer advances to slide two", async ({ page }, info) => {
   await page.goto("/demo/welcome");
   const slides = page.frameLocator("iframe");
   await expect(slides.getByRole("heading", { name: "Welcome", exact: true })).toBeVisible();
+  await page.screenshot({ path: info.outputPath("deck-cover.png") });
   await page.keyboard.press("ArrowRight");
   await expect(slides.getByRole("heading", { name: "Next slide", exact: true })).toBeVisible();
+  await page.screenshot({ path: info.outputPath("deck-second-slide.png") });
 });

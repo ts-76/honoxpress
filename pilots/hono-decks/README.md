@@ -6,7 +6,7 @@ The public registry still served 0.1.1 when this pilot was created on 2026-10-03
 
 ## Real content and provenance
 
-Adapted from [hono-decks `docs/app/guides.tsx`](https://github.com/ts-76/hono-decks/blob/965c27468a7c9f75ed84ea3a41bab128b46c544d/docs/app/guides.tsx): the English/Japanese getting-started guides and a small authoring excerpt. The Welcome deck is the guide's actual two-slide example. The source is MIT, copyright 2026 ts-76; its full license is retained in [UPSTREAM-LICENSE](./UPSTREAM-LICENSE).
+Adapted from [hono-decks `docs/app/guides.tsx`](https://github.com/ts-76/hono-decks/blob/965c27468a7c9f75ed84ea3a41bab128b46c544d/docs/app/guides.tsx): the English/Japanese getting-started guides and a small authoring excerpt. The Welcome deck adapts the guide's actual two-slide example, including its per-slide cover metadata. Deck sources are excluded from the generic formatter, which otherwise rewrites the custom slide frontmatter as Markdown headings. The documentation shows that source in a plain-text fence to preserve the same syntax. The source is MIT, copyright 2026 ts-76; its full license is retained in [UPSTREAM-LICENSE](./UPSTREAM-LICENSE).
 
 This is a representative excerpt conversion, not a full migration. Manual TSX sections become static Markdown headings with generated TOC anchors. Counter, copy-code and DemoFrame are consumer-owned additions. Unmigrated guide links are omitted rather than pointing at nonexistent local pages. `decks.paths("welcome")` supplies the deck URLs.
 
@@ -55,11 +55,13 @@ Local results with Node 24.12.0:
 | Typecheck, deck compilation, client/SSG/Worker build | Passed                                          |
 | Build tests                                          | 5 passed                                        |
 | Development and production local browser tests       | 6 passed                                        |
-| HMR: Japanese MDX add/unlink, nav, routing, 404      | Passed                                          |
+| HMR: Japanese MDX add/unlink backend routing and 404 | Passed                                          |
 | HMR: saved Unicode MDX after manual reload           | Passed                                          |
 | HMR: automatic MDX save reload in published 0.1.1    | **Expected failure, reproduced**                |
 
 The last test is explicitly marked `test.fail` for pinned 0.1.1; a green HMR command therefore does **not** mean automatic save reload works. JSON evidence records that test's expected failure, and the receipt checks that its actual error is the stale MDX body. The first plain reproduction failed while the browser retained the old guide. HonoX disables the default dev-server reload hook, and 0.1.1 only requests reload for MDX add/unlink. Reload the page after the watcher processes a save, or restart development. [Core fix PR #21](https://github.com/ts-76/honoxpress/pull/21) adds save reload and tests both the example and an installed tarball; this pilot intentionally remains on the published version.
+
+Automatic add/unlink reload also races HonoX's route restart on Linux: CI captured an aborted document request when reload was sent before the SSR transport had been replaced. The published-version test verifies backend route changes and 404; automatic navigation refresh is not claimed to pass. If navigation is stale after reload, restart the development process. PR #21 tests automatic refresh after awaiting the shared public restart promise. The fixture uses a websocket round trip before edits, so a missing initial HMR connection cannot masquerade as the known save failure.
 
 Build assertions verify four generated docs, manifest asset files, hashed client paths, removal of obsolete HTML/client/Worker/cf outputs, nonpublic manifest, real 404, and a positive eager-import leakage control. The SSG report skips every `/demo` route; an adversarial dynamic handler confirms zero demo executions. Browser tests verify nav/TOC, translations, Counter after repeat navigation, clock iframe, actual deck embed, second-slide navigation, and encoded Unicode URLs.
 

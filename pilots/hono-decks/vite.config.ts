@@ -39,6 +39,7 @@ export default defineConfig(({ mode }) => {
       fmt: {
         ignorePatterns: [
           "app/generated/**",
+          "decks/**",
           "dist/**",
           "packages/*/dist/**",
           "evidence/**",
@@ -67,6 +68,7 @@ export default defineConfig(({ mode }) => {
     fmt: {
       ignorePatterns: [
         "app/generated/**",
+        "decks/**",
         "dist/**",
         "packages/*/dist/**",
         "evidence/**",

@@ -17,6 +17,19 @@ for (const name of [
   ".npmrc",
 ])
   await cp(name, join(root, name), { recursive: true });
+// A fixture-only round trip verifies the parent document's HMR channel is live.
+const configFile = join(root, "vite.config.ts");
+let config = await readFile(configFile, "utf8");
+config = config.replace(
+  "plugins: lazyPlugins(async () => [",
+  `plugins: lazyPlugins(async () => [
+  { name: "hmr-test-readiness", configureServer(server) {
+    server.ws.on("honoxpress:test-ready", (data, client) => {
+      client.send({ type: "custom", event: "honoxpress:test-ready-ack", data });
+    });
+  } },`,
+);
+await writeFile(configFile, config);
 const pkg = JSON.parse(await readFile("package.json", "utf8"));
 pkg.scripts.dev = pkg.scripts.dev.replace("5183", "5185");
 await writeFile(join(root, "package.json"), JSON.stringify(pkg));

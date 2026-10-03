@@ -11,7 +11,7 @@
     "typecheck": "pnpm decks:compile && tsc --noEmit",
     "test:build": "vp test run tests/build.test.mjs --reporter=default --reporter=json --outputFile=dist/evidence/unit-tests.json",
     "test:browser": "playwright test",
-    "verify": "node tests/installed-package.mjs && pnpm check && pnpm lint && pnpm typecheck && pnpm build && pnpm types:cf && pnpm test:build && pnpm test:browser && pnpm test:hmr && pnpm preview:dry-run && node tests/report-evidence.mjs",
+    "verify": "node tests/installed-package.mjs && pnpm typecheck && pnpm check && pnpm lint && pnpm build && pnpm types:cf && pnpm test:build && pnpm test:browser && pnpm test:hmr && pnpm preview:dry-run && node tests/report-evidence.mjs",
     "preview": "cf dev",
     "preview:dry-run": "cf deploy --dry-run --prebuilt",
     "check": "vp check",
