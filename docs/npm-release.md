@@ -1,8 +1,22 @@
 # npm releases after 0.1.0
 
-## Published release
+## Current published release: 0.1.1
 
-[honoxpress@0.1.0](https://www.npmjs.com/package/honoxpress) was published on 2026-10-03. latest resolves to 0.1.0, the license is MIT and the maintainer is ts-76. main and v0.1.0 resolved to accepted commit a3ddd9e070274d9fbc2e3ea5611799fdbc0ec646 at publication. The local ghq path remains honox-docs-poc; GitHub and origin use ts-76/honoxpress.
+[honoxpress@0.1.1](https://www.npmjs.com/package/honoxpress) became latest on 2026-10-03 at 19:23 JST after the owner completed manual npm 2FA approval. Its source is 934a3e4aea866397902a92609de06b963f2582a8 at [v0.1.1](https://github.com/ts-76/honoxpress/releases/tag/v0.1.1).
+
+PR #15 recorded the initial publication, #16 introduced release-please, and generated release PR #17 proposed 0.1.1. All were reviewed, passed exact-head CI and merged. Main push created the release PR; its merge created the tag/GitHub Release and explicitly dispatched [tag acceptance and preparation](https://github.com/ts-76/honoxpress/actions/runs/37114591151). All three Node quality jobs and preparation passed; CI stage was skipped.
+
+The owner-requested manual stage used the original same-run Node 24.12.0 CI tgz, public/latest, ignore-scripts and provenance:false. CI stage settings remain disabled. Downloaded stage and public-registry bytes match the source metadata/LICENSE and accepted artifact:
+
+- SHA256: 9a6bdaf11dfbc3ac9718b3c1c2b24377042e31fb319cc3c9d98c2e9f813c83dd.
+- SHA512: sha512-ev0hF9mqRQssDm3pxNlP6+TiwIXcIwLo/w3Xuc09NQUWoGlGDXuN1imIFtTK4pYY0/N0kqyIRpl7Wal1XnkD4A==.
+- Fresh public-registry consumer install, frozen install and runtime/build exports, emitted types, private-export rejection, Worker-empty metadata and copied assets passed. pnpm's default non-strict minimum-release-age behavior auto-added the explicitly pinned honoxpress@0.1.1 to the temporary consumer's exclusions; repository/global policy was unchanged.
+
+The first bot pull_request event required workflow approval and later ended without jobs. The explicit SHA-checked bot dispatch and the final reviewed PR head both passed all three Node jobs. Final npm approve was performed by the owner, never by CI or the agent. Both published versions and tags remain immutable.
+
+## Initial published release: 0.1.0
+
+[honoxpress@0.1.0](https://www.npmjs.com/package/honoxpress) was published on 2026-10-03. latest resolved to 0.1.0 at initial publication, the license is MIT and the maintainer is ts-76. main and v0.1.0 resolved to accepted commit a3ddd9e070274d9fbc2e3ea5611799fdbc0ec646 at publication. The local ghq path remains honox-docs-poc; GitHub and origin use ts-76/honoxpress.
 
 The owner approved public GitHub visibility, main integration/tag and the exact initial local stage. The owner completed final npm approval through terminal/browser 2FA. The agent did not approve the stage. Initial provenance was explicitly false; Mac cannot generate cloud CI provenance.
 
@@ -15,7 +29,7 @@ The public registry tarball, downloaded stage and accepted CI artifact have iden
 
 Mac and Linux gzip bytes differ, while decompressed tar bytes and all 17 files/modes match. Stage only the original downloaded CI tgz; never repack it on Mac. Root/package/packed LICENSE and metadata were checked. An optional offline install probe lacked cached hono policy metadata; normal online frozen install passed with standard policy checks intact. Failed diagnostics are retained locally.
 
-The initial public 0.0.0-stage placeholder remains in registry history; latest is the approved 0.1.0. Do not remove registry history or restage the published version. The immutable npm artifact/README reflect the release candidate at its accepted commit; current repository documentation records the completed release.
+The initial public 0.0.0-stage placeholder remains in registry history; latest is now the approved 0.1.1. Do not remove registry history or restage the published version. The immutable npm artifact/README reflect the release candidate at its accepted commit; current repository documentation records the completed release.
 
 ## What happens when a PR is merged
 
