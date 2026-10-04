@@ -53,6 +53,9 @@ const virtual = await plugin.load.call(
 assert.match(virtual, /entries:\[\]/);
 assert.doesNotMatch(virtual, /frontmatter|\.mdx/);
 for (const [name, target] of [
+  ["docs-content.tsx", "app/components/docs-content.tsx"],
+  ["docs-layout.tsx", "app/components/docs-layout.tsx"],
+  ["components.css", "public/components.css"],
   ["docs-ui.tsx", "app/components/docs-ui.tsx"],
   ["copy-code.tsx", "app/islands/copy-code.tsx"],
   ["demo-frame.tsx", "app/components/demo-frame.tsx"],

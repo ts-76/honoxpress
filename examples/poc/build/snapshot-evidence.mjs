@@ -43,7 +43,7 @@ if (unit.numPassedTests !== 5 || unit.numFailedTests !== 0 || !unit.success)
   throw new Error("Unit verification is incomplete");
 const packageTests = await json("../../artifacts/package-tests.json");
 if (
-  packageTests.numPassedTests !== 16 ||
+  packageTests.numPassedTests !== 20 ||
   packageTests.numFailedTests !== 0 ||
   !packageTests.success
 )
@@ -51,7 +51,7 @@ if (
 const cfBuild = await json("dist/evidence/cf-build.json");
 if (!cfBuild.passed) throw new Error("cf verification is incomplete");
 const browser = await json("dist/evidence/browser-tests.json");
-if (browser.stats.unexpected !== 0 || browser.stats.expected !== 6)
+if (browser.stats.unexpected !== 0 || browser.stats.expected !== 8)
   throw new Error("Browser verification is incomplete");
 const outputs = {};
 for (const file of [

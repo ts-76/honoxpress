@@ -1,0 +1,142 @@
+---
+title: コンポーネント
+description: Standard documentation components and your own registry extensions.
+order: 2
+---
+
+# コンポーネント
+
+These examples use the shared `app/mdx-components.ts` registry. No per-page imports are required.
+
+## Callout
+
+<Callout type="info" title="Ready to write">
+  Standard components are included.
+</Callout>
+<Callout type="tip" title="Tip">
+  Edit the copied components to match your site.
+</Callout>
+<Callout type="warning" title="Warning">
+  Review changes before publishing.
+</Callout>
+<Callout type="danger" title="Danger">
+  This is a visual severity, not a confirmation dialog.
+</Callout>
+
+Props: `type` (`info`, `tip`, `warning`, `danger`; default `info`), optional `title`, and children.
+
+```mdx
+<Callout type="tip" title="Tip">
+  Your content.
+</Callout>
+```
+
+## Cards
+
+<Cards columns={2}>
+  <Card title="Getting started" href="/docs/getting-started">
+    Read the guide.
+  </Card>
+  <Card title="Your components">You own their source and styles.</Card>
+</Cards>
+
+Props: `Cards.columns` is `2` (default) or `3`. `Card` takes `title`, optional `href`, and children.
+
+```mdx
+<Cards columns={2}>
+  <Card title="Guide" href="/docs/getting-started">
+    Read more.
+  </Card>
+</Cards>
+```
+
+## Tabs
+
+<Tabs labels={["pnpm", "npm"]} ariaLabel="Package manager">
+  <TabPanel index={0}>pnpm add honoxpress</TabPanel>
+  <TabPanel index={1}>npm install honoxpress</TabPanel>
+</Tabs>
+
+<Tabs labels={["Preview", "Source"]} ariaLabel="Example view" selectedIndex={1}>
+  <TabPanel index={0}>Preview content</TabPanel>
+  <TabPanel index={1}>Source content</TabPanel>
+</Tabs>
+
+Props: `labels` is a non-empty array, `ariaLabel` names the tab list, `selectedIndex` defaults to `0`. Each `TabPanel.index` matches its label. Arrow keys, Home, and End select tabs.
+
+```mdx
+<Tabs labels={["First", "Second"]} ariaLabel="Example">
+  <TabPanel index={0}>First content</TabPanel>
+  <TabPanel index={1}>Second content</TabPanel>
+</Tabs>
+```
+
+## Steps
+
+<Steps>
+  <Step title="Install">Add honoxpress to your HonoX app.</Step>
+  <Step title="Configure">Connect the provider and remark plugin.</Step>
+  <Step title="Write">Use registered components in MDX.</Step>
+</Steps>
+
+Props: `Steps` wraps `Step` children; `Step.title` is optional.
+
+```mdx
+<Steps>
+  <Step title="Install">Add the package.</Step>
+</Steps>
+```
+
+## Accordion
+
+<Accordion>
+  <AccordionItem title="Who owns the components?">
+    Your application owns the copied source.
+  </AccordionItem>
+  <AccordionItem title="Does this need JavaScript?" open={true}>
+    Native details works without JavaScript.
+  </AccordionItem>
+</Accordion>
+
+Props: `AccordionItem.title` labels the summary; `open` defaults to `false`.
+
+```mdx
+<Accordion>
+  <AccordionItem title="Question">Answer.</AccordionItem>
+</Accordion>
+```
+
+## Code block
+
+<CodeBlock
+  code="pnpm add honoxpress"
+  filename="Terminal"
+  copyLabel="Copy example"
+  copiedLabel="Copied example"
+/>
+
+Props: `code` is required; optional `filename`, `copyLabel`, and `copiedLabel`. Plain Markdown fences remain plain code; use this component when you need a copy button.
+
+```mdx
+<CodeBlock code="pnpm add honoxpress" filename="Terminal" />
+```
+
+## Demo frame
+
+<DemoFrame src="/demo/clock" title="Component clock demo" />
+
+Props: `src` and `title` are required, with optional `linkLabel`. Demo routes remain dynamic and are excluded before SSG execution.
+
+```mdx
+<DemoFrame src="/demo/clock" title="Clock" />
+```
+
+## Your components
+
+<ProjectNote>A custom component is registered once and used here without an import.</ProjectNote>
+
+Add an import and an entry to the registry. `useMDXComponents(overrides)` merges per-render overrides after the defaults. Unknown or incorrectly cased component names fail during MDX compilation when `remarkDocsComponents` is configured.
+
+## Acknowledgments
+
+The component delivery approach was informed by [Nimbus](https://github.com/cloudflare/nimbus) and [Fumapress](https://github.com/fuma-nama/fumapress). These Hono JSX templates were implemented independently.

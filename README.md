@@ -1,10 +1,10 @@
 # honoxpress
 
-Documentation metadata, build helpers, and editable UI templates for Hono JSX and MDX.
+Documentation metadata, build helpers, and an editable Hono JSX component system for HonoX and MDX.
 
 Use HonoX's file-based routes to build navigation, tables of contents, and language links. Your application owns its routes, renderer, islands, and CSS, so you can adapt the documentation to your existing app.
 
-[npm](https://www.npmjs.com/package/honoxpress) · [Integration guide](docs/api.md) · [Package API](packages/docs/README.md) · [Releases](https://github.com/ts-76/honoxpress/releases) · [MIT License](LICENSE)
+[npm](https://www.npmjs.com/package/honoxpress) · [Component system](docs/components.md) · [Integration guide](docs/api.md) · [Package API](packages/docs/README.md) · [Releases](https://github.com/ts-76/honoxpress/releases) · [MIT License](LICENSE)
 
 ![Example documentation page with navigation, a table of contents, language links, code copying, an island, and a live demo.](examples/poc/evidence/screenshots/english.png)
 
@@ -14,9 +14,10 @@ Use HonoX's file-based routes to build navigation, tables of contents, and langu
 - **Multilingual documentation** — Derive URLs and locales from file paths and connect translations with matching relative slugs. Unavailable translations have no link.
 - **Tables of contents and anchors** — Generate a TOC from Markdown headings, with support for Unicode text and duplicate headings.
 - **Static docs and dynamic demos** — Build documentation as static pages while keeping demos as dynamic Worker routes.
-- **Editable UI** — Copy and customize navigation, TOC, language links, code copying, demo frames, and CSS. Add HonoX islands to MDX where interaction is needed.
+- **Shared MDX components** — Register reusable callouts, cards, steps, accordions, tabs, code blocks, and demo frames once for every MDX page.
+- **Editable layout and starter** — Install consumer-owned navigation, TOC, language links, page layout, components, and styles. A runnable HonoX starter configures the client, docs SSG, and Worker build stages.
 
-honoxpress fits existing HonoX applications and projects that keep their layouts in their own code. It does not include search, a CMS, hosting, or a project generator.
+honoxpress fits existing HonoX applications and projects that keep their layouts in their own code. It does not include search, a CMS, or hosting.
 
 ## Install and try the API
 
@@ -25,6 +26,8 @@ pnpm add honoxpress hono
 ```
 
 The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX and MDX build dependencies belong to your application.
+
+The component CLI and runnable starter are being prepared for an upcoming release. The currently published npm version, `honoxpress@0.1.4`, contains the metadata API and file templates but does not include `honoxpress init`, `honoxpress add`, or `init --starter`. The [component guide](docs/components.md#start-a-new-site) shows how to build and run the current repository candidate.
 
 `createDocsCatalog` turns page metadata into URLs, navigation, and translation links:
 
@@ -68,7 +71,7 @@ pnpm build
 pnpm preview
 ```
 
-The build runs **client → docs SSG → Worker**. Local production preview uses Cloudflare tooling and requires `cf@1.0.0-beta.6`. See the [compatibility guide](docs/compatibility.md) for dependency versions and environment requirements.
+The build runs **client → docs SSG → Worker**. Local production preview uses Cloudflare tooling; install it with `npm install --global cf@1.0.0-beta.6` before running `pnpm preview`. See the [compatibility guide](docs/compatibility.md) for dependency versions and environment requirements.
 
 ## Add MDX pages
 
@@ -107,9 +110,9 @@ Templates are exported as files through `honoxpress/templates/*`:
 | `demo-frame.tsx` | `app/components/demo-frame.tsx` |
 | `docs.css`       | Your public stylesheet          |
 
-Copy the files into your app and edit them to fit your design. **Place `copy-code.tsx` under `app/islands`** so HonoX can discover it. Importing the component directly from the package does not register an application island.
+For the complete component list, props, MDX registry setup, CLI workflow, and starter, see the [component system guide](docs/components.md). The upcoming CLI installs Hono JSX components and islands into your app, then validates MDX tags using the same registry supplied to `providerImportSource`.
 
-The templates include mobile navigation and TOC disclosures, visible keyboard focus, a skip link, copy success/failure feedback, and color-scheme tokens. Review and merge template updates manually, preserving the MIT copyright and permission notice in distributed copies. The [integration guide](docs/api.md#copy-and-customize-the-ui) includes a copy script.
+The layout and styles include responsive navigation and TOC disclosures, visible keyboard focus, a skip link, copy success/failure feedback, and color-scheme tokens. Installed components are app-owned; review changes manually and preserve the MIT notice when distributing copied files. See the [component system guide](docs/components.md) for installation, registry setup, props, and customization.
 
 ## Build model and scope
 
@@ -124,6 +127,7 @@ honoxpress is a 0.x library. Pin your package version and review the [changelog]
 
 ## Documentation and development
 
+- [Component system](docs/components.md) — MDX registry, standard component props, CLI, layout config, and starter
 - [Integration guide / API](docs/api.md) — MDX, Vite, renderer, templates, and Worker configuration
 - [Compatibility guide](docs/compatibility.md) — Tested environments and known limitations
 - [Maintenance and upgrades](docs/maintenance.md) — Compatibility decisions and template migration

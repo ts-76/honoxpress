@@ -9,6 +9,33 @@ const read = (p) => readFile(p, "utf8");
 const json = async (p) => JSON.parse(await read(p));
 
 async function assertArtifacts() {
+  const { default: mdx } = await import("@mdx-js/rollup");
+  const { remarkDocsComponents } = await import("honoxpress/build");
+  const compiler = mdx({
+    jsxImportSource: "hono/jsx",
+    providerImportSource: "/app/mdx-components",
+    remarkPlugins: [[remarkDocsComponents, { names: ["Callout"] }]],
+  });
+  await assert.rejects(compiler.transform("<Missing />", "/fixture.mdx"), /Register Missing/);
+  for (const source of ["<$Missing />", "<_Missing />", "<ui.Missing />"])
+    await assert.rejects(compiler.transform(source, "/fixture.mdx"), /Unknown MDX component/);
+  await assert.rejects(compiler.transform("<callout />", "/fixture.mdx"), /<Callout>/);
+  await assert.rejects(
+    compiler.transform("{true ? <Missing /> : null}", "/fixture.mdx"),
+    /Register Missing/,
+  );
+  await assert.rejects(
+    compiler.transform("<Callout content={<Missing />} />", "/fixture.mdx"),
+    /Register Missing/,
+  );
+  await assert.rejects(
+    compiler.transform('import callout from "./custom";\n\n<callout />', "/fixture.mdx"),
+    /<Callout>/,
+  );
+  await compiler.transform("{[() => null].map((LocalView) => <LocalView />)}", "/fixture.mdx");
+  const registered = await compiler.transform("<Callout>Content</Callout>", "/fixture.mdx");
+  assert.match(registered.code, /useMDXComponents/);
+  await compiler.transform('import Custom from "./custom";\n\n<Custom />', "/fixture.mdx");
   const manifest = await json("dist/evidence/client-manifest.json");
   assert.ok(manifest["app/client.ts"].isEntry);
   for (const entry of Object.values(manifest))
@@ -38,12 +65,17 @@ async function assertArtifacts() {
   const report = await json("dist/evidence/ssg.json");
   assert.deepEqual(
     [...new Set(report.accepted)].sort((a, b) => a.localeCompare(b)),
-    ["/docs/getting-started", "/ja/docs/getting-started"],
+    [
+      "/docs/components",
+      "/docs/getting-started",
+      "/ja/docs/components",
+      "/ja/docs/getting-started",
+    ],
   );
   assert.ok(report.skipped.includes("/demo/clock"), JSON.stringify(report));
   assert.ok(report.skipped.includes("/demo/status"));
   assert.equal(report.result.success, true);
-  assert.equal(report.result.files.length, 2);
+  assert.equal(report.result.files.length, 4);
   await assert.rejects(access("dist/public/demo/clock.html"));
   await assert.rejects(access("dist/public/.vite/manifest.json"));
 }
@@ -62,6 +94,11 @@ test("SSG excludes /demo before execution (including an adversarial dynamic rout
     mode: "ssg",
   });
   try {
+    const registry = await server.ssrLoadModule("/app/mdx-components.ts");
+    const Custom = () => null;
+    assert.equal(registry.useMDXComponents({ Callout: Custom }).Callout, Custom);
+    assert.equal(registry.useMDXComponents().Callout, registry.components.Callout);
+    assert.equal(typeof registry.components.ProjectNote, "function");
     const { docsOnlyPlugin } = await server.ssrLoadModule("/build/docs-only.ts");
     const app = new Hono();
     let calls = 0;
@@ -137,6 +174,7 @@ test("positive control: standard eager router includes MDX bodies in a Worker bu
       honox(),
       mdx({
         jsxImportSource: "hono/jsx",
+        providerImportSource: "/app/mdx-components",
         remarkPlugins: [
           remarkFrontmatter,
           [remarkMdxFrontmatter, { name: "frontmatter" }],
@@ -155,7 +193,7 @@ test("positive control: standard eager router includes MDX bodies in a Worker bu
     .filter((id) => id.endsWith(".mdx"));
   assert.match(code, /DOCS_BODY_EN_7f91/);
   assert.match(code, /DOCS_BODY_JA_8e42/);
-  assert.equal(mdxModules.length, 2);
+  assert.equal(mdxModules.length, 4);
   await writeFile(
     "dist/evidence/eager-control.json",
     JSON.stringify(

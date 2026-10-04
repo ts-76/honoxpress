@@ -1,0 +1,63 @@
+---
+title: Getting started
+description: Start a HonoX documentation site with shared MDX components and a Cloudflare Worker.
+order: 1
+---
+
+# Getting started
+
+Write your documentation in MDX. The starter registers reusable components once so pages do not need repeated imports.
+
+## Add a callout
+
+<Callout type="tip" title="Edit this starter">
+  Change this page, the site name, and the component registry to make the docs your own.
+</Callout>
+
+## Compose cards
+
+<Cards columns={2}>
+  <Card title="Write pages">
+    Add MDX files below `app/routes/docs`. Their file paths become their URLs.
+  </Card>
+  <Card title="Add components">
+    Register components in `app/mdx-components.ts` and use them in every MDX page.
+  </Card>
+</Cards>
+
+## Show steps
+
+<Steps>
+  <Step title="Install">Run `pnpm install` to install the pinned toolchain.</Step>
+  <Step title="Develop">Run `pnpm dev` and open the local documentation site.</Step>
+  <Step title="Preview">
+    Run `pnpm build` followed by `pnpm preview` to test the Worker and static assets locally.
+  </Step>
+</Steps>
+
+## Add an accordion
+
+<Accordion>
+  <AccordionItem title="Where do the components live?">
+    Server-rendered components are in `app/components`; interactive islands are in `app/islands`.
+  </AccordionItem>
+  <AccordionItem title="What runs in the Worker?">
+    The Worker routes are bundled separately from MDX. Documentation HTML is generated in the SSG
+    stage.
+  </AccordionItem>
+</Accordion>
+
+## Add tabs
+
+<Tabs labels={["pnpm", "npm"]}>
+  <TabPanel index={0}>Run `pnpm install`.</TabPanel>
+  <TabPanel index={1}>Run `npm install`.</TabPanel>
+</Tabs>
+
+## Copy a command
+
+<CodeBlock code="pnpm dev" filename="Terminal" />
+
+## Embed a live route
+
+<DemoFrame title="Worker clock" src="/demo/clock" linkLabel="Open the demo" />

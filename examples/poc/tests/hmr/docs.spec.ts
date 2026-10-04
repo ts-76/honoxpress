@@ -37,6 +37,25 @@ test("MDX save updates body, title, nav and TOC, then rehydrates the island", as
     await page.getByRole("button", { name: button, exact: true }).click();
     await expect(page.getByTestId("count")).toHaveText("1");
   }
+  // The registry is also a Vite config dependency. Editing a provider override
+  // must refresh an open MDX page, including its islands, without a manual reload.
+  await gotoConnected(page, "/docs/components");
+  await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
+  const registryPath = join(root, "app/mdx-components.ts");
+  const registry = await readFile(registryPath, "utf8");
+  await writeFile(
+    registryPath,
+    registry.replace(
+      "...standardComponents, ProjectNote",
+      '...standardComponents, ProjectNote: () => ProjectNote({ children: "Registry override applied" })',
+    ),
+  );
+  await expect(page.getByText("Registry override applied", { exact: true })).toBeVisible();
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(3);
+  await page.getByRole("tab", { name: "npm", exact: true }).click();
+  await expect(page.locator(".hx-tabs").first().getByRole("tabpanel")).toHaveText(
+    "npm install honoxpress",
+  );
 });
 
 test("Japanese MDX add/unlink refreshes navigation, routing and real 404", async ({

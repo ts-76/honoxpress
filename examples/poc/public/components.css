@@ -1,0 +1,245 @@
+/* Optional styles for docs-content.tsx and tabs.tsx. Import alongside docs.css. */
+.hx-callout {
+  --hx-callout-accent: #2563eb;
+  margin-block: 1.5rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid color-mix(in srgb, var(--hx-callout-accent) 28%, transparent);
+  border-inline-start: 0.25rem solid var(--hx-callout-accent);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--hx-callout-accent) 7%, Canvas);
+  color: CanvasText;
+}
+
+.hx-callout-info {
+  --hx-callout-accent: #2563eb;
+}
+
+.hx-callout-tip {
+  --hx-callout-accent: #15803d;
+}
+
+.hx-callout-warning {
+  --hx-callout-accent: #b45309;
+}
+
+.hx-callout-danger {
+  --hx-callout-accent: #b91c1c;
+}
+
+.hx-callout-title {
+  margin: 0 0 0.375rem;
+  color: CanvasText;
+  font-weight: 700;
+}
+
+.hx-callout-content > :first-child,
+.hx-card-content > :first-child,
+.hx-step-content > :first-child,
+.hx-accordion-content > :first-child,
+.hx-tab-panel > :first-child {
+  margin-block-start: 0;
+}
+
+.hx-callout-content > :last-child,
+.hx-card-content > :last-child,
+.hx-step-content > :last-child,
+.hx-accordion-content > :last-child,
+.hx-tab-panel > :last-child {
+  margin-block-end: 0;
+}
+
+.hx-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+
+.hx-cards-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.hx-card {
+  min-width: 0;
+  padding: 1rem 1.125rem;
+  border: 1px solid color-mix(in srgb, CanvasText 18%, transparent);
+  border-radius: 0.625rem;
+  background: Canvas;
+  color: CanvasText;
+}
+
+.hx-card-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+}
+
+.hx-card-title a {
+  color: inherit;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+}
+
+.hx-card-content {
+  color: color-mix(in srgb, CanvasText 82%, Canvas);
+}
+
+.hx-steps {
+  display: grid;
+  gap: 1.125rem;
+  margin-block: 1.5rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: hx-step;
+}
+
+.hx-step {
+  position: relative;
+  min-width: 0;
+  padding-inline-start: 3rem;
+  counter-increment: hx-step;
+}
+
+.hx-step::before {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: grid;
+  width: 2rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, LinkText 36%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, LinkText 10%, Canvas);
+  color: LinkText;
+  content: counter(hx-step);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.hx-step-title {
+  margin: 0 0 0.375rem;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+
+.hx-accordion {
+  display: grid;
+  gap: 0.625rem;
+  margin-block: 1.5rem;
+}
+
+.hx-accordion-item {
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border-radius: 0.5rem;
+  background: Canvas;
+  color: CanvasText;
+}
+
+.hx-accordion-summary {
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.hx-accordion-summary::marker {
+  color: LinkText;
+}
+
+.hx-accordion-content {
+  padding: 0 1rem 1rem;
+}
+
+.hx-tabs {
+  margin-block: 1.5rem;
+  color: CanvasText;
+}
+
+.hx-tab-list {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  border-block-end: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+}
+
+.hx-tab {
+  flex: 0 0 auto;
+  margin-block-end: -1px;
+  padding: 0.625rem 0.875rem;
+  border: 0;
+  border-block-end: 2px solid transparent;
+  border-radius: 0.375rem 0.375rem 0 0;
+  background: transparent;
+  color: color-mix(in srgb, CanvasText 74%, Canvas);
+  font: inherit;
+  cursor: pointer;
+}
+
+.hx-tab[aria-selected="true"] {
+  border-block-end-color: LinkText;
+  color: CanvasText;
+  font-weight: 650;
+}
+
+.hx-tab-panels {
+  padding-block: 1rem;
+}
+
+.hx-tab-panel {
+  min-width: 0;
+}
+
+.hx-tab:focus-visible,
+.hx-tab-panel:focus-visible,
+.hx-accordion-summary:focus-visible,
+.hx-card-title a:focus-visible {
+  outline: 3px solid LinkText;
+  outline-offset: 3px;
+}
+
+.hx-tab:focus:not(:focus-visible),
+.hx-accordion-summary:focus:not(:focus-visible),
+.hx-card-title a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.hx-tab-panel[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 42rem) {
+  .hx-cards,
+  .hx-cards-3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hx-callout,
+  .hx-card {
+    padding: 0.875rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-callout,
+  .hx-card,
+  .hx-tab,
+  .hx-accordion-item {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+}
+
+@media (forced-colors: active) {
+  .hx-callout,
+  .hx-card,
+  .hx-accordion-item,
+  .hx-tab-list {
+    border-color: CanvasText;
+  }
+
+  .hx-tab[aria-selected="true"] {
+    border-block-end-color: Highlight;
+  }
+}
