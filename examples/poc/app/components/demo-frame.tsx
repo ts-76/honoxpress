@@ -1,3 +1,4 @@
+/** @jsxImportSource hono/jsx */
 // Consumer-owned live demo frame; embedding is a browser request, never an SSG execution.
 export default function DemoFrame({
   title = "Live Worker demo",

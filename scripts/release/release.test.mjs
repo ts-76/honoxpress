@@ -66,7 +66,19 @@ const fixture = async (t) => {
       workspaceOrSourceLinks: false,
       packageStaleOutputRemoved: true,
     },
-    validation: { buildTests: 5, browserTests: 6, clientSSGWorker: "passed", cfBuild: "passed" },
+    validation: { buildTests: 5, browserTests: 8, clientSSGWorker: "passed", cfBuild: "passed" },
+    starter: {
+      packageInstalledFromTarball: true,
+      cliInitStarter: true,
+      frozenInstall: true,
+      typecheck: true,
+      fullBuild: true,
+      staticDocsAndComponents: true,
+      workerCompilerIsolation: true,
+      cloudflareDryRun: true,
+      temporaryFixtureRemoved: true,
+      developmentHttp: { docsStatus: 200, demoStatus: 200 },
+    },
     graphs: {
       worker: { docsCompilerOrBuildModules: [] },
       client: { docsCompilerOrBuildModules: [] },
@@ -74,7 +86,7 @@ const fixture = async (t) => {
   });
   await save("artifacts/package-tests.json", {
     success: true,
-    numPassedTests: 16,
+    numPassedTests: 20,
     numFailedTests: 0,
   });
   return { root, tarball, commit: "fixture-commit", ref: `refs/tags/v${pkg.version}` };

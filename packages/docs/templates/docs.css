@@ -1,3 +1,5 @@
+@import "./components.css";
+
 /* Independent Hono JSX starter. Visual references and acknowledgements: package README. */
 :root {
   color-scheme: light dark;
@@ -600,4 +602,17 @@ button:disabled {
   color: var(--docs-accent);
   font-size: 10px;
   margin: 0 0 5px;
+}
+
+.prose > pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 1rem;
+  border: 1px solid var(--docs-line);
+  border-radius: 0.5rem;
+  background: var(--docs-surface);
+  font-size: 0.875rem;
+}
+.prose :not(pre) > code {
+  overflow-wrap: anywhere;
 }

@@ -5,6 +5,9 @@ import { readdir } from "node:fs/promises";
 import { resolve, relative } from "node:path";
 import type { Heading } from "./catalog.js";
 
+export { remarkDocsComponents } from "./mdx-components.js";
+export type { DocsComponentsOptions } from "./mdx-components.js";
+
 export interface DocsBuildOptions {
   readonly locales: readonly string[];
   readonly defaultLocale: string;

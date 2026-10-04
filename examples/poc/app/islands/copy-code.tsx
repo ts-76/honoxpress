@@ -1,3 +1,4 @@
+/** @jsxImportSource hono/jsx */
 import { useState } from "hono/jsx";
 
 // Copy into app/islands. HonoX detects islands by the consumer-owned file path.

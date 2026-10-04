@@ -16,6 +16,7 @@ import { metadataBlockers, approvedMetadataBlockers } from "./release/release-ga
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { verifyStarter } from "./verify-starter.mjs";
 
 const root = process.cwd();
 const example = path.join(root, "examples/poc");
@@ -69,7 +70,7 @@ const files = (await run("tar", ["-tzf", tarball])).trim().split("\n").sort();
 for (const file of files)
   assert.match(
     file,
-    /^package\/(?:package\.json|README\.md|LICENSE|dist\/[a-z-]+\.(?:js|d\.ts)|templates\/(?:docs-ui\.tsx|copy-code\.tsx|demo-frame\.tsx|docs\.css))$/,
+    /^package\/(?:package\.json|README\.md|LICENSE|dist\/[a-z-]+\.(?:js|d\.ts)|templates\/(?:docs-ui\.tsx|docs-content\.tsx|docs-layout\.tsx|tabs\.tsx|site-config\.ts|copy-code\.tsx|demo-frame\.tsx|docs\.css|components\.css)|bin\/honoxpress\.mjs|starter\/(?:client\.ts|docs-virtual\.d\.ts|mdx-components\.ts)|scaffold\/[\w./-]+)$/,
   );
 for (const file of [
   "dist/index.js",
@@ -221,7 +222,7 @@ const cf = await json(path.join(consumer, "dist/evidence/cf-build.json"));
 assert.equal(unit.numPassedTests, 5);
 assert.equal(unit.numFailedTests, 0);
 assert.equal(unit.success, true);
-assert.equal(browser.stats.expected, 6);
+assert.equal(browser.stats.expected, 8);
 assert.equal(browser.stats.unexpected, 0);
 assert.equal(hmr.stats.expected, 2);
 assert.equal(hmr.stats.unexpected, 0);
@@ -237,6 +238,7 @@ for (const target of ["worker", "client"]) {
 }
 await rm(consumer, { recursive: true, force: true });
 await assert.rejects(access(consumer));
+const starter = await verifyStarter({ tarball, run, artifacts });
 const evidence = {
   capturedAt: new Date().toISOString(),
   commit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
@@ -276,6 +278,7 @@ const evidence = {
     cfDryRun: "passed; no deployment",
   },
   graphs,
+  starter,
   dependencyVersions,
   consumerLockfileSha256: createHash("sha256")
     .update(await readFile(path.join(artifacts, "consumer-pnpm-lock.yaml")))

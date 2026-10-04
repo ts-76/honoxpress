@@ -84,14 +84,28 @@ export async function inspectArtifact({ root = process.cwd(), artifactRoot = roo
   assert.equal(evidence.externalConsumer.workspaceOrSourceLinks, false);
   assert.equal(evidence.externalConsumer.packageStaleOutputRemoved, true);
   assert.equal(evidence.validation.buildTests, 5);
-  assert.equal(evidence.validation.browserTests, 6);
+  assert.equal(evidence.validation.browserTests, 8);
   assert.equal(evidence.validation.clientSSGWorker, "passed");
   assert.equal(evidence.validation.cfBuild, "passed");
+  for (const key of [
+    "packageInstalledFromTarball",
+    "cliInitStarter",
+    "frozenInstall",
+    "typecheck",
+    "fullBuild",
+    "staticDocsAndComponents",
+    "workerCompilerIsolation",
+    "cloudflareDryRun",
+    "temporaryFixtureRemoved",
+  ])
+    assert.equal(evidence.starter?.[key], true, `Starter verification missing: ${key}`);
+  assert.equal(evidence.starter.developmentHttp.docsStatus, 200);
+  assert.equal(evidence.starter.developmentHttp.demoStatus, 200);
   for (const target of ["worker", "client"])
     assert.deepEqual(evidence.graphs[target].docsCompilerOrBuildModules, []);
   const unit = await json(path.join(artifactRoot, "artifacts/package-tests.json"));
   assert.equal(unit.success, true);
-  assert.equal(unit.numPassedTests, 16);
+  assert.equal(unit.numPassedTests, 20);
   assert.equal(unit.numFailedTests, 0);
   return {
     pkg,

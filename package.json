@@ -9,9 +9,9 @@
     "lint": "vp lint --deny-warnings",
     "fmt": "vp fmt",
     "typecheck": "pnpm build:package && tsc --noEmit && pnpm --filter honoxpress-example typecheck",
-    "test:unit": "vp test run tests/core.test.ts tests/build-api.test.ts tests/ui.test.ts --reporter=default --reporter=json --outputFile=artifacts/package-tests.json",
+    "test:unit": "vp test run tests/core.test.ts tests/build-api.test.ts tests/ui.test.ts tests/components.test.ts --reporter=default --reporter=json --outputFile=artifacts/package-tests.json",
     "test": "vp test run",
-    "verify": "pnpm build:package && pnpm check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm --filter honoxpress-example verify && pnpm test:consumer && pnpm test:release && pnpm release:plan && pnpm release:dry-run",
+    "verify": "pnpm build:package && pnpm check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:setup && pnpm --filter honoxpress-example verify && pnpm test:consumer && pnpm test:release && pnpm release:plan && pnpm release:dry-run",
     "dev": "pnpm --filter honoxpress-example dev",
     "build": "pnpm --filter honoxpress-example build",
     "build:client": "pnpm --filter honoxpress-example build:client",
@@ -28,7 +28,8 @@
     "pack:docs": "pnpm build:package && pnpm --dir packages/docs pack --pack-destination ../../artifacts/package",
     "test:release": "node --test scripts/release/release.test.mjs scripts/release/dispatch-release.test.mjs",
     "release:plan": "node scripts/release/release-plan.mjs",
-    "release:dry-run": "node scripts/release/release-dry-run.mjs"
+    "release:dry-run": "node scripts/release/release-dry-run.mjs",
+    "test:setup": "node --test tests/setup.test.mjs"
   },
   "dependencies": {
     "honoxpress": "workspace:*"

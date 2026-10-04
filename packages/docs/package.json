@@ -13,11 +13,17 @@
     "type": "git",
     "url": "https://github.com/ts-76/honoxpress.git"
   },
+  "bin": {
+    "honoxpress": "./bin/honoxpress.mjs"
+  },
   "files": [
     "dist",
     "README.md",
     "templates",
-    "LICENSE"
+    "LICENSE",
+    "bin",
+    "starter",
+    "scaffold"
   ],
   "type": "module",
   "sideEffects": [
