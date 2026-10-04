@@ -44,6 +44,8 @@ const virtualId = "virtual:honoxpress/catalog";
 const resolvedId = `\0${virtualId}`;
 export function docsMetadataPlugin(options: DocsBuildOptions): Plugin {
   let routeRoot = "";
+  let routeRestart: Promise<void> | undefined;
+  let routeRevision = 0;
   const config = { locales: options.locales, defaultLocale: options.defaultLocale };
   return {
     name: "honoxpress-metadata",
@@ -89,21 +91,37 @@ export function docsMetadataPlugin(options: DocsBuildOptions): Plugin {
       if (options.worker) return;
       const reloadAfterRouteChange = async (file: string) => {
         if (!file.startsWith(`${routeRoot}/`) || !file.endsWith(".mdx")) return;
+        routeRevision++;
         // HonoX also restarts for route additions/removals. The shared restart
         // closes Vite's websocket; its client reloads after reconnecting. Sending
         // full-reload as well schedules a second navigation that can abort links.
-        await server.restart();
+        const restart = server.restart();
+        routeRestart = restart;
+        try {
+          await restart;
+        } finally {
+          if (routeRestart === restart) routeRestart = undefined;
+        }
       };
       server.watcher.on("add", reloadAfterRouteChange).on("unlink", reloadAfterRouteChange);
     },
-    async handleHotUpdate({ file, server, read }) {
-      if (options.worker || !file.startsWith(`${routeRoot}/`) || !file.endsWith(".mdx")) return;
-      await read(); // Editors can emit a filesystem event before a save completes.
-      // HonoX suppresses the dev server's default reload hook. MDX is SSR content,
-      // so updating its module alone does not replace the browser document.
-      const module = server.moduleGraph.getModuleById(resolvedId);
-      if (module) server.moduleGraph.invalidateModule(module);
-      server.ws.send({ type: "full-reload" });
+    hotUpdate: {
+      // Run after Vite's import-glob hook, which adds the eager HonoX router to
+      // create/delete updates. Its default SSR reload races the route restart.
+      order: "post",
+      async handler({ type, file, server, read }) {
+        if (options.worker || !file.startsWith(`${routeRoot}/`) || !file.endsWith(".mdx")) return;
+        if (type !== "update" || routeRestart) return [];
+        const revision = routeRevision;
+        await read(); // Editors can emit a filesystem event before a save completes.
+        if (routeRestart || revision !== routeRevision) return [];
+        // The restart reconnects and reloads the browser on create/delete. An
+        // ordinary save instead needs one explicit reload, sent only by client.
+        const module = this.environment.moduleGraph.getModuleById(resolvedId);
+        if (module) this.environment.moduleGraph.invalidateModule(module);
+        if (this.environment.name === "client") server.ws.send({ type: "full-reload" });
+        return [];
+      },
     },
   };
 }

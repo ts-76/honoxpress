@@ -1,7 +1,9 @@
 import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { test, expect } from "vite-plus/test";
+import { EventEmitter } from "node:events";
+import { test, expect, vi } from "vite-plus/test";
+import type { ViteDevServer } from "vite-plus";
 import { docsMetadataPlugin, docsOnlyPlugin, remarkDocsHeadings } from "honoxpress/build";
 import { resolveClientScript } from "honoxpress";
 
@@ -97,4 +99,82 @@ test("metadata discovery follows HonoX exclusions and Worker never discovers fil
   } finally {
     await rm(root, { recursive: true, force: true });
   }
+});
+
+test("route restarts suppress eager-router reloads and saves that overlap the restart", async () => {
+  const plugin = docsMetadataPlugin({ locales: ["en"], defaultLocale: "en", worker: false });
+  const configure = plugin.configResolved as (config: { root: string }) => void;
+  configure({ root: "/fixture" });
+  const hook = plugin.hotUpdate;
+  if (!hook || typeof hook === "function") throw new Error("Expected the ordered update hook");
+  expect(hook.order).toBe("post");
+  const update = hook.handler;
+  const watcher = new EventEmitter();
+  const deferred = <T>() => {
+    let resolve!: (value: T) => void;
+    const promise = new Promise<T>((done) => {
+      resolve = done;
+    });
+    return { promise, resolve };
+  };
+  const restarting = deferred<void>();
+  const reading = deferred<string>();
+  const send = vi.fn();
+  const invalidateModule = vi.fn();
+  const module = {};
+  const server = {
+    watcher,
+    restart: vi.fn(() => restarting.promise),
+    ws: { send },
+  } as unknown as ViteDevServer;
+  const configureServer = plugin.configureServer as (server: ViteDevServer) => void;
+  configureServer(server);
+  const context = (name: string) =>
+    ({
+      environment: {
+        name,
+        moduleGraph: { getModuleById: () => module, invalidateModule },
+      },
+    }) as unknown as ThisParameterType<typeof update>;
+  const change = (type: "create" | "update" | "delete", read = async () => "MDX") => ({
+    type,
+    file: "/fixture/app/routes/docs/page.mdx",
+    server,
+    read,
+    timestamp: 0,
+    modules: [],
+  });
+  // Even without a save, import-glob's eager router would send an SSR reload
+  // for create/delete. Returning no modules prevents that premature reload.
+  for (const type of ["create", "delete"] as const)
+    for (const environment of ["client", "ssr"])
+      expect(await update.call(context(environment), change(type))).toEqual([]);
+  expect(send).not.toHaveBeenCalled();
+  // A save can start reading before the add event begins its restart.
+  const save = update.call(
+    context("client"),
+    change("update", () => reading.promise),
+  );
+  watcher.emit("add", "/fixture/app/routes/docs/new.mdx");
+  reading.resolve("MDX");
+  expect(await save).toEqual([]);
+  expect(send).not.toHaveBeenCalled();
+  restarting.resolve();
+  await restarting.promise;
+  // A restart can also finish before a save's asynchronous read finishes.
+  const lateRead = deferred<string>();
+  const lateSave = update.call(
+    context("client"),
+    change("update", () => lateRead.promise),
+  );
+  watcher.emit("unlink", "/fixture/app/routes/docs/new.mdx");
+  await restarting.promise;
+  lateRead.resolve("MDX");
+  expect(await lateSave).toEqual([]);
+  expect(send).not.toHaveBeenCalled();
+  // Ordinary saves still invalidate both catalogs and send just one reload.
+  for (const environment of ["client", "ssr"])
+    expect(await update.call(context(environment), change("update"))).toEqual([]);
+  expect(invalidateModule).toHaveBeenCalledTimes(2);
+  expect(send).toHaveBeenCalledExactlyOnceWith({ type: "full-reload" });
 });
