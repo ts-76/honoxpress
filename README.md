@@ -126,6 +126,7 @@ honoxpress is a 0.x library. Pin your package version and review the [changelog]
 
 - [Integration guide / API](docs/api.md) — MDX, Vite, renderer, templates, and Worker configuration
 - [Compatibility guide](docs/compatibility.md) — Tested environments and known limitations
+- [Maintenance and upgrades](docs/maintenance.md) — Compatibility decisions and template migration
 - [Example application](examples/poc) — The complete client/SSG/Worker pipeline
 - [Changelog](CHANGELOG.md) / [Releases](https://github.com/ts-76/honoxpress/releases)
 - [Contributing](CONTRIBUTING.md) — Development setup, verification, and PR workflow

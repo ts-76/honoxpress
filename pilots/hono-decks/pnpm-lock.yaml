@@ -27,8 +27,8 @@ importers:
         specifier: 0.1.61
         version: 0.1.61(hono@4.13.12)(supports-color@10.2.2)(wrangler@4.145.0(@types/node@22.20.4))
       honoxpress:
-        specifier: 0.1.1
-        version: 0.1.1(hono@4.13.12)(vite-plus@1.0.0(@types/node@22.20.4)(@vitest/ui@5.0.1(vitest@5.0.1))(esbuild@0.28.2)(typescript@5.9.3)(yaml@2.9.1))
+        specifier: 0.1.3
+        version: 0.1.3(hono@4.13.12)(vite-plus@1.0.0(@types/node@22.20.4)(@vitest/ui@5.0.1(vitest@5.0.1))(esbuild@0.28.2)(typescript@5.9.3)(yaml@2.9.1))
     devDependencies:
       '@cloudflare/config':
         specifier: 0.20.0
@@ -1889,8 +1889,8 @@ packages:
     peerDependencies:
       hono: '>=4.*'
 
-  honoxpress@0.1.1:
-    resolution: {integrity: sha512-ev0hF9mqRQssDm3pxNlP6+TiwIXcIwLo/w3Xuc09NQUWoGlGDXuN1imIFtTK4pYY0/N0kqyIRpl7Wal1XnkD4A==}
+  honoxpress@0.1.3:
+    resolution: {integrity: sha512-+mPgHx3jshZ83E5uNghF2vOptjyydBmK+VBWkL6mA9CKercVwlJPpvWYPoRJcY2+1ewQIXpAOmfqfJ6rPsW/XQ==}
     engines: {node: ^22.20.0 || ^24.12.0 || >=26.0.0}
     peerDependencies:
       hono: ^4.13.12
@@ -4102,7 +4102,7 @@ snapshots:
       - supports-color
       - wrangler
 
-  honoxpress@0.1.1(hono@4.13.12)(vite-plus@1.0.0(@types/node@22.20.4)(@vitest/ui@5.0.1(vitest@5.0.1))(esbuild@0.28.2)(typescript@5.9.3)(yaml@2.9.1)):
+  honoxpress@0.1.3(hono@4.13.12)(vite-plus@1.0.0(@types/node@22.20.4)(@vitest/ui@5.0.1(vitest@5.0.1))(esbuild@0.28.2)(typescript@5.9.3)(yaml@2.9.1)):
     dependencies:
       hono: 4.13.12
     optionalDependencies:

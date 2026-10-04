@@ -18,21 +18,10 @@ const specs = (suites) =>
 const hmrTests = specs(hmr.suites).flatMap((spec) =>
   spec.tests.map((test) => ({ ...test, title: spec.title })),
 );
-const known = hmrTests.filter((test) => test.expectedStatus === "failed");
-assert.equal(known.length, 1);
-assert.match(known[0].title, /MDX save updates body/);
-assert.equal(known[0].results.length, 1);
-assert.equal(known[0].results[0].status, "failed");
-assert.ok(
-  known[0].results[0].errors.some((error) => error.message.includes("HMR en body revision.")),
-  "known failure must be the stale MDX body, not an unrelated browser/server error",
-);
-assert.equal(
-  hmrTests.filter(
-    (test) => test.expectedStatus === "passed" && test.results.at(-1).status === "passed",
-  ).length,
-  2,
-);
+assert.equal(hmr.stats.skipped, 0);
+assert.equal(hmr.stats.flaky, 0);
+assert.ok(hmrTests.every((test) => test.expectedStatus === "passed"));
+assert.equal(hmrTests.filter((test) => test.results.at(-1).status === "passed").length, 3);
 const graphs = {};
 for (const target of ["worker", "client"]) {
   const graph = await json(`dist/evidence/${target}-modules.json`);
@@ -50,15 +39,14 @@ const receipt = {
   dirty: Boolean(execFileSync("git", ["status", "--porcelain"], { encoding: "utf8" }).trim()),
   node: process.version,
   platform: process.platform,
-  packages: { honoxpress: "0.1.1", honoDecks: "1.0.0" },
+  packages: {
+    honoxpress: (await json("node_modules/honoxpress/package.json")).version,
+    honoDecks: (await json("node_modules/hono-decks/package.json")).version,
+  },
   lockSha256: createHash("sha256")
     .update(await readFile("pnpm-lock.yaml"))
     .digest("hex"),
-  validation: { buildTests: 5, browserTests: 6, hmrPassed: 2, hmrExpectedFailures: 1 },
-  knownFailure: {
-    title: known[0].title,
-    reason: "published 0.1.1 browser retains the pre-save MDX body",
-  },
+  validation: { buildTests: 5, browserTests: 6, hmrPassed: 3, hmrExpectedFailures: 0 },
   graphs,
   ssg: await json("dist/evidence/ssg.json"),
   cfBuild: await json("dist/evidence/cf-build.json"),
@@ -67,5 +55,5 @@ const receipt = {
 };
 await writeFile("dist/evidence/pilot-receipt.json", JSON.stringify(receipt, null, 2) + "\n");
 console.log(
-  "Pilot evidence: build 5, browser 6, HMR 2 passed + 1 confirmed known failure; no module leaks",
+  "Pilot evidence: build 5, browser 6, HMR 3 passed; zero expected failures; no module leaks",
 );

@@ -1,6 +1,6 @@
 # Contributing to honoxpress
 
-Report bugs and proposals in [GitHub Issues](https://github.com/ts-76/honoxpress/issues). Include package/toolchain versions, reproduction steps, the affected URL, and the failing dev/SSG/Worker stage. Keep credentials and private content out of logs. Contribution, support, and broader adoption policy are still being defined in [Issue #6](https://github.com/ts-76/honoxpress/issues/6). The instructions below describe the existing development and review workflow.
+Report bugs and proposals in [GitHub Issues](https://github.com/ts-76/honoxpress/issues). Include package/toolchain versions, reproduction steps, the affected URL, and the failing dev/SSG/Worker stage. Keep credentials and private content out of logs. See the [maintenance and upgrade policy](docs/maintenance.md) for compatibility, consumer-owned templates, and change acceptance. Broader adoption in hono-decks remains tracked in [Issue #6](https://github.com/ts-76/honoxpress/issues/6).
 
 Use your existing Node environment manager to select a tested runtime. The reference development setup uses Node.js 24.12.0, pnpm 11.22.0, and `cf@1.0.0-beta.6`. See [compatibility](docs/compatibility.md) for the CI matrix and other dependency versions.
 

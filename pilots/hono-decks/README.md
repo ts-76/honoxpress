@@ -1,8 +1,8 @@
 # hono-decks real-page pilot
 
-This independent, private consumer app evaluates the published `honoxpress@0.1.1` with published `hono-decks@1.0.0`. Both versions and all dependencies are locked. It does not use repository package sources, `workspace:*`, unpublished 0.1.2, or a Vite alias to honoxpress source.
+This independent, private consumer app uses published `honoxpress@0.1.3` and `hono-decks@1.0.0`. All dependencies are locked. It installs honoxpress from the public registry and does not use repository package sources, `workspace:*`, or a Vite source alias.
 
-The public registry still served 0.1.1 when this pilot was created on 2026-10-03. The existing 0.1.2 release at commit `2912c5bdbc8fa6537bb7aeb4bbc73583b26e6029` was staged with provenance and awaited owner 2FA. That release is separate from the subsequent HMR fix candidate. Publishing or approving either is outside this pilot.
+The pilot checks representative real documentation and slide content against the public package, including automatic MDX reload on save, addition, and removal. It is an integration reference rather than a full migration of hono-decks.
 
 ## Real content and provenance
 
@@ -44,26 +44,25 @@ For a production local preview, run `pnpm build:cf`, then `pnpm preview`. No dep
 
 Development is at `http://127.0.0.1:5183`; Worker local preview is at `http://127.0.0.1:8793`. The isolated HMR test server uses port 5185. Tests use disposable application copies under the system temporary directory, preserve the tracked MDX, and stop their process group on exit.
 
-The consumer's `build/honox-watch.ts` adapter registers an absolute `app` directory instead of HonoX 0.1.61's relative `./app/**` glob, retaining its restart callbacks and other plugins. The original registration can leave routes absent from the initial Linux watcher; simply enabling relative globs also failed save invalidation. Fixture identity and the current MDX's watched path are checked before any test edit. This pinned-version setup fix does not resolve published 0.1.1's save reload failure; recheck the adapter when upgrading dependencies.
+The consumer's `build/honox-watch.ts` adapter registers an absolute `app` directory for HonoX 0.1.61 / Vite Plus 1.0.0, retaining HonoX's route restart callbacks. Recheck this adapter when upgrading HonoX or Vite Plus. The HMR tests confirm the disposable app identity and watched MDX path before editing.
 
-## Verification and known HMR failure
+## Verification
 
-Local results with Node 24.12.0:
+Local full acceptance passed with Node.js 24.12.0 on macOS arm64. The dedicated [pilot workflow](../../.github/workflows/hono-decks-pilot.yml) repeats the same acceptance on Ubuntu / Node.js 24.12.0; use its exact-commit result to assess a PR.
 
-| Verification                                         | Result                                          |
-| ---------------------------------------------------- | ----------------------------------------------- |
-| Registry package resolution and integrity lock       | Passed; 0.1.1, no workspace/source dependencies |
-| Format, lint (deny warnings), and types              | Passed                                          |
-| Typecheck, deck compilation, client/SSG/Worker build | Passed                                          |
-| Build tests                                          | 5 passed                                        |
-| Development and production local browser tests       | 6 passed                                        |
-| HMR: Japanese MDX add/unlink backend routing and 404 | Passed                                          |
-| HMR: saved Unicode MDX after manual reload           | Passed                                          |
-| HMR: automatic MDX save reload in published 0.1.1    | **Expected failure, reproduced**                |
+| Verification                                                         | Local result                                    |
+| -------------------------------------------------------------------- | ----------------------------------------------- |
+| Public package resolution and integrity lock                         | Passed; 0.1.3, no workspace/source dependencies |
+| Format, lint, types, and deck compilation                            | Passed                                          |
+| Client / docs SSG / Worker build and cf dry-run                      | Passed                                          |
+| Build regressions                                                    | 5 passed                                        |
+| Development and production-local browser tests                       | 6 passed                                        |
+| HMR: English/Japanese save updates body, title, nav, TOC, and island | Passed                                          |
+| HMR: Japanese add/unlink updates navigation, routing, and real 404   | Passed; one automatic reload per route change   |
+| HMR: Unicode MDX save updates the open browser                       | Passed                                          |
+| Expected failures, skipped HMR tests, or flaky HMR tests             | Zero                                            |
 
-The last test is explicitly marked `test.fail` for pinned 0.1.1; a green HMR command therefore does **not** mean automatic save reload works. JSON evidence records that test's expected failure, and the receipt checks that its actual error is the stale MDX body. The first plain reproduction failed while the browser retained the old guide. HonoX disables the default dev-server reload hook, and 0.1.1 only requests reload for MDX add/unlink. Reload the page after the watcher processes a save, or restart development. [Core fix PR #21](https://github.com/ts-76/honoxpress/pull/21) adds save reload and tests both the example and an installed tarball; this pilot intentionally remains on the published version.
-
-Automatic add/unlink reload also races HonoX's route restart on Linux: CI captured an aborted document request when reload was sent before the SSR transport had been replaced. The published-version test verifies backend route changes and 404; automatic navigation refresh is not claimed to pass. If navigation is stale after reload, restart the development process. PR #21 tests automatic refresh after awaiting the shared public restart promise. The fixture uses a websocket round trip before edits, so a missing initial HMR connection cannot masquerade as the known save failure.
+All three HMR tests must succeed. Assertions after an edit do not call `page.reload` or navigate to refresh content. The evidence receipt rejects expected failures and records the installed package versions. Test edits remain in disposable application copies, so restoring a file cannot trigger a reload during the next test.
 
 Build assertions verify four generated docs, manifest asset files, hashed client paths, removal of obsolete HTML/client/Worker/cf outputs, nonpublic manifest, real 404, and a positive eager-import leakage control. The SSG report skips every `/demo` route; an adversarial dynamic handler confirms zero demo executions. Browser tests verify nav/TOC, translations, Counter after repeat navigation, clock iframe, actual deck embed, second-slide navigation, and encoded Unicode URLs.
 
@@ -73,4 +72,4 @@ Both client and Worker module graphs exclude docs MDX, MDX/remark tooling, `hono
 
 Experimental compatibility is limited to these pinned dependencies on macOS and CI Linux, using the tested Node version. This does not establish a compatibility range or a full hono-decks migration. Search, drafts, remote/untrusted MDX, deployment, cross-origin embedding, presenter, exports, OGP, and deck-source HMR are outside the pilot. Deck compilation is explicit at startup/build; documentation HMR is tested separately.
 
-The existing hono-decks application and its dirty worktree remain untouched. Discarding this branch or removing `pilots/hono-decks` and its dedicated CI workflow is sufficient to roll back the pilot. There is no production route, registry setting, permission, or deployment to undo.
+This pilot is isolated from the upstream hono-decks application. Discarding this branch or removing `pilots/hono-decks` and its dedicated CI workflow is sufficient to roll back the pilot. There is no production route, registry setting, permission, or deployment to undo.

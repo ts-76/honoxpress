@@ -124,7 +124,7 @@ honoxpress is a 0.x library for trusted local MDX. It supplies metadata, build h
 
 Repository CI validates Node.js 22.23.3, 24.12.0, and 24.21.0, including installation of a packed tarball in an independent application. Node.js 26, other operating systems/browsers, and production Cloudflare deployment are unverified. Browser checks cover representative UI behavior rather than a complete accessibility certification. Pin your package version and review the [changelog](https://github.com/ts-76/honoxpress/blob/main/CHANGELOG.md) when upgrading.
 
-Report bugs with package/toolchain versions, reproduction steps, the affected URL, and the failing dev/SSG/Worker stage in [GitHub Issues](https://github.com/ts-76/honoxpress/issues). Development and verification instructions are in [CONTRIBUTING](https://github.com/ts-76/honoxpress/blob/main/CONTRIBUTING.md).
+Report bugs with package/toolchain versions, reproduction steps, the affected URL, and the failing dev/SSG/Worker stage in [GitHub Issues](https://github.com/ts-76/honoxpress/issues). Compatibility and template migration follow the [maintenance policy](https://github.com/ts-76/honoxpress/blob/main/docs/maintenance.md). Development and verification instructions are in [CONTRIBUTING](https://github.com/ts-76/honoxpress/blob/main/CONTRIBUTING.md).
 
 ## License and acknowledgements
 
