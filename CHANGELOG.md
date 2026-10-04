@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.3](https://github.com/ts-76/honoxpress/compare/v0.1.2...v0.1.3) (2026-10-04)
+
+
+### Bug Fixes
+
+* **build:** reload MDX docs after saves and route restarts ([#21](https://github.com/ts-76/honoxpress/issues/21)) ([55bf1a3](https://github.com/ts-76/honoxpress/commit/55bf1a379f770dffe0e395edba16260b3efaac99))
+* **build:** suppress MDX reloads during route restarts ([#25](https://github.com/ts-76/honoxpress/issues/25)) ([20a386d](https://github.com/ts-76/honoxpress/commit/20a386d4b8e07b0c99150c0f83568804b007ca96))
+* **dev:** normalize HonoX app watching in consumers ([c78769a](https://github.com/ts-76/honoxpress/commit/c78769aaddb55f81153d75fae589806ed5d49fe3))
+
 ## [0.1.2](https://github.com/ts-76/honoxpress/compare/v0.1.1...v0.1.2) (2026-10-03)
 
 
