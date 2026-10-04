@@ -1,6 +1,6 @@
 # Compatibility and evidence
 
-This is a proof of concept with tested combinations, not a support promise for every version allowed by dependency engines. The lockfile is the primary dependency record. A runtime change requires the full acceptance pipeline and an exact-commit CI result.
+The tables below record tested combinations. Dependency engine ranges also admit untested versions. The lockfile is the primary dependency record. A runtime change requires the full acceptance pipeline and an exact-commit CI result.
 
 | Environment                       | Coverage                                                       |
 | --------------------------------- | -------------------------------------------------------------- |
@@ -30,4 +30,4 @@ The package currently includes four editable UI/CSS templates rather than instal
 
 Known non-fatal upstream messages: HonoX's deprecated `esbuild` client option under Vite 8; a missing Rollup pluginutils source map; and cf reporting a stopped Docker daemon on the Mac with no Containers. Actual build/test/dry-run exit status, module graphs and browser results are the acceptance criteria. Lint warnings from this project are forbidden.
 
-`examples/poc/evidence` and `packages/docs/evidence/consumer.json` are dated local snapshots. CI re-runs acceptance, checks out the PR head SHA explicitly, logs `git rev-parse HEAD`, and attaches its own fresh evidence per Node version. Judge CI success from that run's conclusion and SHA, not a committed snapshot claiming future CI success. No Cloudflare deployment or npm publication has been tested.
+`examples/poc/evidence` and `packages/docs/evidence/consumer.json` are dated local snapshots. CI re-runs acceptance, checks out the PR head SHA explicitly, logs `git rev-parse HEAD`, and attaches its own fresh evidence per Node version. Judge CI success from that run's conclusion and SHA, not a committed snapshot claiming future CI success. Production Cloudflare deployment is unverified. Published versions are listed on [npm](https://www.npmjs.com/package/honoxpress); tags and release notes are on [GitHub Releases](https://github.com/ts-76/honoxpress/releases).

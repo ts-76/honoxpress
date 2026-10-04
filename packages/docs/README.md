@@ -1,73 +1,133 @@
 # honoxpress
 
-`honoxpress@0.1.0` is the owner-approved initial release candidate, licensed under [MIT](LICENSE), copyright 2026 ts-76. The declared npm owner is `ts-76`.
-The GitHub repository is public by owner approval on 2026-10-03. This package is an unpublished release candidate with `private: false`; the staging workflow remains disabled. Actual stage/publish and publishing setup require approval of the verified candidate.
+Documentation metadata, build helpers, and editable UI templates for Hono JSX and MDX.
 
-The runtime entry is a pure metadata API. Consumers own standard HonoX
-`app/routes`, `_renderer.tsx`, islands and CSS. No router, mounting API, CLI,
-runtime MDX compiler, search or draft feature is introduced.
+Use HonoX's file-based routes to build navigation, tables of contents, and language links. Your application owns its routes, renderer, islands, and CSS, so you can adapt the documentation to your existing app.
+
+[Integration guide](https://github.com/ts-76/honoxpress/blob/main/docs/api.md) · [Example app](https://github.com/ts-76/honoxpress/tree/main/examples/poc) · [Releases](https://github.com/ts-76/honoxpress/releases) · [Issues](https://github.com/ts-76/honoxpress/issues) · [MIT](https://github.com/ts-76/honoxpress/blob/main/LICENSE)
+
+## Install
+
+```sh
+pnpm add honoxpress hono
+```
+
+The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX, Vite Plus, MDX, and SSG adapters are application dependencies. See the [compatibility guide](https://github.com/ts-76/honoxpress/blob/main/docs/compatibility.md) for tested versions.
+
+## Runtime API
 
 ```ts
 import { createDocsCatalog } from "honoxpress";
+
 const docs = createDocsCatalog({
   locales: ["en", "ja"],
   defaultLocale: "en",
-  entries: [{ route: "docs/getting-started.mdx", title: "Getting started" }],
+  entries: [
+    { route: "docs/getting-started.mdx", title: "Getting started", order: 1 },
+    { route: "ja/docs/getting-started.mdx", title: "はじめに", order: 1 },
+  ],
 });
-docs.page("/docs/getting-started");
-docs.navigation("en");
+
+docs.page("/docs/getting-started")?.title; // "Getting started"
+docs.navigation("ja").map((page) => page.href); // ["/ja/docs/getting-started"]
 docs.translations("/docs/getting-started");
+// [{ locale: "en", href: "/docs/getting-started" },
+//  { locale: "ja", href: "/ja/docs/getting-started" }]
 ```
 
-Identity comes from the route path; frontmatter `id` is neither required nor
-used. Nested paths and `index.mdx` map to standard document URLs. Translations
-share a relative slug. Missing translations return a locale with no `href`;
-callers can show unavailable text instead of a broken link. Invalid paths,
-duplicate URLs, invalid metadata and duplicate heading anchors fail early.
-Navigation sorts by optional numeric `order`, then URL. All metadata results
-are immutable. Titles remain plain text and rendering must escape them.
+This example supplies metadata directly. For an MDX application, `docsMetadataPlugin` generates the catalog from route exports; use that catalog instead of maintaining a second list by hand.
 
-Compatibility currently follows the repository's tested HonoX/Vite Plus setup.
+| Export                                                | Purpose                                                                                          |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `createDocsCatalog(options)`                          | Validate metadata and build an immutable page catalog                                            |
+| `resolveClientScript(manifest, entry)`                | Resolve a client script URL from its production build manifest; fail on missing or unsafe assets |
+| `DocsEntry`, `DocsPage`, `DocsOptions`, `DocsCatalog` | Types for catalog inputs, pages, options, and queries                                            |
+| `Heading`, `LocaleLink`, `ClientManifest`             | Types for headings, optional translation links, and client manifests                             |
 
-For the pinned HonoX 0.1.61 / Vite Plus 1.0.0 development setup, use the consumer's `examples/poc/build/honox-watch.ts` adapter in place of the direct `honox/vite` config import. It registers an absolute `app` directory instead of HonoX's relative `./app/**` glob, keeping its add/unlink restart behavior. See `docs/hmr-regression.md` for the initial Linux watcher failure and pinned-version limitations.
-The build entry, copyable UI and packed external consumer are verified together;
-this evaluation does not promise an npm release.
+The runtime entry contains no Node API or MDX compiler.
 
-## Build-only entry
+## Routes and frontmatter
 
-`honoxpress/build` exports `docsMetadataPlugin`, `remarkDocsHeadings`, and `docsOnlyPlugin`. Import them only in Vite/build configuration. The runtime entry exports no Node API or MDX compiler. The package does not own the build pipeline, router, renderer or server.
+Place trusted local MDX in standard HonoX `app/routes`. With `defaultLocale: "en"`:
 
-Use `docsMetadataPlugin({locales: ["en", "ja"], defaultLocale: "en", worker: mode === "worker"})` before HonoX and register `remarkDocsHeadings` after the frontmatter plugins in `@mdx-js/rollup`. Dev/SSG discover local standard MDX routes and expose their frontmatter/TOC through `virtual:honoxpress/catalog`. Worker mode returns an empty catalog without reading or importing docs. **A Worker using HonoX's default eager router will still import MDX:** consumers must supply literal dynamic route globs via `honox/server/base`, as in the example.
+| Route relative to `app/routes` | URL                        |
+| ------------------------------ | -------------------------- |
+| `docs/index.mdx`               | `/docs`                    |
+| `docs/getting-started.mdx`     | `/docs/getting-started`    |
+| `ja/docs/getting-started.mdx`  | `/ja/docs/getting-started` |
 
-The remark plugin adds deterministic Unicode heading anchors and a `toc` named export, avoids duplicate/suffixed collisions, and does not evaluate MDX expressions for heading text. Expression-only headings fail; the slug algorithm is this package's small documented algorithm, not GitHub-slugger compatibility.
+```mdx
+---
+title: Getting started
+description: Install the package and create your first page.
+order: 1
+---
 
-Pass `docsOnlyPlugin({locales, defaultLocale}, report)` before `defaultPlugin()` to Hono SSG. It rejects `/demo/*` and colon/wildcard discovery before request execution. Client→SSG→Worker remains an explicit consumer pipeline. `resolveClientScript(manifest, "app/client.ts")` fails on missing/unsafe assets; use the ordinary dev client URL during development. Consumers copy CSS/assets and remove public build metadata after all stages. See `examples/poc/vite.config.ts` and its `_renderer.tsx` for the full integration.
+# Getting started
 
-## Copyable standard UI
+## Installation
 
-Copy `templates/docs-ui.tsx` and `templates/demo-frame.tsx` into `app/components`, `templates/copy-code.tsx` into **`app/islands`**, and `templates/docs.css` into your public stylesheet. Templates are available through `honoxpress/templates/*`; resolve/read them as files, then copy them. Importing the island directly from the package does not give HonoX a consumer island route and is not supported. No installer CLI or React runtime is required. Keep the bundled MIT copyright and permission notice with copied templates and distributed copies. The example renderer shows nav/TOC/language composition. Adjust names, links, wording, tokens and layout in your owned files. Missing translations render unavailable text without a link.
+Write your documentation here.
+```
 
-The starter uses a restrained three-column reading layout, native mobile navigation/TOC disclosures, meaningful landmarks, current-page navigation, skip link, visible keyboard focus, selectable/scrollable code, live copy feedback (including failure), system fonts, color-scheme-aware tokens and reduced-motion support. The browser fixture checks representative contrast/keyboard/mobile behavior; this is not a full accessibility certification.
+`title` is required; `description` and numeric `order` are optional. Identity comes from the route path, not a frontmatter `id`. Navigation sorts by `order` (default `0`), then URL. Translations share the same relative slug; an unavailable translation has no `href`.
 
-## References and acknowledgements
+Nested paths and Unicode filenames are supported. In a renderer, use `new URL(c.req.url).pathname` for catalog lookups and the resolved page's `href` for current-page navigation. Malformed or double-encoded paths do not create a page. Discovery follows HonoX exclusions: `_`, `-`, and `$` filenames and `-`/dot directories are excluded; underscore directories remain valid. Invalid metadata, duplicate URLs, and duplicate supplied heading anchors fail early. Titles are plain text and must be escaped when rendered.
 
-Thank you to **Cloudflare Nimbus** and **Fumapress** for their thoughtful documentation UI and ownership model. These are the exact references named in the original design, not a substitution for a similarly named product:
+## Build integration
 
-- Nimbus [philosophy](https://nimbus-docs.com/philosophy/) / [registry](https://nimbus-docs.com/registry/) / [source](https://github.com/cloudflare/nimbus). Its desktop reading width, typography, whitespace, sidebar/TOC hierarchy and mobile overview inspired this starter.
-- Fumapress [docs](https://press.fumadocs.dev/docs) / [plugins](https://press.fumadocs.dev/docs/plugins) / [config source](https://github.com/fuma-nama/fumapress/blob/main/packages/core/src/config.tsx) / [repository](https://github.com/fuma-nama/fumapress). Its quiet current-page accent, code actions and mobile TOC informed the interaction design.
+Import build helpers from `honoxpress/build` in your Vite/build configuration.
 
-Desktop (1440px) and mobile (390px) UI were observed on 2026-10-01. Nimbus is [MIT, Cloudflare copyright 2025](https://github.com/cloudflare/nimbus/blob/main/LICENSE); Fumapress is [MIT, Fuma copyright 2026](https://github.com/fuma-nama/fumapress/blob/main/LICENSE). This starter's JSX/CSS/icons were independently written: no source code, logo, font or other asset was copied. If future changes copy source or assets, review that exact file's license and preserve required copyright/license/NOTICE. The owner selected this project's [MIT license](LICENSE) on 2026-10-02; this decision is separate from the reference projects' licenses.
+| Export                             | Purpose                                                                  |
+| ---------------------------------- | ------------------------------------------------------------------------ |
+| `docsMetadataPlugin(options)`      | Discover MDX frontmatter/TOC and expose `virtual:honoxpress/catalog`     |
+| `remarkDocsHeadings`               | Generate heading anchors and a named `toc` export during MDX compilation |
+| `docsOnlyPlugin(options, report?)` | Filter Hono SSG requests to documentation routes before execution        |
+| `DocsBuildOptions`, `SSGReport`    | Types for plugin options and accepted/skipped route reporting            |
 
-## Packed consumer validation
+Register the metadata plugin before HonoX. Register `remarkDocsHeadings` after the frontmatter plugins in `@mdx-js/rollup`. The `worker` option is a required boolean:
 
-From the repository, run `pnpm test:consumer`. It cleans/builds the package, packs it without publishing, checks the files allowlist and exports, and installs it into a fresh directory outside the repo. Consumer type checks use emitted declarations and expected type failures. Runtime imports exclude Node/MDX/React/compiler modules; private source paths are not exported. Templates/CSS are copied from the installed tarball, then standard HonoX builds, 5 build regressions, 6 browser checks and global cf dry-run run independently. Successful temporary directories are removed. Failed directories and `artifacts/*.log` remain for diagnosis.
+```ts
+docsMetadataPlugin({
+  locales: ["en", "ja"],
+  defaultLocale: "en",
+  worker: mode === "worker",
+});
+```
 
-`pnpm pack:docs` makes the evaluation tarball only. The candidate has public package metadata at the approved 0.1.0 with MIT license. This command performs no registry auth/token/stage/publish step. The tarball includes compiled ESM/declarations, selected editable UI templates, this README and the approved LICENSE; it excludes package source, tests, configs, internal evidence and application docs. Exported CSS is marked as a side effect for bundlers. Packed evidence is recorded in `packages/docs/evidence/consumer.json`; tarballs are local artifacts, not committed releases.
+Development and SSG discover route metadata. Worker mode returns an empty catalog without reading or importing MDX. **HonoX's default eager router still imports MDX bodies:** to exclude them from the Worker, use `honox/server/base` with literal globs selecting only dynamic routes and layouts. The SSG filter does not remove Worker imports.
 
-## Compatibility and release gate
+Build client → docs SSG → Worker, preserving the client manifest until rendering completes. `docsOnlyPlugin({ locales, defaultLocale }, report)` goes before Hono SSG's `defaultPlugin()` and skips non-documentation and colon/wildcard routes before making requests. Clear stale output at the start of the pipeline and preserve earlier outputs during subsequent stages.
 
-Local acceptance uses macOS arm64 / Devbox Node 24.12.0. CI checks exact PR commits on Ubuntu / Node 22.23.3, 24.12.0 and 24.21.0; inspect each run result rather than treating a committed snapshot as CI proof. The newest observed LTS (2026-10-01) is 24.21.0; Node 26 is Current and unverified. Toolchain engines also admit untested combinations. No actual Cloudflare deployment, other browser/OS, arbitrary docs parameter routing, SPA state, exhaustive HMR or accessibility certification is promised.
+Heading anchors use static Markdown text, Unicode normalization, lowercase letters, and hyphens for whitespace, with suffixes for collisions. MDX expressions are not evaluated for heading text; expression-only headings fail. This is a package-specific algorithm, not a guarantee of GitHub slug compatibility.
 
-The owner approved MIT, honoxpress, 0.1.0 and npm owner ts-76 on 2026-10-02. Root/package/packed LICENSE bytes are checked together. The owner approved public GitHub visibility on 2026-10-03, and existing npm login was verified as ts-76 with auth-and-writes 2FA. This public-metadata candidate requires new exact-commit acceptance; earlier private tarballs are not reused. Before actual stage/publish, authorize the exact verified candidate and first public placeholder, and choose initial local-bootstrap provenance separately from future CI provenance. Contribution/support/template migration policy and real-page pilot remain separate decisions. Copied template updates require documented manual migration; they must not silently overwrite consumer files. The evaluation scripts retain disabled staging and perform no publish/auth/token/deploy. Integration, compatibility, contribution and release-decision guides are in the repository docs.
+For the tested HonoX 0.1.61 / Vite Plus 1.0.0 setup, also copy the example's [watch adapter](https://github.com/ts-76/honoxpress/blob/main/examples/poc/build/honox-watch.ts) to register an absolute `app` directory for route additions/removals. The [integration guide](https://github.com/ts-76/honoxpress/blob/main/docs/api.md) connects these pieces, including the virtual module declaration, renderer, manifest handling, and Worker entry.
 
-Unicode route lookups normalize encoded and decoded URL paths; use `new URL(c.req.url).pathname` in the owned renderer and pass the resolved page href to navigation, avoiding a second decode of Hono request paths. Malformed and double-encoded input do not synthesize a page. Metadata discovery follows standard HonoX MDX exclusions: `_`, `-`, `$` filenames and `-`/dot directories are excluded; underscore directories remain valid. Direct catalog entries for excluded routes fail early.
+## Copy and customize the UI
+
+Templates are exported as files through `honoxpress/templates/*`. Resolve them with `import.meta.resolve`, then copy them into your application:
+
+| Template         | Destination                     |
+| ---------------- | ------------------------------- |
+| `docs-ui.tsx`    | `app/components/docs-ui.tsx`    |
+| `copy-code.tsx`  | **`app/islands/copy-code.tsx`** |
+| `demo-frame.tsx` | `app/components/demo-frame.tsx` |
+| `docs.css`       | Your public stylesheet          |
+
+The [copy example](https://github.com/ts-76/honoxpress/blob/main/docs/api.md#copy-and-customize-the-ui) uses Node's file APIs. Importing the island directly from the package does not register a consumer HonoX island route.
+
+The UI includes responsive navigation and TOC disclosures, landmarks, a skip link, visible keyboard focus, copy success/failure feedback, system fonts, color-scheme tokens, and reduced-motion styles. Edit links, wording, components, and styles in your own files. Keep the bundled MIT copyright and permission notice in distributed copies. Template updates are manual: review and merge changes into your owned files.
+
+## Scope and compatibility
+
+honoxpress is a 0.x library for trusted local MDX. It supplies metadata, build helpers, and templates; applications configure routing, rendering, and deployment. It does not include search, drafts, a CMS, a project generator, or a React runtime. Navigation uses ordinary document loads, so island state resets between pages.
+
+Repository CI validates Node.js 22.23.3, 24.12.0, and 24.21.0, including installation of a packed tarball in an independent application. Node.js 26, other operating systems/browsers, and production Cloudflare deployment are unverified. Browser checks cover representative UI behavior rather than a complete accessibility certification. Pin your package version and review the [changelog](https://github.com/ts-76/honoxpress/blob/main/CHANGELOG.md) when upgrading.
+
+Report bugs with package/toolchain versions, reproduction steps, the affected URL, and the failing dev/SSG/Worker stage in [GitHub Issues](https://github.com/ts-76/honoxpress/issues). Development and verification instructions are in [CONTRIBUTING](https://github.com/ts-76/honoxpress/blob/main/CONTRIBUTING.md).
+
+## License and acknowledgements
+
+MIT © 2026 ts-76. The distribution includes `LICENSE`.
+
+Thank you to [Cloudflare Nimbus](https://github.com/cloudflare/nimbus) for its reading width, typography, spacing, and navigation hierarchy, and [Fumapress](https://github.com/fuma-nama/fumapress) for its current-page accent, code actions, and mobile TOC. The templates' JSX, CSS, and icons were independently written; no upstream code or assets were copied.
