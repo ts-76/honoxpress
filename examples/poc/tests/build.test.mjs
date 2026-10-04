@@ -17,6 +17,8 @@ async function assertArtifacts() {
     remarkPlugins: [[remarkDocsComponents, { names: ["Callout"] }]],
   });
   await assert.rejects(compiler.transform("<Missing />", "/fixture.mdx"), /Register Missing/);
+  for (const source of ["<$Missing />", "<_Missing />", "<ui.Missing />"])
+    await assert.rejects(compiler.transform(source, "/fixture.mdx"), /Unknown MDX component/);
   await assert.rejects(compiler.transform("<callout />", "/fixture.mdx"), /<Callout>/);
   await assert.rejects(
     compiler.transform("{true ? <Missing /> : null}", "/fixture.mdx"),

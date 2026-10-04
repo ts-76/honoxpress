@@ -112,7 +112,7 @@ function validateName(
   bound: Set<string>,
 ) {
   const base = name.split(".")[0];
-  if (/^[A-Z]/.test(base) && !registered.has(base) && !bound.has(base))
+  if ((/^[A-Z_$]/.test(base) || name.includes(".")) && !registered.has(base) && !bound.has(base))
     throw new Error(
       `Unknown MDX component <${name}>. Register ${base} in app/mdx-components.ts or import it in this page.`,
     );

@@ -22,6 +22,8 @@ test("shared MDX names are accepted and unregistered components fail before rend
   const validate = remarkDocsComponents({ names: ["Callout", "Card", "Tabs"] });
   expect(() => validate(root(tag("Callout"), tag("Card"), tag("Tabs")))).not.toThrow();
   expect(() => validate(root(tag("Missing")))).toThrow("Register Missing");
+  for (const name of ["$Missing", "_Missing", "ui.Missing"])
+    expect(() => validate(root(tag(name)))).toThrow("Unknown MDX component");
   expect(() => validate(root(tag("section"), tag("my-element")))).not.toThrow();
   expect(() =>
     validate({
