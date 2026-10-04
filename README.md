@@ -1,199 +1,139 @@
 # honoxpress
 
-`honoxpress@0.1.1`をnpmへ公開済みです。MIT、npm ownerは`ts-76`、`latest`は`0.1.1`です。
-[npm package](https://www.npmjs.com/package/honoxpress) / [release source v0.1.1](https://github.com/ts-76/honoxpress/tree/v0.1.1)。
+Hono JSX と MDX でドキュメントを作るための、メタデータ API・ビルドヘルパー・編集可能な UI テンプレート。
+
+HonoX のファイルルーティングに沿って、ページ一覧、目次、言語切り替えを組み立てます。ルート、レイアウト、Island、CSS はアプリ側で管理するため、既存の HonoX アプリに合わせて見た目や動作を調整できます。
+
+[npm](https://www.npmjs.com/package/honoxpress) · [API / integration guide](docs/api.md) · [English package README](packages/docs/README.md) · [Releases](https://github.com/ts-76/honoxpress/releases) · [MIT License](LICENSE)
+
+![サンプルのドキュメント画面。ページ一覧、本文、目次、言語切り替え、コードコピー、Island とライブデモを配置。](examples/poc/evidence/screenshots/english.png)
+
+## できること
+
+- **ページの整理** — MDX の frontmatter からタイトル、説明、表示順を読み取り、ナビゲーションを生成します。
+- **多言語ドキュメント** — ファイルパスから URL と言語を決め、同じ相対パスの翻訳ページを結びます。未翻訳の言語にはリンクを作りません。
+- **目次とアンカー** — Markdown の見出しから目次を生成します。日本語などの Unicode 文字と、重複する見出しに対応します。
+- **静的ドキュメントと動的デモ** — ドキュメントだけを静的生成し、デモを Worker の動的ルートとして扱うためのビルドヘルパーを提供します。
+- **自分で編集できる UI** — ナビゲーション、目次、言語切り替え、コードコピー、デモ表示、CSS をコピーして使えます。HonoX の Island を MDX に組み込めます。
+
+既存の HonoX アプリにドキュメントを追加したい場合や、レイアウトを自分のコードで管理したい場合に向いています。検索、CMS、ホスティング、プロジェクト生成 CLI は含みません。
+
+## インストールと最小例
 
 ```sh
-pnpm add honoxpress@0.1.1 hono
+pnpm add honoxpress hono
 ```
 
-導入時は[APIガイド](docs/api.md)と[package README](packages/docs/README.md)を参照してください。標準HonoXのroutes/renderer/islands/CSSは利用者が所有します。
-初回の公開tarballはCI・stageと完全一致し、公開registryからの新規consumer導入も成功しました。詳細と次回releaseの操作は[npm release手順](docs/npm-release.md)に記録しています。
+パッケージは ESM です。Node.js の要件は `^22.20.0 || ^24.12.0 || >=26.0.0`、Hono の peer dependency は `^4.13.12` です。HonoX と MDX のビルド依存は、アプリ側に追加します。
 
-mainへのPRマージでrelease-pleaseがバージョン・CHANGELOGを更新するリリースPRを作成・更新します。リリースPRをマージすると`v<version>`タグとGitHub Releaseが作成され、タグの品質検証・配布物準備が起動します。npmへのCI stageは停止のままです。npm公開は検証済み配布物を手動stageし、本人の2FA承認で行います。詳細は[npm release手順](docs/npm-release.md)を参照してください。
+`createDocsCatalog` は、ページの情報を URL・ナビゲーション・翻訳リンクに変換する API です。次の例はメタデータの使い方を示します。
 
-信頼済みローカルMDXをHono JSXで静的生成し、Counter Islandと動的Hono `/demo/*`を同じCloudflare Worker構成で共存させる最小PoCです。2026-10-01、MacBook Air（macOS / arm64）で検証しました。
+```ts
+import { createDocsCatalog } from "honoxpress";
 
-## 実装した構成
+const docs = createDocsCatalog({
+  locales: ["en", "ja"],
+  defaultLocale: "en",
+  entries: [
+    { route: "docs/getting-started.mdx", title: "Getting started", order: 1 },
+    { route: "ja/docs/getting-started.mdx", title: "はじめに", order: 1 },
+  ],
+});
 
-| URL                        | ソース                                   | 開発                       | 本番構成                    |
-| -------------------------- | ---------------------------------------- | -------------------------- | --------------------------- |
-| `/docs/getting-started`    | `app/routes/docs/getting-started.mdx`    | HonoX SSR                  | Workers Static AssetsのHTML |
-| `/ja/docs/getting-started` | `app/routes/ja/docs/getting-started.mdx` | HonoX SSR                  | Workers Static AssetsのHTML |
-| `/demo/clock`              | `app/routes/demo/index.tsx`              | Honoによるリクエスト時生成 | 同じWorkerの動的Hono        |
-| `/demo/status`             | 同上                                     | リクエスト時JSON生成       | 同じWorkerの動的Hono        |
-| `/`                        | `app/routes/index.tsx`                   | HonoX SSR                  | WorkerのHonoX SSR           |
-
-ルートはHonoX標準の`app/routes`と`_renderer.tsx`です。frontmatterは`title`と`description`のみで、`id`はありません。URLはファイルパスが決めます。日英MDX内にCounter IslandとDemoFrameを置いています。React、検索、下書き、独自`docs.mount`、hono-decksは導入していません。
-
-```text
-app/
-  server.ts               # 開発・SSG: 標準createApp()のeager file router
-  worker.ts               # 本番Worker: 公式server/baseへ動的ルートだけ渡す
-  client.ts               # 公式createClient()、hydration完了マーカー
-  islands/counter.tsx      # Hono useState
-  components/demo-frame.tsx
-  routes/
-    _renderer.tsx          # 言語、frontmatter、manifestからscriptを出力
-    _404.tsx
-    index.tsx
-    demo/index.tsx         # Honoインスタンス
-    docs/getting-started.mdx
-    ja/docs/getting-started.mdx
-build/
-  docs-only.ts             # SSGのリクエスト実行前フィルター
-  build.mjs                # clean → client → SSG → Worker
-  snapshot-evidence.mjs
-dist/                      # git管理外
-  public/                  # CSS、ハッシュ付きJS、日英HTMLのみ公開
-  worker/index.js          # assetsと別の出力先
-  evidence/                # manifest、module graph、SSG・browser結果
+docs.page("/docs/getting-started")?.title; // "Getting started"
+docs.navigation("ja").map((page) => page.href); // ["/ja/docs/getting-started"]
+docs.translations("/docs/getting-started");
+// [{ locale: "en", href: "/docs/getting-started" },
+//  { locale: "ja", href: "/ja/docs/getting-started" }]
 ```
 
-cf設定は`dist/worker/index.js`と`dist/public`を1つのWorker設定で扱います。assetsは先に解決し、`/demo/*`は`run_worker_first`でWorkerへ送ります。`html_handling: drop-trailing-slash`で拡張子なしURLを提供し、`not_found_handling: none`で未一致はWorkerの404へ渡します。HonoXのContext storageに合わせて`nodejs_compat`を指定しています。
+HonoX アプリでは、ビルドプラグインが MDX からカタログを生成します。ページ情報を手作業で二重管理する必要はありません。設定と renderer の実装は [組み込みガイド](docs/api.md) を参照してください。
 
-## 再現コマンド
+## サンプルを動かす
 
-Devbox管理のNode **24.12.0**（`.node-version`）、pnpm **11.22.0**（`packageManager`）、Vite Plus **1.0.0**で検証しました。cf **1.0.0-beta.6**はMacの既存グローバルCLIを使用します。projectにcf本体は入れず、設定APIと型を提供する`@cloudflare/config` **0.20.0**へ直接依存します。実バージョンと再現可能な依存解決は`pnpm-lock.yaml`と[`examples/poc/evidence/verification.json`](examples/poc/evidence/verification.json)に記録しています。npm lockfileとNodeの開発依存は除去しました。Node/pnpmは既存Devbox global、シェル設定は既存chezmoi管理を保持し、追加PATHや別のNode管理ツールは導入していません。
-
-通常のログインシェルでは既存chezmoiの`.zshrc`がDevbox globalを有効にします。`command -v node`と`command -v pnpm`がDevbox profileを指し、`node --version`が24.12.0、`pnpm --version`が11.22.0、`command -v cf`が既存グローバルCLIを指すことを確認して実行します。pnpmの最新版取得もDevbox管理に従い、この環境でDevboxが提供する11.22.0を保持します。Vite Plus単体の要件よりcfの要件が高いため、repoのengineは`^22.20.0 || ^24.12.0 || >=26.0.0`です。
+[examples/poc](examples/poc) は、日英の MDX、Island、コードコピー、動的デモを含む HonoX アプリです。Node.js 24.12.0 と pnpm 11.22.0 で次を実行できます。
 
 ```sh
+git clone https://github.com/ts-76/honoxpress.git
+cd honoxpress
 pnpm install --frozen-lockfile
-pnpm --filter honoxpress-example exec playwright install chromium
-pnpm verify
-pnpm evidence
+pnpm build:package
+pnpm dev
 ```
 
-手動確認は別ターミナルで実行します。
+[http://127.0.0.1:5173/docs/getting-started](http://127.0.0.1:5173/docs/getting-started) を開くと英語版、`/ja/docs/getting-started` を開くと日本語版を表示します。サンプルの開発サーバーはポート 5173 を使います。
 
 ```sh
-pnpm dev        # Vite Plus / HonoX開発: http://127.0.0.1:5173
-pnpm build      # clean → client → SSG → Worker
-pnpm preview    # cf dev / 本番ローカル: http://127.0.0.1:8787
-pnpm build:cf   # cf build: .cloudflare/output/v0へBuild Output生成
-pnpm preview:dry-run  # cf deploy --dry-run --prebuilt、アップロードなし
-pnpm types:cf   # cf workers types: .cloudflare/typesへ型生成
+pnpm build
+pnpm preview
 ```
 
-`verify`はVite Plusのformat・Oxlint/tsgo型チェック、警告禁止lint、従来の`tsc`、3段階ビルド、cf型生成、Vitest5のビルド検査、両環境のPlaywright、cf prebuilt dry-runを実行します。ビルド検査の最後に`cf build`も実行します。Playwrightが5173/8787を起動・停止するため、検査前に手動サーバーを止めてください。実Cloudflareデプロイは行いません。
+ビルドは **client → docs SSG → Worker** の順で実行します。プレビューは Cloudflare のローカル環境を使うため、追加で `cf@1.0.0-beta.6` が必要です。依存バージョンと環境要件は [互換性ガイド](docs/compatibility.md) にまとめています。
 
-Vite Plus組み込みの`vp build`は1段階のViteビルドです。子ビルドには`NODE_ENV=production`を明示し、Vitestが付ける`NODE_ENV=test`の影響を防いでいます。通常ビルドとテスト内再ビルドでmanifestとWorker出力が同一であることも検査します。このPoCの全パイプラインには`pnpm build`（または`pnpm exec vp run build`）を使います。`build:client` → `build:ssg` → `build:worker`もそれぞれ`vp build --mode ...`です。全ビルドの先頭で`dist`だけを削除し、後続段階は先行assets/HTMLを保持します。manifestはclient生成後にSSG・Workerへ渡し、最後に公開ディレクトリの`.vite`を削除します。検証用manifestは`dist/evidence`に残します。検査は共有出力を書き換えるためVitestを逐次実行し、PlaywrightをVitestの対象から除外しています。検証にtask cacheを設定していません。
+## MDX の配置とページ情報
 
-pnpmのcatalogと`vite@*` overrideは公式migratorの設定を保持しています。Hono系プラグインがimportする`vite`をVite Plus coreへ揃えます。直接`vite`依存は削除しても全ビルド・検査が通ることを確認しました。transitive Viteにはoverrideを適用します。`defineConfig`とテスト内の`createServer`/`build`は`vite-plus`、unit APIは`vite-plus/test`です。Vite Plus経由のAPI解決も確認しました。OxfmtがTSX・MDX・Markdown・CSSを整形し、`lazyPlugins`は静的チェック時のアプリplugin起動を防ぎます。
+標準の `app/routes` 配下に、信頼できるローカル MDX を置きます。既定言語が `en` の場合、次のファイルが対応する URL になります。
 
-## cf設定と制約
+| ファイル                                 | URL                        |
+| ---------------------------------------- | -------------------------- |
+| `app/routes/docs/index.mdx`              | `/docs`                    |
+| `app/routes/docs/getting-started.mdx`    | `/docs/getting-started`    |
+| `app/routes/ja/docs/getting-started.mdx` | `/ja/docs/getting-started` |
 
-`cloudflare.config.ts`がWorker入口・互換性・asset routingを持ち、`wrangler.config.ts`は内部ビルドツールのassets directory・dev IP/portを持ちます。設定importは`@cloudflare/config/public`です。グローバルcfの`cf/config`もこのpublic exportを再exportするだけですが、projectからグローバルpackageへのimportは解決できないため、設定ライブラリだけを導入しました。既存`wrangler.jsonc`は移行前の参考設定として残していますが、cfは読みません。直接Wranglerを実行するnpm scriptsはありません。
+```mdx
+---
+title: はじめに
+description: インストールと最初のページの作り方
+order: 1
+---
 
-このHonoXの分離ビルド構成では、cfは内部でWrangler **4.145.0**へ委譲するため、その直接依存は保持しています。実際に除去した検査ではcfが「Cloudflare dev-server未宣言」として失敗しました。cfはprojectのpackage.jsonにWranglerなどのdev-serverがちょうど1つ宣言されていることを要求します。cf自体はbundlerではありません。Cloudflare Vite pluginを追加する別構成への変更は行っていません。`cf build`がpackage.jsonの全build scriptを実行することもないため、先に`pnpm build`が必要です。
+# はじめに
 
-`cf dev`は既定でローカル起動し、`--local`を拒否します。設定にremote resource bindingはありません。`cf deploy --dry-run --prebuilt`は既に作ったBuild Outputを検証するだけでAPI送信・デプロイを行いません。cfが最終生成したbundleにもdocs本文/MDXコンパイラーがなく、asset一覧とHTMLが`dist/public`と一致することを自動検査します。古いcf assetの削除も検査しています。
+## インストール
 
-cfはbetaで、設定とBuild Output仕様が変わる可能性があります。今回`cf build`はDocker daemon未起動のメッセージを出しますが、Containersなしの本PoCでは終了コード0でBuild Output生成・dry-run・全テストが成功しました。Viteの依存`@rollup/pluginutils`の欠落source map警告もunit時に出ますが、テストは成功します。
+ここに本文を書きます。
+```
 
-## 検証結果
+`title` は必須、`description` と数値の `order` は任意です。ページの識別にはファイルパスを使い、frontmatter の `id` は使いません。表示順は `order`、同値の場合は URL で決まります。
 
-最終確認はDevbox Node 24.12.0・pnpm 11.22.0と既存グローバルcfで成功しました。通常の対話ログインシェルとrepo内の双方でNode/pnpmがDevbox profileを解決し、chezmoiのsource/targetは一致しています。shellenvが制限付き実行で止まるとNodebrewの旧Nodeが選ばれるため、確認は通常シェルで行いました。chezmoi管理元・配置先、Devbox package設定の変更は不要でした。
+## UI をカスタマイズする
 
-| 検査                                   | 結果                                     |
-| -------------------------------------- | ---------------------------------------- |
-| 通常シェル / repo内: Devbox Node・pnpm | 成功                                     |
-| `pnpm install --frozen-lockfile`       | 成功、ポリシー適合                       |
-| `pnpm typecheck`                       | 成功                                     |
-| client / SSG / Workerの3段階ビルド     | 成功                                     |
-| package API/build/UI unit              | 15 / 15成功                              |
-| ビルド自動検査                         | 5 / 5成功                                |
-| Playwright: Vite開発                   | 3 / 3成功                                |
-| Playwright: cf dev本番ローカル         | 3 / 3成功                                |
-| cf workers types                       | 成功                                     |
-| cf build / prebuilt dry-run            | 成功、実デプロイなし                     |
-| Vite Plus format / Oxlint・tsgo / tsc  | 成功                                     |
-| GitHub Actions CI                      | 3 Node matrixを設置。結果は該当runで確認 |
-| Cloudflare実デプロイ                   | 未実行（依頼範囲外）                     |
+テンプレートは `honoxpress/templates/*` からファイルとして取得できます。
 
-ビルド検査では、日英HTML、CounterのIsland識別子、client manifestの実ファイル、iframeパス、Worker/clientの読み込まれたmodule graph、bundle本文を検査しています。旧HTML・旧client JS・旧Worker出力を意図的に作り、後続の全ビルドで削除され、新しい日英HTMLとassetsが残ることも確認しています。
+| テンプレート     | アプリ側のコピー先              |
+| ---------------- | ------------------------------- |
+| `docs-ui.tsx`    | `app/components/docs-ui.tsx`    |
+| `copy-code.tsx`  | `app/islands/copy-code.tsx`     |
+| `demo-frame.tsx` | `app/components/demo-frame.tsx` |
+| `docs.css`       | 公開するスタイルシート          |
 
-SSGの実行前hookが`/`、`/demo/clock`、`/demo/status`を除外した記録は[`evidence/ssg.json`](examples/poc/evidence/ssg.json)にあります。別のHonoアプリに実行回数を数える`/demo/clock`と`/demo/:name`を置く検査でも、SSG時の呼び出し回数は**0**でした。
+コピー後のファイルは、アプリに合わせて編集します。`copy-code.tsx` は HonoX が検出できるよう **`app/islands` に置いてください**。パッケージから直接 import するだけでは、アプリの Island として登録されません。
 
-ブラウザーでは、日英URL・タイトル・言語、本文リンク、Counterの増加、英→日→英の再遷移後の再hydration、iframe読み込み、直接demoリンク、CSS/JSの200、各階層の404を確認しました。demoのリクエストごとのUUIDと`no-store`も確認しています。本番では末尾slashの307、manifest・MDXソース・Workerソースの非公開も確認しました。開発の未存在static JSはVite自身の空bodyの404、本番はWorkerの404になります。
+テンプレートには、モバイル用のナビゲーション・目次、キーボードフォーカス、本文へのスキップリンク、コードコピーの結果表示、ダークモード用の色設定を含みます。更新時は差分を確認して手動で取り込み、コピーしたファイルにも MIT のライセンス表記を保持してください。取得方法は [組み込みガイド](docs/api.md#copy-and-customize-the-ui) にあります。
 
-再生成可能な証拠は`dist/evidence`へ出力し、今回の検証記録は[`examples/poc/evidence/verification.json`](examples/poc/evidence/verification.json)、[`Worker module graph`](examples/poc/evidence/worker-modules.json)、[`client manifest`](examples/poc/evidence/client-manifest.json)に保存しました。本番ローカルの操作後スクリーンショット: [English](examples/poc/evidence/screenshots/english.png) / [日本語](examples/poc/evidence/screenshots/japanese.png)。
+## ビルドと利用範囲
 
-## 設計上の発見と制約
+`honoxpress` は実行時のメタデータ API、`honoxpress/build` はビルド時の MDX 読み込み・見出し変換・SSG フィルターを提供します。ルーターと renderer は HonoX アプリ側で設定します。
 
-1. **標準createAppのeager importはWorkerへ本文を入れる。** `honox/server`のデフォルトglobは全MDXを読み込みます。通常のrouterでWorkerを作る比較テストでは日英本文sentinelと2つのMDX moduleが残ります（[`比較結果`](examples/poc/evidence/eager-control.json)）。今回のWorkerは公式`honox/server/base`とliteral globで入口を制限し、本文・MDX module・`@mdx-js`/remark依存が読み込みgraphにも生成bundleにもないことを確認しました。単に実行時の404へ変更したり、createAppの後でルートを除外する方法ではありません。
-2. **SSGの出力除外と実行除外は別。** Hono SSGはルート情報の取得でもリクエストを実行します。`disableSSG`やレスポンス後のフィルターだけでは動的処理を避けられません。docs以外を`beforeRequestHook`で除外し、demoにも`isSSGContext`による実行ガードを設けました。任意のdocsパラメータルートはこのPoCでは対象外です。
-3. **MDXのIsland検出には注意が必要。** HonoX 0.1.61ではこのMDXを`honox-island`へ変換できましたが、raw MDX依存の自動追跡が`__importing_islands`を付けず、`Script/HasIslands`はSSGでscriptを出しませんでした。標準Renderer内でdocsのclient scriptをmanifestから直接出力することで解決しています。未生成manifestではSSGを失敗させます。全ページがCounterを持つ今回の最小構成に適した対応です。
-4. **hydration属性は完了通知ではない。** HonoXは`data-hono-hydrated`を動的import前に設定します。ブラウザー検査は`createClient()`のPromise完了を待ちます。通常のdocument navigationを使い、再遷移時のCounterは0から始まります。SPA遷移・永続stateは実装していません。
-5. **MDXはコードです。** ビルド時に実行する信頼済みローカルファイルのみを対象にします。外部投稿MDXの実行、runtime compile、検索・draft機能は対象外です。動的Workerのrouteを増やす場合は`app/worker.ts`の入力globとテストを更新します。
-6. **現行依存との互換性。** HonoX 0.1.61はclient設定に非推奨`esbuild`オプションを使い、Vite Plus同梱Vite 8.3.1が警告します。今回のビルドとブラウザー操作は成功しました。Cloudflareの実サービス、他ブラウザー、性能負荷試験、実Cloudflareサービスは検証していません。CIの実行結果は各runのSHA/conclusionで確認します。
+- MDX は JavaScript を実行できるため、信頼できるローカルファイルを対象にしてください。
+- Worker で `worker: true` を指定するとメタデータの MDX 読み込みを止めます。本文も Worker から除くには、`honox/server/base` で動的ルートの import 対象を明示する必要があります。SSG のフィルターだけでは本文の import は除去されません。
+- ページ移動は通常のドキュメント遷移です。Island の状態はページを離れるとリセットされます。
+- CI は Node.js 22.23.3 / 24.12.0 / 24.21.0 で、パッケージ、サンプル、配布 tarball を独立したアプリへインストールする検証を行います。Node.js 26、その他の OS・ブラウザー、本番 Cloudflare デプロイは検証対象外です。
 
-## 確認した公式資料
+0.x 系のパッケージです。採用時はバージョンを固定し、更新前に [変更履歴](CHANGELOG.md) と [互換性ガイド](docs/compatibility.md) を確認してください。
 
-- [HonoX公式: standard routes / Renderer / Islands / MDX / SSG](https://github.com/honojs/honox)
-- [HonoX公式: createAppのeager glob実装](https://github.com/honojs/honox/blob/main/src/server/with-defaults.ts)
-- [Hono SSG helper: beforeRequestHook](https://hono.dev/docs/helpers/ssg)
-- [Cloudflare Static Assets: Worker script routing](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/)
-- [Cloudflare Static Assets: HTML handling](https://developers.cloudflare.com/workers/static-assets/routing/advanced/html-handling/)
-- [Wrangler configuration](https://developers.cloudflare.com/workers/wrangler/configuration/) / [CLI commands](https://developers.cloudflare.com/workers/wrangler/commands/)
+## ドキュメントと開発
 
-挙動とmodule graphの最終的な根拠は、lockfileで固定したローカル依存のソースと、このrepoの自動検査です。
+- [組み込みガイド / API](docs/api.md) — MDX、Vite、renderer、テンプレート、Worker の設定
+- [互換性ガイド](docs/compatibility.md) — 検証する環境と既知の制約
+- [サンプルアプリ](examples/poc) — client・SSG・Worker の一連の構成
+- [変更履歴](CHANGELOG.md) / [リリース](https://github.com/ts-76/honoxpress/releases)
+- [コントリビューションガイド](CONTRIBUTING.md) — 開発環境、検証、PR の進め方
 
-## ツールチェイン移行で確認した公式資料
+不具合や提案は [GitHub Issues](https://github.com/ts-76/honoxpress/issues) へ。使用バージョン、再現手順、対象 URL、dev / SSG / Worker のどの段階で起きるかを添えてください。
 
-- [Vite Plus migration](https://viteplus.dev/guide/migrate) / [migration rules](https://viteplus.dev/guide/migrate-rules)
-- [Vite Plus check](https://viteplus.dev/guide/check) / [Vitest5](https://viteplus.dev/guide/vitest-v5)
-- [pnpm import](https://pnpm.io/cli/import)
-- [Devbox globalとshellenv](https://www.jetify.com/docs/devbox/cli-reference/devbox-global) / [chezmoi apply](https://www.chezmoi.io/reference/commands/apply/)
-- [Cloudflare cf overview](https://developers.cloudflare.com/cf/) / [migrate](https://developers.cloudflare.com/cf/wrangler/migrate/)
-- [cf develop/build/dry-runと内部ツールへの委譲](https://developers.cloudflare.com/cf/projects/)
+## ライセンスと謝辞
 
-Macのghq checkoutは`~/ghq/github.com/ts-76/honox-docs-poc`です。ChatGPT Projectsの作成・会話移動・ローカルフォルダの紐付けは、このrepoの実装やcf設定とは別の作業で、未実行です。
+[MIT](LICENSE) © 2026 ts-76。
 
-## OSS化の成果順
-
-package候補名はユーザー決定の`honoxpress`です。MITとGitHub公開は承認済みで、npm公開済みのprivate workspaceとして検証し、利用者はHonoX標準routes/_rendererを所有します。runtimeの純粋metadata APIにcompiler/Node/build処理を混ぜません。
-
-1. [#1 package境界とmetadata API](https://github.com/ts-76/honoxpress/issues/1)
-2. [#2 薄いMDX/SSG build連携](https://github.com/ts-76/honoxpress/issues/2)
-3. [#3 nav/TOC/言語リンク・コピーUI](https://github.com/ts-76/honoxpress/issues/3)
-4. [#4 tarballと外部consumer](https://github.com/ts-76/honoxpress/issues/4)
-5. [#5 CIと公開判断ガイド](https://github.com/ts-76/honoxpress/issues/5)
-6. [#6 判断後のhono-decks実ページpilot](https://github.com/ts-76/honoxpress/issues/6)（ユーザー判断待ち）
-
-各成果は作業branchのDraft PRでレビューします。GitHub公開化は2026-10-03の承認で実施済みです。承認されたPR #7–14のmain統合・v0.1.0・初回stage・本人2FAによるnpm公開は完了しました。token作成や実deployは行っていません。パッケージの利用者APIは[package README](packages/docs/README.md)を参照してください。
-
-## Workspace境界
-
-再利用packageは`packages/docs`、標準HonoXアプリは`examples/poc`です。cf beta6はworkspace rootでアプリ検出を拒否するため、rootのdev/build/preview/test/evidence scriptsはexampleへ委譲します。app/routesと_rendererの構造はexample内で保持し、URLは変えません。上のapp/build/dist相対パスはexampleのcwdを基準にしています。runtime/build/UIの15件のunit検査はrootで別途実行します。
-
-Issue #2 adds a separate build-only package entry. MDX frontmatter and generated TOC come from the actual route files in dev/SSG, eliminating the temporary duplicate catalog. Worker mode provides an empty metadata catalog and never discovers MDX. The explicit renderer uses the package's manifest resolver; the consumer still owns client→SSG→Worker ordering, cleaning and literal Worker route selection. Core/build helper unit coverage is 10 cases in addition to the 5 application build regressions.
-
-## 標準UIの参考・謝辞
-
-[Cloudflare Nimbus](https://nimbus-docs.com/philosophy/)（[registry](https://nimbus-docs.com/registry/)、[repo](https://github.com/cloudflare/nimbus)）と[Fumapress](https://press.fumadocs.dev/docs)（[plugins](https://press.fumadocs.dev/docs/plugins)、[config source](https://github.com/fuma-nama/fumapress/blob/main/packages/core/src/config.tsx)、[repo](https://github.com/fuma-nama/fumapress)）のdesktop/mobile実UIを観察し、本文幅・余白・文字組み・sidebar/TOC・選択表示・code操作・mobile配置を参考にしました。両プロジェクトに感謝します。Fumapressの指定サイトは元設計書どおりで、別製品への読み替えではありません。
-
-両repoのMITライセンスを確認しました（[Nimbus](https://github.com/cloudflare/nimbus/blob/main/LICENSE) / [Fumapress](https://github.com/fuma-nama/fumapress/blob/main/LICENSE)）。今回のJSX/CSS/アイコンは独自実装で、コード・ロゴ・fontなどの素材は流用していません。今後流用する場合は対象ファイルのlicenseと必要なcopyright/NOTICEを保持します。このproject自体は2026-10-02にユーザー承認された[MIT](LICENSE)です（copyright 2026 ts-76）。詳しいコピー手順と謝辞は配布対象の[package README](packages/docs/README.md)にも含めています。
-
-標準UIのPlaywright追加検査は開発・本番local各1件、合計6 browser testsです。active nav、heading/TOC anchor、実clipboard成功と拒否時の案内、native mobile開閉、skip link/keyboard focus、390pxでのoverflow、dark modeの本文contrastを検査します。全項目のa11y認証は行っていません。
-
-## tarballと外部consumer
-
-`pnpm pack:docs`は現在のsourceの検証用tarballを`artifacts/package`へ作るだけで、公開しません。`pnpm test:consumer`はpackageの古い出力削除→pack files/exports/types検査→repo外の一時consumerへtarball install→凍結install→runtime/型/配布asset検査→standard HonoXの全受入を実行します。アプリ部分は既存exampleのコピーですが、package source/workspaceリンクやrepoのnode_modulesに依存しません。UI/CSSは実際にインストールしたpackageからコピーして上書きします。
-
-検証スクリプトは[scripts/verify-consumer.mjs](scripts/verify-consumer.mjs)、型とruntime fixtureは[fixtures/consumer](fixtures/consumer)。成功時は一時consumerを削除し、失敗時は診断用に残します。ログとtarballはGit対象外の`artifacts`、確認結果は[consumer evidence](packages/docs/evidence/consumer.json)です。全`pnpm verify`にも外部consumer受入を含めています。検証コマンドはnpm publish/auth/tokenやhono-decks実ページへの導入を行いません。
-
-## CIとOSS公開判断
-
-[Verify workflow](.github/workflows/verify.yml)はPRのhead commitを明示checkoutし、UbuntuのNode 22.23.3 / 24.12.0 / 24.21.0で凍結install、format・typed lint・tsc、package unit15件、3段build、build検査5件、browser検査6件、tarball外部consumerの同じ受入を実行します。cfはjob内だけglobalに用意し、実deploy・npm auth/publishはありません。公式Actionsはcommit SHA固定、repo権限はread-onlyです。各Nodeの証拠・tarball・診断は7日保持します。ローカル保存のsnapshotとCI run結果は別で、exact SHAとconclusionを確認して成功判定します。
-
-[API導入ガイド](docs/api.md)、[互換性と未検証範囲](docs/compatibility.md)、[貢献手順](CONTRIBUTING.md)、[公開判断・release gate](docs/release-decisions.md)を用意しました。Node24.21.0が確認時の最新LTS、Macは既存Devboxの24.12.0を保持し両方をCI対象にしています。26系はCurrentかつ未検証です。名前`honoxpress`は反映済みです。MIT・honoxpress・初回0.1.0・npm owner ts-76は承認済みです。GitHub公開とnpm ts-76/2FA確認は2026-10-03に完了しました。後続CIのprovenance・次回stage/publishなどの判断は[#6](https://github.com/ts-76/honoxpress/issues/6)で行い、その後にhono-decksの実ページpilotへ進めます。初回0.1.0はprivate:falseのCI配布物をstageし、本人2FAで公開済みです。hono-decks実ページpilotは未実行です。
-
-[stage型release CIの準備](docs/npm-release.md)を追加しました。品質検証済みtarballとcommit・版/tag・SHA256を照合し、npm 11.21.0のstage dry-runを認証なしのloopback registryで検証します。MIT・現在版・npm owner ts-76をpolicyへ反映し、LICENSEの同梱と同一性を検証します。正式なGitHub URLに合わせたprivate:falseの配布候補を検証します。stageEnabled:falseとprovenance未設定によりCI stageはblockedです。公開済みv0.1.0 tagをrelease-pleaseの基準に設定しました。通常PRのrefはrelease tag条件を満たしません。リリースPRの生成とGitHub Release作成はmain pushから自動起動し、bot PRのCIとタグの配布物準備は明示的なworkflow dispatchで実行します。初回stageは公開placeholderを作り、既存packageが必要なTrusted Publishingのbootstrapとは別の承認対象です。初回stage・本人によるpublish・main統合は完了しました。後続CIのOIDC登録・環境設定・activationは未実行です。
-
-## honoxpress命名と累積レビュー
-
-ユーザー決定の候補名`honoxpress`をpackage/import/build virtual ID・UI・README・sample・配布tarballへ反映しました。npm registryのread-only確認は2026-10-01に404でしたが、名前の予約や公開はしていません。GitHubの正式URLは`ts-76/honoxpress`へ変更済みで、ローカルghqパスは`honox-docs-poc`を保持しています。2026-10-03の公開承認を反映し、配布候補はprivate:false、stage停止guardは保持しています。MIT・0.1.0・owner ts-76は承認済みです。
-
-累積独立レビューでP2を2件修正しました。Unicode routeのencoded hrefとHono decoded pathの不一致はlookup正規化・raw URL pathname使用・解決済みhrefのactive navで修正。HonoX標準の補助MDX除外とmetadata discoveryの不一致は共有内部判定で修正しました。実Hono request＋実rendererのIsland script/nav/TOC/翻訳と、補助ファイル/ディレクトリの一時fixtureを含むpackage unitは15件です。レビューの詳細と残る判断は[review report](docs/review-honoxpress.md)に記録します。
+UI の設計では [Cloudflare Nimbus](https://github.com/cloudflare/nimbus) の読み幅・余白・ナビゲーションと、[Fumapress](https://github.com/fuma-nama/fumapress) の現在ページ表示・コード操作・モバイル目次を参考にしました。JSX、CSS、アイコンは独自に実装しています。
