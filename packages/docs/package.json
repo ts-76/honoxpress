@@ -1,6 +1,6 @@
 {
   "name": "honoxpress",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": false,
   "description": "Hono JSX documentation metadata and build helpers with consumer-owned UI templates",
   "homepage": "https://github.com/ts-76/honoxpress#readme",
