@@ -10,7 +10,7 @@
     "build:ssg": "vp build --mode ssg",
     "build:worker": "vp build --mode worker",
     "preview": "cf dev",
-    "preview:dry-run": "cf deploy --dry-run --prebuilt",
+    "preview:dry-run": "cf build && cf deploy --dry-run --prebuilt",
     "check": "vp check",
     "lint": "vp lint --deny-warnings",
     "fmt": "vp fmt",
