@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/ts-76/honoxpress/compare/v0.1.4...v0.2.0) (2026-10-11)
+
+
+### Features
+
+* add shared MDX components, setup CLI, and HonoX starter ([#29](https://github.com/ts-76/honoxpress/issues/29)) ([a20a2e6](https://github.com/ts-76/honoxpress/commit/a20a2e67a037628d8a6b2fa738d445b14dfb8798))
+
 ## [0.1.4](https://github.com/ts-76/honoxpress/compare/v0.1.3...v0.1.4) (2026-10-04)
 
 
