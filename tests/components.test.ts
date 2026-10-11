@@ -2,6 +2,9 @@ import { Hono } from "hono";
 import { jsx } from "hono/jsx/jsx-runtime";
 import { FileTree, File, Folder } from "../packages/docs/templates/file-tree";
 import { TypeTable } from "../packages/docs/templates/type-table";
+import { DefinitionList } from "../packages/docs/templates/definition-list";
+import { APIReference } from "../packages/docs/templates/api-reference";
+import DemoFrame from "../packages/docs/templates/demo-frame";
 import { Figure } from "../packages/docs/templates/figure";
 import { test, expect } from "vite-plus/test";
 import { remarkDocsComponents, remarkDocsCode, highlightDocsCode } from "honoxpress/build";
@@ -393,5 +396,53 @@ test("CodeGroup highlights literal samples and leaves dynamic data, spreads, and
     const dynamic = makeGroup(expression);
     await remarkDocsCode()({ type: "root", children: [dynamic] });
     expect(dynamic.attributes[0].value.value).toBe("original");
+  }
+});
+
+test("structured references escape content and demo sizing preserves defaults with explicit overrides", () => {
+  const html = jsx("div", {
+    children: [
+      DefinitionList({
+        items: [
+          { term: "<unsafe>", description: jsx("a", { href: "/guide", children: "Read more" }) },
+        ],
+      }),
+      APIReference({
+        name: "<API>",
+        importFrom: "pkg",
+        usage: "Use it here",
+        sourceHref: "/source",
+        labels: { usage: "用途", source: "ソース" },
+        children: TypeTable({ properties: [{ name: "src", type: "string" }] }),
+      }),
+      DemoFrame({
+        src: "/embed",
+        href: "/full",
+        aspectRatio: 16 / 9,
+        allowFullscreen: true,
+        openInNewTab: true,
+      }),
+    ],
+  }).toString();
+  expect(html).toContain("<dt>&lt;unsafe&gt;</dt><dd><a");
+  expect(html).toContain("&lt;API&gt;");
+  expect(html).toContain("用途");
+  expect(html).toContain("ソース");
+  expect(html).toContain('scope="row"');
+  expect(html).toContain('href="/full" target="_blank" rel="noreferrer"');
+  expect(html).toContain("aspect-ratio:");
+  expect(html).toContain('allow="fullscreen"');
+  const defaultFrame = jsx(DemoFrame, { src: "/embed" }).toString();
+  expect(defaultFrame).toContain('href="/embed"');
+  expect(defaultFrame).toContain('loading="lazy"');
+  expect(defaultFrame).not.toContain('target="_blank"');
+  expect(defaultFrame).not.toContain("style=");
+  const fixed = jsx(DemoFrame, { height: 320, aspectRatio: 16 / 9 }).toString();
+  expect(fixed).toContain("height:320px");
+  expect(fixed).not.toContain("aspect-ratio:");
+  expect(DefinitionList({ items: [] })).toBeNull();
+  for (const value of [0, -1, Infinity, NaN]) {
+    expect(() => DemoFrame({ height: value })).toThrow(RangeError);
+    expect(() => DemoFrame({ aspectRatio: value })).toThrow(RangeError);
   }
 });

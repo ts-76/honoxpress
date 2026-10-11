@@ -1,5 +1,6 @@
 import type { Child } from "hono/jsx";
 import type { DocsPage, LocaleLink } from "honoxpress";
+import { ThemeScript, ThemeSwitch } from "./theme-switch";
 import { DocsNavigation, LanguageLinks, TableOfContents } from "./docs-ui";
 
 export interface DocsLayoutLabels {
@@ -17,6 +18,8 @@ export interface DocsSiteConfig {
   readonly localeLabels: Readonly<Record<string, string>>;
   readonly labels?: Readonly<Record<string, Partial<DocsLayoutLabels>>>;
   readonly footer?: string;
+  /** Enable the Light / Dark / System control (default true). */
+  readonly themeSwitch?: boolean;
 }
 
 export interface DocsLayoutProps {
@@ -26,6 +29,8 @@ export interface DocsLayoutProps {
   readonly translations: readonly LocaleLink[];
   readonly locale: string;
   readonly clientSrc?: string;
+  /** Request-specific CSP nonce for the early theme initializer. */
+  readonly nonce?: string;
   readonly config: DocsSiteConfig;
 }
 
@@ -45,6 +50,7 @@ export function DocsLayout({
   translations,
   locale,
   clientSrc,
+  nonce,
   config,
 }: DocsLayoutProps) {
   const homeHref = config.homeHref ?? "/";
@@ -65,6 +71,7 @@ export function DocsLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{current ? `${current.title} · ${config.name}` : config.name}</title>
         {current?.description && <meta name="description" content={current.description} />}
+        {config.themeSwitch !== false && <ThemeScript nonce={nonce} />}
         <link rel="stylesheet" href={stylesheetHref} />
         {isDocsPage && clientSrc && <script type="module" src={clientSrc} />}
       </head>
@@ -87,11 +94,24 @@ export function DocsLayout({
                   GitHub <span aria-hidden="true">↗</span>
                 </a>
               )}
+              {config.themeSwitch !== false && (
+                <div class={current ? "theme-desktop" : "theme-desktop theme-home"}>
+                  <ThemeSwitch locale={locale} />
+                </div>
+              )}
               <LanguageLinks links={translations} locale={locale} labels={config.localeLabels} />
               {current && (
                 <details class="mobile-nav">
                   <summary>{locale === "ja" ? "メニュー" : "Menu"}</summary>
-                  <DocsNavigation pages={pages} pathname={current.href} label={navLabel} />
+                  <div class="mobile-nav-content">
+                    <DocsNavigation pages={pages} pathname={current.href} label={navLabel} />
+                    {config.themeSwitch !== false && (
+                      <div class="mobile-theme">
+                        <span>{locale === "ja" ? "テーマ" : "Theme"}</span>
+                        <ThemeSwitch locale={locale} />
+                      </div>
+                    )}
+                  </div>
                 </details>
               )}
             </div>

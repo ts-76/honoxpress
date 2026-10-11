@@ -132,9 +132,16 @@ app.get("/hello", (c) => c.json({ message: "Hello", count: 1 }));
 
 ## Demo frame
 
-<DemoFrame src="/demo/clock" title="Component clock demo" />
+<DemoFrame
+  src="/demo/clock"
+  href="/demo/clock?view=full"
+  title="Component clock demo"
+  aspectRatio={16 / 9}
+  allowFullscreen={true}
+  openInNewTab={true}
+/>
 
-Props: `src` and `title` are required, with optional `linkLabel`. Demo routes remain dynamic and are excluded before SSG execution.
+Set `src` for the embed and `href` for the full demo link (defaults to `src`). Use `aspectRatio={16 / 9}` for slides, or a positive `height` in pixels for fixed-height examples. `height` takes precedence. `allowFullscreen` grants fullscreen permission; `openInNewTab` opens the link separately. Both default to `false`. `loading` defaults to `"lazy"`. Demo routes remain dynamic and are excluded before SSG execution.
 
 ```tsx
 <DemoFrame src="/demo/clock" title="Clock" />
@@ -228,6 +235,65 @@ Pass a `properties` array with `name`, `type`, optional `description`, `required
 />
 
 Provide `src`, `alt`, and the image's intrinsic `width` and `height`. The image keeps its aspect ratio without cropping. Optional `caption` accepts MDX content; `loading` defaults to `lazy`.
+
+## Theme switch
+
+Choose Light, Dark, or System from the header. On a phone, open Menu to find the same control. The choice is remembered across pages; System follows the device appearance.
+
+`DocsLayout` includes `ThemeSwitch` and its early `ThemeScript`. For a custom layout, place `ThemeScript` in the document head before the stylesheet and render `<ThemeSwitch locale="en" />` wherever readers expect the control. Theme changes affect the documentation, while embedded demos keep their own theme.
+
+## Definition list
+
+<DefinitionList
+  label="Presentation configuration"
+  items={[
+    { term: <code>theme</code>, description: "The presentation's authored colors and typography." },
+    {
+      term: <code>basePath</code>,
+      description: "The URL prefix where the presentation is served.",
+    },
+    { term: "Documentation theme", description: "The reader's Light, Dark, or System preference." },
+  ]}
+/>
+
+Pass `items` with `term` and `description`. Both accept JSX content, including inline code and links. The native definition list stacks terms above descriptions on small screens; an empty list renders nothing. Use Type Table for typed API properties.
+
+## API reference
+
+<APIReference
+  name="DemoFrame"
+  importFrom="./components/demo-frame"
+  description="Embed an interactive example alongside its documentation."
+  usage="Use it when readers need to try a demo without leaving the guide."
+  guideHref="#demo-frame"
+  sourceHref="https://github.com/ts-76/honoxpress/blob/main/packages/docs/templates/demo-frame.tsx"
+>
+  <CodeBlock
+    language="tsx"
+    filename="components.mdx"
+    copyLabel="Copy demo example"
+    code={
+      '<DemoFrame src="/demo/product/embed" href="/demo/product" aspectRatio={16 / 9} allowFullscreen />'
+    }
+  />
+  <TypeTable
+    caption="Demo frame sizing"
+    properties={[
+      {
+        name: "aspectRatio",
+        type: "number",
+        description: "Positive width-to-height ratio, such as 16 / 9.",
+      },
+      {
+        name: "height",
+        type: "number",
+        description: "Positive pixel height; overrides aspectRatio.",
+      },
+    ]}
+  />
+</APIReference>
+
+`APIReference` groups an API `name`, optional `importFrom`, `description`, `usage`, guide/source links, and ordinary children. Compose CodeBlock, TypeTable, and prose inside it. The optional `labels` object localizes usage and link labels. Add a Markdown section heading for automatic TOC discovery; `id` can provide a direct anchor for the reference itself.
 
 ## Your components
 

@@ -1,7 +1,7 @@
 /* Foundations and reading roles shared by the shell and copied components.
    Override semantic --docs-* properties after the default stylesheet. */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
   /* Canvas is pinned to #F9FAFB. Surfaces use very low-chroma cool neutrals;
      the rust accent and semantic colors carry deliberate chroma. Hex values are
@@ -89,7 +89,8 @@
   }
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
     --docs-bg: #181b1f;
     --docs-panel: #1e2125;
     --docs-surface: #272a30;
@@ -103,6 +104,21 @@
     --docs-warning: #fabc59;
     --docs-danger: #ff9aab;
   }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --docs-bg: #181b1f;
+  --docs-panel: #1e2125;
+  --docs-surface: #272a30;
+  --docs-text: #e5e8ed;
+  --docs-muted: #a0a8b6;
+  --docs-line: #383d46;
+  --docs-accent: #ffad8c;
+  --docs-tint: #362821;
+  --docs-info: #95baff;
+  --docs-tip: #6dd09e;
+  --docs-warning: #fabc59;
+  --docs-danger: #ff9aab;
 }
 @media (forced-colors: active) {
   :root {

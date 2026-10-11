@@ -168,6 +168,11 @@ void test("init starter dry-run includes the runnable project scaffold", () => {
     assert.ok(existsSync(join(directory, "vite.config.ts")));
     assert.ok(existsSync(join(directory, ".gitignore")));
     assert.ok(existsSync(join(directory, "public/tokens.css")));
+    assert.ok(existsSync(join(directory, "app/components/theme-switch.tsx")));
+    assert.match(
+      readFileSync(join(directory, "app/components/docs-layout.tsx"), "utf8"),
+      /<ThemeScript nonce=/,
+    );
   });
 });
 
@@ -177,7 +182,15 @@ void test("authoring groups install separate sources and reuse consumer-owned co
     const tabsPath = join(directory, "app/islands/tabs.tsx");
     const customized = readFileSync(tabsPath, "utf8") + "\n// Application customization\n";
     writeFileSync(tabsPath, customized);
-    for (const group of ["file-tree", "type-table", "code-group", "figure"]) {
+    for (const group of [
+      "file-tree",
+      "type-table",
+      "code-group",
+      "figure",
+      "theme-switch",
+      "definition-list",
+      "api-reference",
+    ]) {
       const result = invoke(directory, "add", group);
       assert.equal(result.status, 0, result.stderr);
       assert.ok(
@@ -196,6 +209,9 @@ void test("authoring groups install separate sources and reuse consumer-owned co
       "TypeTable",
       "CodeGroup",
       "Figure",
+      "ThemeSwitch",
+      "DefinitionList",
+      "APIReference",
       "TabPanel",
       "CodeBlock",
     ])

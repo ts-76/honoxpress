@@ -51,13 +51,21 @@ test("MDX save updates body, title, nav and TOC, then rehydrates the island", as
     ),
   );
   await expect(page.getByText("Registry override applied", { exact: true })).toBeVisible();
-  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(4);
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
   await page.getByRole("tab", { name: "npm", exact: true }).click();
   await expect(page.locator(".hx-tabs").first().getByRole("tabpanel")).toHaveText(
     "npm install honoxpress",
   );
   // Add an island after this browser has cached the prebundled HonoX client.
   // App-owned globs must discover it without clearing the browser's cache.
+  // Adding the source triggers HonoX's restart. Observe its automatic document
+  // reload before the separate MDX save, so a reload cannot target a closed
+  // listener while both filesystem events are in flight. Browser cache stays intact.
+  const restarted = page.waitForEvent("framenavigated", {
+    predicate: (frame) =>
+      frame === page.mainFrame() && new URL(frame.url()).pathname === "/docs/components",
+    timeout: 15000,
+  });
   await writeFile(
     join(root, "app/islands/runtime-probe.tsx"),
     `/** @jsxImportSource hono/jsx */
@@ -68,6 +76,9 @@ export default function RuntimeProbe() {
 }
 `,
   );
+  await restarted;
+  await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
+  await expect(page.getByText("Registry override applied", { exact: true })).toBeVisible();
   const componentsPath = join(root, "app/routes/docs/components.mdx");
   const components = await readFile(componentsPath, "utf8");
   await writeFile(
@@ -76,7 +87,7 @@ export default function RuntimeProbe() {
   );
   const probe = page.getByRole("button", { name: "New island count: 0", exact: true });
   await expect(probe).toBeVisible();
-  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(6);
   await probe.click();
   await expect(
     page.getByRole("button", { name: "New island count: 1", exact: true }),

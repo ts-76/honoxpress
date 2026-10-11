@@ -103,21 +103,24 @@ Write your documentation here.
 
 Templates are exported as files through `honoxpress/templates/*`:
 
-| Template         | Destination in your app                     |
-| ---------------- | ------------------------------------------- |
-| `docs-ui.tsx`    | `app/components/docs-ui.tsx`                |
-| `copy-code.tsx`  | `app/islands/copy-code.tsx`                 |
-| `file-tree.tsx`  | `app/components/file-tree.tsx`              |
-| `type-table.tsx` | `app/components/type-table.tsx`             |
-| `code-group.tsx` | `app/islands/code-group.tsx`                |
-| `figure.tsx`     | `app/components/figure.tsx`                 |
-| `demo-frame.tsx` | `app/components/demo-frame.tsx`             |
-| `docs.css`       | Your public stylesheet                      |
-| `tokens.css`     | Shared theme, typography, and spacing roles |
+| Template              | Destination in your app                     |
+| --------------------- | ------------------------------------------- |
+| `docs-ui.tsx`         | `app/components/docs-ui.tsx`                |
+| `copy-code.tsx`       | `app/islands/copy-code.tsx`                 |
+| `file-tree.tsx`       | `app/components/file-tree.tsx`              |
+| `type-table.tsx`      | `app/components/type-table.tsx`             |
+| `code-group.tsx`      | `app/islands/code-group.tsx`                |
+| `figure.tsx`          | `app/components/figure.tsx`                 |
+| `theme-switch.tsx`    | `app/components/theme-switch.tsx`           |
+| `definition-list.tsx` | `app/components/definition-list.tsx`        |
+| `api-reference.tsx`   | `app/components/api-reference.tsx`          |
+| `demo-frame.tsx`      | `app/components/demo-frame.tsx`             |
+| `docs.css`            | Your public stylesheet                      |
+| `tokens.css`          | Shared theme, typography, and spacing roles |
 
 For the complete component list, props, MDX registry setup, CLI workflow, and starter, see the [component system guide](docs/components.md). The upcoming CLI installs Hono JSX components and islands into your app, then validates MDX tags using the same registry supplied to `providerImportSource`.
 
-The layout and styles include responsive navigation and TOC disclosures, visible keyboard focus, a skip link, copy success/failure feedback, and color-scheme tokens. Installed components are app-owned; review changes manually and preserve the MIT notice when distributing copied files. See the [component system guide](docs/components.md) for installation, registry setup, props, and customization.
+The layout and styles include responsive navigation and TOC disclosures, visible keyboard focus, a skip link, copy success/failure feedback, and a persistent Light / Dark / System theme selector. Installed components are app-owned; review changes manually and preserve the MIT notice when distributing copied files. See the [component system guide](docs/components.md) for installation, registry setup, props, and customization.
 
 ## Build model and scope
 

@@ -38,7 +38,11 @@ const groups = {
     dependencies: ["tabs", "code-block"],
   },
   figure: { files: ["components/figure.tsx"], names: ["Figure"] },
+  "theme-switch": { files: ["components/theme-switch.tsx"], names: ["ThemeSwitch"] },
+  "definition-list": { files: ["components/definition-list.tsx"], names: ["DefinitionList"] },
+  "api-reference": { files: ["components/api-reference.tsx"], names: ["APIReference"] },
   layout: {
+    dependencies: ["theme-switch"],
     files: [
       "components/docs-ui.tsx",
       "components/docs-layout.tsx",
@@ -173,6 +177,9 @@ function registryBlock(names) {
   for (const [name, file] of [
     ["TypeTable", "type-table"],
     ["Figure", "figure"],
+    ["ThemeSwitch", "theme-switch"],
+    ["DefinitionList", "definition-list"],
+    ["APIReference", "api-reference"],
   ]) {
     if (names.includes(name)) imports.push(`import { ${name} } from "./components/${file}";`);
   }
@@ -281,6 +288,9 @@ function install({ command, target, cwd, dryRun, starter }) {
     "type-table",
     "code-group",
     "figure",
+    "theme-switch",
+    "definition-list",
+    "api-reference",
   ];
   const visualsAlreadyInstalled = previous.groups.some((name) => visualGroups.includes(name));
   for (const name of added) {
@@ -301,7 +311,14 @@ function install({ command, target, cwd, dryRun, starter }) {
       else if (rel === "islands/code-group.tsx")
         addSource(join(templateRoot, "code-group.tsx"), `app/${rel}`);
       else if (
-        ["file-tree", "type-table", "figure"].some((file) => rel === `components/${file}.tsx`)
+        [
+          "file-tree",
+          "type-table",
+          "figure",
+          "theme-switch",
+          "definition-list",
+          "api-reference",
+        ].some((file) => rel === `components/${file}.tsx`)
       )
         addSource(join(templateRoot, rel.slice("components/".length)), `app/${rel}`);
       else if (rel === "components/docs-ui.tsx")
@@ -338,6 +355,9 @@ function install({ command, target, cwd, dryRun, starter }) {
       "app/components/type-table.tsx",
       "app/islands/code-group.tsx",
       "app/components/figure.tsx",
+      "app/components/theme-switch.tsx",
+      "app/components/definition-list.tsx",
+      "app/components/api-reference.tsx",
       "app/islands/tabs.tsx",
       "app/islands/copy-code.tsx",
       "public/style.css",

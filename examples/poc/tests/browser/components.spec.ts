@@ -8,7 +8,7 @@ test("component styles retain their hierarchy and share the docs theme across si
     for (const width of [1280, 800, 390]) {
       await page.setViewportSize({ width, height: 844 });
       await page.goto("/docs/components");
-      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(4);
+      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
       await expect(page.getByRole("tab", { name: "pnpm", exact: true })).toHaveAttribute(
         "aria-selected",
         "true",
@@ -159,7 +159,7 @@ test("component styles retain their hierarchy and share the docs theme across si
   // A site-level customization must reach navigation and interactive components alike.
   await page.addStyleTag({
     content:
-      ":root { --docs-accent: #94612f; --docs-radius: 12px; --docs-panel-padding: 28px; --docs-title-size: 19px; --docs-title-gap: 10px; }",
+      ":root, :root[data-theme] { --docs-accent: #94612f; --docs-radius: 12px; --docs-panel-padding: 28px; --docs-title-size: 19px; --docs-title-gap: 10px; }",
   });
   await expect(page.locator('.docs-nav a[aria-current="page"]').first()).toHaveCSS(
     "color",
@@ -199,7 +199,7 @@ test("copy feedback remains readable during pending and failure states", async (
   for (const colorScheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme });
     await page.goto("/docs/components");
-    await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(4);
+    await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
     const copy = page.getByRole("button", { name: "Copy example", exact: true });
     await copy.click();
     await expect(copy).toBeDisabled();
@@ -224,7 +224,7 @@ test("registered components: hydration, isolated keyboard tabs, disclosures and 
   page.on("pageerror", (error) => errors.push(error.message));
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/docs/components");
-  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(4);
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
   await expect(page.locator(".hx-callout")).toHaveCount(5);
   await expect(page.locator(".hx-card")).toHaveCount(2);
   await expect(page.locator(".hx-step")).toHaveCount(3);
@@ -295,7 +295,7 @@ test("authoring components support code switching, responsive tables, figures, a
     for (const width of [1280, 390]) {
       await page.setViewportSize({ width, height: 844 });
       await page.goto("/docs/components");
-      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(4);
+      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
       const tree = page.getByRole("group", { name: "Documentation project" });
       const folder = tree.locator("summary").filter({ hasText: /^routes$/ });
       await folder.focus();
@@ -356,9 +356,12 @@ test("authoring components support code switching, responsive tables, figures, a
         ["type-table", ".hx-type-table"],
         ["code-group", ".hx-code-group"],
         ["figure", ".hx-figure"],
+        ["definition-list", ".hx-definition-list"],
+        ["api-reference", ".hx-api-reference"],
       ]) {
         await page
           .locator(selector)
+          .first()
           .screenshot({ path: testInfo.outputPath(`${name}-${width}-${colorScheme}.png`) });
       }
     }
@@ -387,7 +390,114 @@ test("native file disclosures and all code examples remain usable without JavaSc
     await expect(page.locator(".hx-code-group .code-block").nth(0)).toBeVisible();
     await expect(page.locator(".hx-code-group .code-block").nth(1)).toBeVisible();
     await expect(page.getByRole("table", { name: "Figure properties" })).toBeVisible();
+    await expect(page.locator(".hx-definition-list dt")).toHaveCount(3);
+    await expect(page.getByRole("article", { name: "DemoFrame", exact: true })).toBeVisible();
+    await expect(page.locator(".theme-desktop select")).toBeDisabled();
+    await page.emulateMedia({ colorScheme: "dark" });
+    await expect(page.locator("body")).toHaveCSS("background-color", "rgb(24, 27, 31)");
   } finally {
     await context.close();
+  }
+});
+
+test("theme choice persists before rendering, follows the OS, syncs tabs, and works with restricted storage", async ({
+  page,
+  context,
+  browser,
+  baseURL,
+}, testInfo) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.addInitScript(() => {
+    const observer = new MutationObserver(() => {
+      if (document.body) {
+        document.documentElement.dataset.firstBodyTheme = document.documentElement.dataset.theme;
+        observer.disconnect();
+      }
+    });
+    observer.observe(document, { childList: true, subtree: true });
+  });
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/docs/components");
+  const desktop = page.locator(".theme-desktop select");
+  await expect(desktop).toHaveValue("system");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await desktop.selectOption("light");
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(249, 250, 251)");
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-first-body-theme", "light");
+  await expect(desktop).toHaveValue("light");
+  await page.goto("/docs/getting-started");
+  await expect(desktop).toHaveValue("light");
+  const other = await context.newPage();
+  try {
+    await other.goto("/docs/components");
+    await other.locator(".theme-desktop select").selectOption("dark");
+    await expect(desktop).toHaveValue("dark");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  } finally {
+    await other.close();
+  }
+  await desktop.selectOption("system");
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/docs/components");
+  await page.locator(".mobile-nav > summary").click();
+  const mobile = page.locator(".mobile-theme select");
+  await expect(mobile).toBeVisible();
+  await mobile.focus();
+  await expect(mobile).toHaveCSS("outline-width", "2px");
+  await mobile.selectOption("light");
+  await expect(desktop).toHaveValue("light");
+  await page
+    .locator(".mobile-nav-content")
+    .screenshot({ path: testInfo.outputPath("theme-mobile-menu.png") });
+  await page.locator(".mobile-nav > summary").click();
+  const frame = page.locator("iframe");
+  await expect(frame).toHaveAttribute("allow", "fullscreen");
+  const bounds = await frame.boundingBox();
+  expect(bounds!.width / bounds!.height).toBeCloseTo(16 / 9, 1);
+  await expect(page.getByRole("link", { name: "Open live demo" })).toHaveAttribute(
+    "href",
+    "/demo/clock?view=full",
+  );
+  await expect(page.locator(".hx-definition-list dt")).toHaveCount(3);
+  const reference = page.getByRole("article", { name: "DemoFrame", exact: true });
+  const propertyName = reference.locator("tbody th code").first();
+  // A normal-sized API identifier should fit without splitting inside a word.
+  expect((await propertyName.boundingBox())!.height).toBeLessThan(30);
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await reference.getByRole("button", { name: "Copy demo example", exact: true }).click();
+  await expect(reference.getByRole("status")).toHaveText("Copied");
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toContain(
+    "/demo/product/embed",
+  );
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
+  await page.goto("/ja/docs/components");
+  await page.locator(".mobile-nav > summary").click();
+  await expect(page.getByRole("combobox", { name: "テーマ" })).toBeVisible();
+  await page.goto("/");
+  await expect(page.locator(".theme-home select")).toBeVisible();
+  expect(errors).toEqual([]);
+
+  const restricted = await browser.newContext({ baseURL, colorScheme: "dark" });
+  try {
+    await restricted.addInitScript(() => {
+      Object.defineProperty(window, "localStorage", {
+        get: () => {
+          throw new Error("Storage unavailable");
+        },
+      });
+    });
+    const isolated = await restricted.newPage();
+    await isolated.goto("/docs/components");
+    await expect(isolated.locator("html")).toHaveAttribute("data-theme", "dark");
+    await isolated.locator(".theme-desktop select").selectOption("light");
+    await expect(isolated.locator("body")).toHaveCSS("background-color", "rgb(249, 250, 251)");
+  } finally {
+    await restricted.close();
   }
 });

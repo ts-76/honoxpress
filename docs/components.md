@@ -23,7 +23,7 @@ pnpm exec honoxpress add tabs
 pnpm exec honoxpress list
 ```
 
-Available groups are `callout`, `cards`, `steps`, `accordion`, `tabs`, `code-block`, `demo-frame`, `file-tree`, `type-table`, `code-group`, `figure`, and `layout`. `init` is shorthand for all groups. `add` adds the group's files and refreshes only the managed registry block in `app/mdx-components.ts`; local code outside that block is preserved. Do not edit the lines between the `honoxpress:components` markers: a later `add` replaces that generated block. Put custom imports and registry additions outside it. `--dry-run` prints the complete proposed changes without writing files. `add code-group` also installs the `tabs` and `code-block` groups when they are missing; previously installed, locally edited islands are preserved.
+Available groups are `callout`, `cards`, `steps`, `accordion`, `tabs`, `code-block`, `demo-frame`, `file-tree`, `type-table`, `code-group`, `figure`, `theme-switch`, `definition-list`, `api-reference`, and `layout`. `init` is shorthand for all groups. `add` adds the group's files and refreshes only the managed registry block in `app/mdx-components.ts`; local code outside that block is preserved. Do not edit the lines between the `honoxpress:components` markers: a later `add` replaces that generated block. Put custom imports and registry additions outside it. `--dry-run` prints the complete proposed changes without writing files. `add code-group` also installs the `tabs` and `code-block` groups when they are missing; previously installed, locally edited islands are preserved. `add layout` also installs `theme-switch`.
 
 Content groups such as `callout` or `tabs` also install `public/components.css` and its shared `public/tokens.css` on first addition. The `layout` group installs `public/style.css`, which imports that component stylesheet. Either run `add layout` as well, or link the component stylesheet from your own layout with `<link rel="stylesheet" href="/components.css" />`. `CodeBlock` also uses the base code-toolbar styles from `docs.css`; if you skip the layout group, copy and load both stylesheets or provide equivalent styles in your own CSS.
 
@@ -77,25 +77,28 @@ The generated `useMDXComponents` provider accepts `Record<string, unknown>` over
 
 ## Component gallery and props
 
-| Component       | What it renders                                                  | Props                                                                                                       |
-| --------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `Callout`       | Semantic note with `info`, `tip`, `warning`, or `danger` styling | `type?`, `title?`, children                                                                                 |
-| `Cards`         | Responsive card grid                                             | `columns?: 2 \| 3` (default `2`), children                                                                  |
-| `Card`          | A titled card with optional link                                 | `title` (required), `href?`, children                                                                       |
-| `Steps`         | Numbered sequence                                                | children                                                                                                    |
-| `Step`          | One item in `Steps`                                              | `title?`, children                                                                                          |
-| `Accordion`     | Container for disclosure items                                   | children                                                                                                    |
-| `AccordionItem` | Native expandable disclosure                                     | `title` (required), `open?` (default `false`), children                                                     |
-| `Tabs`          | Keyboard-operable tab navigation island                          | `labels: string[]` (required), `ariaLabel?` (default `"Tabs"`), `selectedIndex?` (default `0`), children    |
-| `TabPanel`      | Content associated with a `Tabs` label by its index              | `index: number` (required), children                                                                        |
-| `CodeBlock`     | Copyable command or code sample island                           | `code: string` (required), `language?`, `tokens?`, `filename?`, `copyLabel?`, `copiedLabel?`, `errorLabel?` |
-| `DemoFrame`     | Lazy iframe with a caption and direct link                       | `title?`, `src?` (default `/demo/clock`), `linkLabel?`                                                      |
-| `FileTree`      | Accessible nested file list                                      | `label?` (default `"Project files"`), children                                                              |
-| `Folder`        | Native collapsible folder inside a file tree                     | `name`, `open?` (default `true`), children                                                                  |
-| `File`          | File name, with optional link or emphasis                        | `name`, `href?`, `highlighted?` (default `false`)                                                           |
-| `TypeTable`     | Semantic property reference table                                | `properties: TypeProperty[]`, `caption?` (default `"Properties"`), `emptyLabel?`                            |
-| `CodeGroup`     | Tabbed code samples using the existing islands                   | `samples: CodeSample[]`, `ariaLabel?` (default `"Code examples"`), `selectedIndex?`                         |
-| `Figure`        | Responsive image and optional caption                            | `src`, `alt`, intrinsic `width` and `height`, `caption?`, `loading?` (default `"lazy"`)                     |
+| Component        | What it renders                                                  | Props                                                                                                               |
+| ---------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `Callout`        | Semantic note with `info`, `tip`, `warning`, or `danger` styling | `type?`, `title?`, children                                                                                         |
+| `Cards`          | Responsive card grid                                             | `columns?: 2 \| 3` (default `2`), children                                                                          |
+| `Card`           | A titled card with optional link                                 | `title` (required), `href?`, children                                                                               |
+| `Steps`          | Numbered sequence                                                | children                                                                                                            |
+| `Step`           | One item in `Steps`                                              | `title?`, children                                                                                                  |
+| `Accordion`      | Container for disclosure items                                   | children                                                                                                            |
+| `AccordionItem`  | Native expandable disclosure                                     | `title` (required), `open?` (default `false`), children                                                             |
+| `Tabs`           | Keyboard-operable tab navigation island                          | `labels: string[]` (required), `ariaLabel?` (default `"Tabs"`), `selectedIndex?` (default `0`), children            |
+| `TabPanel`       | Content associated with a `Tabs` label by its index              | `index: number` (required), children                                                                                |
+| `CodeBlock`      | Copyable command or code sample island                           | `code: string` (required), `language?`, `tokens?`, `filename?`, `copyLabel?`, `copiedLabel?`, `errorLabel?`         |
+| `DemoFrame`      | Lazy iframe with a caption and direct link                       | `title?`, `src?`, `href?`, `linkLabel?`, `aspectRatio?`, `height?`, `allowFullscreen?`, `openInNewTab?`, `loading?` |
+| `FileTree`       | Accessible nested file list                                      | `label?` (default `"Project files"`), children                                                                      |
+| `Folder`         | Native collapsible folder inside a file tree                     | `name`, `open?` (default `true`), children                                                                          |
+| `File`           | File name, with optional link or emphasis                        | `name`, `href?`, `highlighted?` (default `false`)                                                                   |
+| `TypeTable`      | Semantic property reference table                                | `properties: TypeProperty[]`, `caption?` (default `"Properties"`), `emptyLabel?`                                    |
+| `CodeGroup`      | Tabbed code samples using the existing islands                   | `samples: CodeSample[]`, `ariaLabel?` (default `"Code examples"`), `selectedIndex?`                                 |
+| `Figure`         | Responsive image and optional caption                            | `src`, `alt`, intrinsic `width` and `height`, `caption?`, `loading?` (default `"lazy"`)                             |
+| `ThemeSwitch`    | Native Light / Dark / System selector                            | `locale?` (default `"en"`; `"ja"` localizes labels)                                                                 |
+| `DefinitionList` | Semantic term-description rows                                   | `items: readonly DefinitionItem[]`, `label?`                                                                        |
+| `APIReference`   | API heading, usage, reference content and links                  | `name`, `id?`, `importFrom?`, `description?`, `usage?`, `guideHref?`, `sourceHref?`, `labels?`, children            |
 
 Children are ordinary MDX content. Language-labelled Markdown fences are highlighted by `remarkDocsCode`. Use `CodeBlock` with `language` when a copy button and filename toolbar are useful.
 
@@ -199,6 +202,51 @@ FileTree, TypeTable, and Figure live in separate application-owned files under `
 
 `Figure` renders a native image with the provided intrinsic dimensions to reserve its aspect ratio. It scales to its container without cropping. Write informative `alt` text; use `alt=""` only for a decorative image. Use `loading="eager"` for an image visible when the page opens. Caption content may include links or ordinary MDX, passed as a JSX expression. The component does not optimize images or provide zoom; serve appropriately sized image files from your application.
 
+## Structured references and live demos
+
+```sh
+pnpm exec honoxpress add definition-list
+pnpm exec honoxpress add api-reference
+pnpm exec honoxpress add theme-switch
+```
+
+`DefinitionList` and `APIReference` live in `app/components/definition-list.tsx` and `app/components/api-reference.tsx`. They render static HTML and can contain links, code, and other registered components.
+
+```mdx
+<DefinitionList
+  label="Configuration"
+  items={[
+    { term: <code>basePath</code>, description: "The URL prefix used by the application." },
+    { term: "Theme", description: "The presentation's authored colors and typography." },
+  ]}
+/>
+
+## DemoFrame API
+
+<APIReference
+  name="DemoFrame"
+  importFrom="./components/demo-frame"
+  description="Embed an interactive example alongside its documentation."
+  usage="Use it when readers need to try the example without leaving the guide."
+  guideHref="/docs/demos"
+  sourceHref="https://github.com/your-org/your-project/blob/main/app/components/demo-frame.tsx"
+>
+  <CodeBlock
+    language="tsx"
+    code={
+      '<DemoFrame src="/demo/product/embed" href="/demo/product" aspectRatio={16 / 9} allowFullscreen />'
+    }
+  />
+  <TypeTable properties={[{ name: "src", type: "string", required: true }]} />
+</APIReference>
+```
+
+`DefinitionItem` has `term: Child` and `description: Child`; an empty array renders nothing. Rows stack on narrow screens. Use it for concepts or configuration explanations, and TypeTable for typed properties.
+
+`APIReference` groups related content in a labelled article. `description` and `usage` accept `Child`; its children can include CodeBlock, TypeTable, DefinitionList, and prose. `labels` accepts `usage`, `guide`, `source`, and `links` strings for localization. Add an ordinary Markdown heading above the component for automatic TOC discovery; its own generated heading is not included in the MDX heading export. The optional `id` supplies a direct anchor.
+
+`DemoFrame` separates an iframe `src` from its link `href` (defaults to `src`). Positive, finite `aspectRatio` values reserve the iframe's width-to-height ratio; positive, finite `height` values specify pixels and take precedence. Without either prop the default stylesheet retains a 210px height. Invalid dimensions throw during rendering. `allowFullscreen={true}` grants the iframe fullscreen permission, while `openInNewTab={true}` adds a separate tab with `rel="noreferrer"`. Both default to `false`; `loading` defaults to `"lazy"`. `title` defaults to `"Live Worker demo"`, and `src` to `/demo/clock`. The embedded app remains responsible for its controls and theme.
+
 ## Layout and site configuration
 
 The layout group installs `DocsLayout` in `app/components/docs-layout.tsx`, its navigation helpers in `app/components/docs-ui.tsx`, and a typed site config in `app/docs.config.ts`. In a route renderer, resolve catalog data and pass it to the layout:
@@ -226,6 +274,7 @@ The layout group installs `DocsLayout` in `app/components/docs-layout.tsx`, its 
 | `translations`    | `readonly LocaleLink[]` | Available and unavailable translations for the current page |
 | `locale`          | `string`                | Active document language and label lookup key               |
 | `clientSrc?`      | `string`                | Client entry to load for an interactive docs page           |
+| `nonce?`          | `string`                | Request-specific CSP nonce for the early theme script       |
 | `config`          | `DocsSiteConfig`        | Site name, links, labels, styles, and footer                |
 
 The config template has this shape:
@@ -257,6 +306,16 @@ export default docsSite;
 | `TableOfContents` | `headings: readonly Heading[]`, `label?: string`                                                               |
 | `LanguageLinks`   | `links: readonly LocaleLink[]`, `locale: string`, `labels: Readonly<Record<string, string>>`, `label?: string` |
 
+## Theme switching
+
+`DocsLayout` installs `ThemeScript` and `ThemeSwitch` from `app/components/theme-switch.tsx` and enables them by default. The control appears in the desktop header and inside the mobile menu. On non-documentation pages it remains visible in the header. Set `config.themeSwitch = false` to omit both the control and initializer.
+
+For a custom shell, render `<ThemeScript />` in `<head>` **before the stylesheet**, then render `<ThemeSwitch locale="en" />` where needed. Include both `components.css` and `tokens.css`; `ThemeSwitch` alone does not initialize the theme. If your CSP uses a nonce, pass the request's value as `<ThemeScript nonce={nonce} />` or `DocsLayout.nonce` and authorize that script in the policy.
+
+The selector offers Light, Dark, and System. Its choice is stored under `honoxpress-theme` in localStorage and survives document navigation. The synchronous head initializer sets `html[data-theme]` before styles load to avoid the wrong initial palette. System follows `prefers-color-scheme`, including later OS changes; storage events synchronize open tabs. Restricted storage still permits switching within the current page. Without JavaScript the selector stays disabled and the stylesheet follows the OS. Forced-colors mode always uses system colors.
+
+**Existing installations:** merge the new layout import, head initializer and controls into your owned layout, and merge the updated tokens/styles. `add theme-switch` installs the component and registry entry but preserves your existing CSS and shell. The documentation theme does not reach inside an iframe or override the presentation's authored theme.
+
 ## Theme and interaction styles
 
 The layout and standard components import one shared `public/tokens.css`. It separates the four-pixel spacing foundation, typography scale, surface colors, and semantic roles. Component styles consume roles such as panel padding or title spacing, so a single customization reaches every component. Override semantic properties after the default stylesheet:
@@ -270,8 +329,12 @@ The layout and standard components import one shared `public/tokens.css`. It sep
   --docs-title-size: 1.125rem;
 }
 
+:root[data-theme="dark"] {
+  --docs-accent: #e8a587;
+  --docs-tint: #362821;
+}
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --docs-accent: #e8a587;
     --docs-tint: #362821;
   }

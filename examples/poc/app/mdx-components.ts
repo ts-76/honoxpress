@@ -18,7 +18,13 @@ import { FileTree, File, Folder } from "./components/file-tree";
 import { TypeTable } from "./components/type-table";
 import CodeGroup from "./islands/code-group";
 import { Figure } from "./components/figure";
+import { ThemeSwitch } from "./components/theme-switch";
+import { DefinitionList } from "./components/definition-list";
+import { APIReference } from "./components/api-reference";
 export const standardComponents = {
+  ThemeSwitch,
+  DefinitionList,
+  APIReference,
   FileTree,
   File,
   Folder,

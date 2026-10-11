@@ -56,4 +56,6 @@ test("actual renderer keeps Unicode docs layout, active navigation, translation 
   expect(html).toContain(`href="/ja${href}"`);
   expect(html).toContain('href="#section"');
   expect(html).toContain('type="module" src="/app/client.ts"');
+  expect(html.indexOf("honoxpress-theme")).toBeLessThan(html.indexOf('rel="stylesheet"'));
+  expect(html).toContain("data-hx-theme-switch");
 });

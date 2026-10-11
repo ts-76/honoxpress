@@ -84,7 +84,7 @@ export async function inspectArtifact({ root = process.cwd(), artifactRoot = roo
   assert.equal(evidence.externalConsumer.workspaceOrSourceLinks, false);
   assert.equal(evidence.externalConsumer.packageStaleOutputRemoved, true);
   assert.equal(evidence.validation.buildTests, 5);
-  assert.equal(evidence.validation.browserTests, 16);
+  assert.equal(evidence.validation.browserTests, 18);
   assert.equal(evidence.validation.clientSSGWorker, "passed");
   assert.equal(evidence.validation.cfBuild, "passed");
   for (const key of [
@@ -105,7 +105,7 @@ export async function inspectArtifact({ root = process.cwd(), artifactRoot = roo
     assert.deepEqual(evidence.graphs[target].docsCompilerOrBuildModules, []);
   const unit = await json(path.join(artifactRoot, "artifacts/package-tests.json"));
   assert.equal(unit.success, true);
-  assert.equal(unit.numPassedTests, 25);
+  assert.equal(unit.numPassedTests, 26);
   assert.equal(unit.numFailedTests, 0);
   return {
     pkg,
