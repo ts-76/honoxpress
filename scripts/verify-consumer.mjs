@@ -70,7 +70,7 @@ const files = (await run("tar", ["-tzf", tarball])).trim().split("\n").sort();
 for (const file of files)
   assert.match(
     file,
-    /^package\/(?:package\.json|README\.md|LICENSE|dist\/[a-z-]+\.(?:js|d\.ts)|templates\/(?:docs-ui\.tsx|docs-content\.tsx|docs-layout\.tsx|tabs\.tsx|site-config\.ts|copy-code\.tsx|demo-frame\.tsx|docs\.css|components\.css)|bin\/honoxpress\.mjs|starter\/(?:client\.ts|docs-virtual\.d\.ts|mdx-components\.ts)|scaffold\/[\w./-]+)$/,
+    /^package\/(?:package\.json|README\.md|LICENSE|dist\/[a-z-]+\.(?:js|d\.ts)|templates\/(?:docs-ui\.tsx|docs-content\.tsx|docs-layout\.tsx|tabs\.tsx|site-config\.ts|copy-code\.tsx|demo-frame\.tsx|docs\.css|components\.css|tokens\.css)|bin\/honoxpress\.mjs|starter\/(?:client\.ts|docs-virtual\.d\.ts|mdx-components\.ts)|scaffold\/[\w./-]+)$/,
   );
 for (const file of [
   "dist/index.js",
@@ -78,6 +78,7 @@ for (const file of [
   "dist/build.js",
   "dist/build.d.ts",
   "templates/docs.css",
+  "templates/tokens.css",
   "templates/copy-code.tsx",
   "README.md",
 ])
