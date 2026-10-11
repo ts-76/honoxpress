@@ -107,6 +107,10 @@ Templates are exported as files through `honoxpress/templates/*`:
 | ---------------- | ------------------------------------------- |
 | `docs-ui.tsx`    | `app/components/docs-ui.tsx`                |
 | `copy-code.tsx`  | `app/islands/copy-code.tsx`                 |
+| `file-tree.tsx`  | `app/components/file-tree.tsx`              |
+| `type-table.tsx` | `app/components/type-table.tsx`             |
+| `code-group.tsx` | `app/islands/code-group.tsx`                |
+| `figure.tsx`     | `app/components/figure.tsx`                 |
 | `demo-frame.tsx` | `app/components/demo-frame.tsx`             |
 | `docs.css`       | Your public stylesheet                      |
 | `tokens.css`     | Shared theme, typography, and spacing roles |

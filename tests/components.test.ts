@@ -1,3 +1,8 @@
+import { Hono } from "hono";
+import { jsx } from "hono/jsx/jsx-runtime";
+import { FileTree, File, Folder } from "../packages/docs/templates/file-tree";
+import { TypeTable } from "../packages/docs/templates/type-table";
+import { Figure } from "../packages/docs/templates/figure";
 import { test, expect } from "vite-plus/test";
 import { remarkDocsComponents, remarkDocsCode, highlightDocsCode } from "honoxpress/build";
 
@@ -261,4 +266,132 @@ test("invalid registry identifiers are rejected and nested inline tags are valid
       ],
     }),
   ).toThrow("Unknown MDX component <Missing>");
+});
+
+test("static authoring markup escapes values and preserves image dimensions and table semantics", async () => {
+  const app = new Hono().get("/", (c) =>
+    c.html(
+      jsx("div", {
+        children: [
+          FileTree({
+            label: "Source files",
+            children: Folder({
+              name: "app",
+              open: false,
+              children: File({ name: '<script>alert("file")</script>', highlighted: true }),
+            }),
+          }),
+          TypeTable({
+            caption: "API props",
+            properties: [
+              {
+                name: "value",
+                type: "<T>",
+                required: true,
+                defaultValue: "",
+                deprecated: true,
+                description: "<unsafe>",
+              },
+            ],
+          }),
+          TypeTable({ properties: [], emptyLabel: "Nothing to configure." }),
+          Figure({
+            src: "/diagram.svg",
+            alt: "<unsafe>",
+            width: 720,
+            height: 240,
+            caption: "Flow",
+          }),
+        ],
+      }).toString(),
+    ),
+  );
+  const html = await (await app.request("http://local.test/")).text();
+  expect(html).not.toContain("<script>");
+  expect(html).toContain("&lt;script&gt;");
+  expect(html).toContain('scope="row"');
+  expect(html).toContain("Required · Deprecated");
+  expect(html).toContain("Default:");
+  expect(html).toContain("Nothing to configure.");
+  expect(html).toContain('width="720" height="240" loading="lazy"');
+  expect(html).toContain("&lt;unsafe&gt;");
+  expect(html).not.toContain("aria-current");
+});
+
+test("CodeGroup highlights literal samples and leaves dynamic data, spreads, and supplied tokens untouched", async () => {
+  const property = (key: string, value: object) => ({
+    type: "Property",
+    key: { type: "Identifier", name: key },
+    value,
+    kind: "init",
+    computed: false,
+    method: false,
+    shorthand: false,
+  });
+  const literal = (value: string) => ({ type: "Literal", value });
+  const sample = {
+    type: "ObjectExpression",
+    properties: [
+      property("label", literal("TypeScript")),
+      property("code", literal("const value = 1")),
+      property("language", literal("ts")),
+    ],
+  };
+  const makeGroup = (expression: object) => ({
+    type: "mdxJsxFlowElement",
+    name: "CodeGroup",
+    attributes: [
+      {
+        type: "mdxJsxAttribute",
+        name: "samples",
+        value: {
+          type: "mdxJsxAttributeValueExpression",
+          value: "original",
+          data: { estree: expressionProgram(expression) },
+        },
+      },
+    ],
+  });
+  const group = makeGroup({ type: "ArrayExpression", elements: [sample] });
+  await remarkDocsCode()({ type: "root", children: [group] });
+  const parsed = JSON.parse(group.attributes[0].value.value);
+  expect(parsed[0].tokens.map((token: { content: string }) => token.content).join("")).toBe(
+    "const value = 1",
+  );
+  expect(parsed[0].tokens.some((token: { kind: string }) => token.kind === "keyword")).toBe(true);
+  for (const expression of [
+    { type: "Identifier", name: "samples" },
+    {
+      type: "ArrayExpression",
+      elements: [
+        {
+          ...sample,
+          properties: [
+            ...sample.properties,
+            { type: "SpreadElement", argument: { type: "CallExpression" } },
+          ],
+        },
+      ],
+    },
+    {
+      type: "ArrayExpression",
+      elements: [
+        {
+          ...sample,
+          properties: [
+            ...sample.properties,
+            property("tokens", { type: "ArrayExpression", elements: [] }),
+          ],
+        },
+      ],
+    },
+    {
+      type: "ArrayExpression",
+      elements: [{ ...sample, properties: [property("code", { type: "CallExpression" })] }],
+    },
+  ]) {
+    const dynamic = makeGroup(expression);
+    await remarkDocsCode()({ type: "root", children: [dynamic] });
+    expect(dynamic.attributes[0].value.value).toBe("original");
+  }
 });

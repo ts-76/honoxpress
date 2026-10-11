@@ -30,6 +30,14 @@ const groups = {
   tabs: { files: ["components/docs-content.tsx", "islands/tabs.tsx"], names: ["Tabs", "TabPanel"] },
   "code-block": { files: ["islands/copy-code.tsx"], names: ["CodeBlock"] },
   "demo-frame": { files: ["components/demo-frame.tsx"], names: ["DemoFrame"] },
+  "file-tree": { files: ["components/file-tree.tsx"], names: ["FileTree", "File", "Folder"] },
+  "type-table": { files: ["components/type-table.tsx"], names: ["TypeTable"] },
+  "code-group": {
+    files: ["islands/code-group.tsx"],
+    names: ["CodeGroup"],
+    dependencies: ["tabs", "code-block"],
+  },
+  figure: { files: ["components/figure.tsx"], names: ["Figure"] },
   layout: {
     files: [
       "components/docs-ui.tsx",
@@ -159,6 +167,16 @@ function registryBlock(names) {
   }
   if (names.includes("CodeBlock")) imports.push('import CodeBlock from "./islands/copy-code";');
   if (names.includes("DemoFrame")) imports.push('import DemoFrame from "./components/demo-frame";');
+  const fileNames = names.filter((name) => ["FileTree", "File", "Folder"].includes(name));
+  if (fileNames.length)
+    imports.push(`import { ${fileNames.join(", ")} } from "./components/file-tree";`);
+  for (const [name, file] of [
+    ["TypeTable", "type-table"],
+    ["Figure", "figure"],
+  ]) {
+    if (names.includes(name)) imports.push(`import { ${name} } from "./components/${file}";`);
+  }
+  if (names.includes("CodeGroup")) imports.push('import CodeGroup from "./islands/code-group";');
   return `${begin}\n${imports.join("\n")}\nexport const standardComponents = {\n${[
     ...new Set(names),
   ]
@@ -209,10 +227,15 @@ function readManifest(root) {
 
 function install({ command, target, cwd, dryRun, starter }) {
   const root = safeRoot(cwd);
-  const requested = command === "init" ? allGroups : target === "all" ? allGroups : [target];
+  let requested = command === "init" ? allGroups : target === "all" ? allGroups : [target];
   for (const group of requested)
     if (!groups[group])
       throw new Error(`unknown group ${group}; choose ${allGroups.join(", ")} or all`);
+  const includeDependencies = (name) => [
+    name,
+    ...(groups[name].dependencies ?? []).flatMap(includeDependencies),
+  ];
+  requested = [...new Set(requested.flatMap(includeDependencies))];
   const previous = readManifest(root);
   const added = requested.filter((name) => !previous.groups.includes(name));
   const installedGroups = [...new Set([...previous.groups, ...requested])].sort((a, b) =>
@@ -226,6 +249,13 @@ function install({ command, target, cwd, dryRun, starter }) {
     if (source === join(templateRoot, "tabs.tsx")) {
       content = Buffer.from(
         content.toString("utf8").replaceAll('"./docs-content"', '"../components/docs-content"'),
+      );
+    }
+    if (source === join(templateRoot, "code-group.tsx")) {
+      content = Buffer.from(
+        content
+          .toString("utf8")
+          .replace('from "./docs-content"', 'from "../components/docs-content"'),
       );
     }
     if (source.startsWith(`${scaffoldRoot}${sep}`) && source.endsWith(`${sep}package.json`)) {
@@ -247,6 +277,10 @@ function install({ command, target, cwd, dryRun, starter }) {
     "code-block",
     "demo-frame",
     "layout",
+    "file-tree",
+    "type-table",
+    "code-group",
+    "figure",
   ];
   const visualsAlreadyInstalled = previous.groups.some((name) => visualGroups.includes(name));
   for (const name of added) {
@@ -258,11 +292,18 @@ function install({ command, target, cwd, dryRun, starter }) {
         if (!contentInstalled) addSource(join(templateRoot, "docs-content.tsx"), `app/${rel}`);
         continue;
       }
+      // Dependencies already owned by the app must not be recopied on later additions.
       if (rel === "islands/tabs.tsx") addSource(join(templateRoot, "tabs.tsx"), `app/${rel}`);
       else if (rel === "islands/copy-code.tsx")
         addSource(join(templateRoot, "copy-code.tsx"), `app/${rel}`);
       else if (rel === "components/demo-frame.tsx")
         addSource(join(templateRoot, "demo-frame.tsx"), `app/${rel}`);
+      else if (rel === "islands/code-group.tsx")
+        addSource(join(templateRoot, "code-group.tsx"), `app/${rel}`);
+      else if (
+        ["file-tree", "type-table", "figure"].some((file) => rel === `components/${file}.tsx`)
+      )
+        addSource(join(templateRoot, rel.slice("components/".length)), `app/${rel}`);
       else if (rel === "components/docs-ui.tsx")
         addSource(join(templateRoot, "docs-ui.tsx"), `app/${rel}`);
       else if (rel === "components/docs-layout.tsx")
@@ -293,6 +334,10 @@ function install({ command, target, cwd, dryRun, starter }) {
       "app/components/docs-ui.tsx",
       "app/components/docs-layout.tsx",
       "app/components/demo-frame.tsx",
+      "app/components/file-tree.tsx",
+      "app/components/type-table.tsx",
+      "app/islands/code-group.tsx",
+      "app/components/figure.tsx",
       "app/islands/tabs.tsx",
       "app/islands/copy-code.tsx",
       "public/style.css",

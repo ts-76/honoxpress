@@ -170,3 +170,58 @@ void test("init starter dry-run includes the runnable project scaffold", () => {
     assert.ok(existsSync(join(directory, "public/tokens.css")));
   });
 });
+
+void test("authoring groups install separate sources and reuse consumer-owned code islands", () => {
+  withProject((directory) => {
+    assert.equal(invoke(directory, "add", "tabs").status, 0);
+    const tabsPath = join(directory, "app/islands/tabs.tsx");
+    const customized = readFileSync(tabsPath, "utf8") + "\n// Application customization\n";
+    writeFileSync(tabsPath, customized);
+    for (const group of ["file-tree", "type-table", "code-group", "figure"]) {
+      const result = invoke(directory, "add", group);
+      assert.equal(result.status, 0, result.stderr);
+      assert.ok(
+        existsSync(
+          join(directory, `app/${group === "code-group" ? "islands" : "components"}/${group}.tsx`),
+        ),
+      );
+    }
+    assert.equal(readFileSync(tabsPath, "utf8"), customized);
+    assert.ok(existsSync(join(directory, "app/islands/copy-code.tsx")));
+    const registry = readFileSync(join(directory, "app/mdx-components.ts"), "utf8");
+    for (const name of [
+      "FileTree",
+      "File",
+      "Folder",
+      "TypeTable",
+      "CodeGroup",
+      "Figure",
+      "TabPanel",
+      "CodeBlock",
+    ])
+      assert.match(registry, new RegExp(`\\b${name}\\b`));
+    assert.match(
+      readFileSync(join(directory, "app/islands/code-group.tsx"), "utf8"),
+      /from "\.\/tabs"/,
+    );
+    const manifest = JSON.parse(readFileSync(join(directory, ".honoxpress.json"), "utf8"));
+    assert.ok(manifest.groups.includes("code-block"));
+    assert.equal(invoke(directory, "add", "code-group").status, 0);
+  });
+});
+
+void test("code-group installs its dependencies and styles in an empty app", () => {
+  withProject((directory) => {
+    const result = invoke(directory, "add", "code-group");
+    assert.equal(result.status, 0, result.stderr);
+    for (const path of [
+      "app/islands/code-group.tsx",
+      "app/components/docs-content.tsx",
+      "app/islands/tabs.tsx",
+      "app/islands/copy-code.tsx",
+      "public/components.css",
+      "public/tokens.css",
+    ])
+      assert.ok(existsSync(join(directory, path)), path);
+  });
+});

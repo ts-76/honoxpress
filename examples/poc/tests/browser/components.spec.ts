@@ -8,7 +8,7 @@ test("component styles retain their hierarchy and share the docs theme across si
     for (const width of [1280, 800, 390]) {
       await page.setViewportSize({ width, height: 844 });
       await page.goto("/docs/components");
-      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(3);
+      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(4);
       await expect(page.getByRole("tab", { name: "pnpm", exact: true })).toHaveAttribute(
         "aria-selected",
         "true",
@@ -92,11 +92,11 @@ test("component styles retain their hierarchy and share the docs theme across si
       expect(styles.stepColor).toBe(accent);
       expect(styles.columns).toBe(width <= 760 ? 1 : 2);
       expect(styles.overflow).toBe(false);
-      await expect(page.locator(".code-block .hx-syntax-function")).toHaveText("pnpm");
+      await expect(page.locator(".code-block .hx-syntax-function").first()).toHaveText("pnpm");
       await expect(
         page.locator(".prose > pre code.language-ts .hx-syntax-keyword").first(),
       ).toBeVisible();
-      await expect(page.locator(".code-block code")).toHaveText("pnpm add honoxpress");
+      await expect(page.locator(".code-block code").first()).toHaveText("pnpm add honoxpress");
       await expect(page.locator(".hx-callout-info")).toHaveCSS(
         "border-top-color",
         colorScheme === "light" ? "rgb(28, 91, 195)" : "rgb(149, 186, 255)",
@@ -131,6 +131,15 @@ test("component styles retain their hierarchy and share the docs theme across si
         );
         await page.mouse.up();
       }
+      await page.locator(".hx-figure img").scrollIntoViewIfNeeded();
+      await expect
+        .poll(() =>
+          page
+            .locator(".hx-figure img")
+            .evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0),
+        )
+        .toBe(true);
+      await page.locator(".hx-figure img").evaluate((image: HTMLImageElement) => image.decode());
       await page.getByRole("heading", { name: "Components", exact: true }).click();
       if (width !== 800) {
         await page.screenshot({
@@ -161,9 +170,9 @@ test("component styles retain their hierarchy and share the docs theme across si
     "rgb(148, 97, 47)",
   );
   await expect(page.locator(".hx-card").first()).toHaveCSS("border-radius", "12px");
-  await expect(page.locator(".code-block")).toHaveCSS("border-radius", "12px");
+  await expect(page.locator(".code-block").first()).toHaveCSS("border-radius", "12px");
   await expect(page.locator(".hx-card").first()).toHaveCSS("padding", "28px");
-  await expect(page.locator(".code-block pre")).toHaveCSS("padding", "12px 28px");
+  await expect(page.locator(".code-block pre").first()).toHaveCSS("padding", "12px 28px");
   await expect(page.locator(".hx-card-title").first()).toHaveCSS("font-size", "19px");
   await expect(page.locator(".hx-step-title").first()).toHaveCSS("margin-bottom", "10px");
   await page.emulateMedia({ forcedColors: "active" });
@@ -190,14 +199,14 @@ test("copy feedback remains readable during pending and failure states", async (
   for (const colorScheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme });
     await page.goto("/docs/components");
-    await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(3);
+    await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(4);
     const copy = page.getByRole("button", { name: "Copy example", exact: true });
     await copy.click();
     await expect(copy).toBeDisabled();
     await expect(copy).toHaveCSS("cursor", "wait");
     await page.evaluate(() => window.dispatchEvent(new Event("test-clipboard-denied")));
     await expect(copy).toBeEnabled();
-    await expect(page.locator(".code-block").getByRole("status")).toHaveText(
+    await expect(page.locator(".code-block").first().getByRole("status")).toHaveText(
       "Copy failed. Select and copy the code manually.",
     );
     await expect(page.locator(".copy-error")).toHaveCSS(
@@ -215,7 +224,7 @@ test("registered components: hydration, isolated keyboard tabs, disclosures and 
   page.on("pageerror", (error) => errors.push(error.message));
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/docs/components");
-  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(3);
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(4);
   await expect(page.locator(".hx-callout")).toHaveCount(5);
   await expect(page.locator(".hx-card")).toHaveCount(2);
   await expect(page.locator(".hx-step")).toHaveCount(3);
@@ -257,7 +266,9 @@ test("registered components: hydration, isolated keyboard tabs, disclosures and 
     page.getByText("Your application owns the copied source.", { exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Copy example", exact: true }).click();
-  await expect(page.locator(".code-block").getByRole("status")).toHaveText("Copied example");
+  await expect(page.locator(".code-block").first().getByRole("status")).toHaveText(
+    "Copied example",
+  );
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("pnpm add honoxpress");
   await expect(page.frameLocator("iframe").getByTestId("demo-time")).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
@@ -272,4 +283,96 @@ test("registered components: hydration, isolated keyboard tabs, disclosures and 
   await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(3);
   await expect(page.getByRole("tab", { name: "npm", exact: true })).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test("authoring components support code switching, responsive tables, figures, and native folders", async ({
+  page,
+  context,
+}, testInfo) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  for (const colorScheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto("/docs/components");
+      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(4);
+      const tree = page.getByRole("group", { name: "Documentation project" });
+      const folder = tree.locator("summary").filter({ hasText: /^routes$/ });
+      await folder.focus();
+      await expect(folder).toHaveCSS("outline-width", "2px");
+      await folder.press("Enter");
+      await expect(tree.getByRole("link", { name: "components.mdx" })).toBeVisible();
+      await folder.press("Space");
+      await expect(tree.getByRole("link", { name: "components.mdx" })).toBeHidden();
+      await expect(tree.locator(".hx-file-highlighted")).toHaveText("mdx-components.ts");
+      const table = page.getByRole("table", { name: "Figure properties" });
+      await expect(table.getByRole("rowheader", { name: "src Required" })).toBeVisible();
+      await expect(table.getByRole("row")).toHaveCount(6);
+      const group = page.locator(".hx-code-group");
+      await expect(group.getByRole("tabpanel")).toContainText("app.ts");
+      await expect(group.locator(".hx-syntax-keyword").first()).toBeVisible();
+      await group.getByRole("tab", { name: "TypeScript", exact: true }).focus();
+      await page.keyboard.press("End");
+      await expect(group.getByRole("tab", { name: "JavaScript", exact: true })).toBeFocused();
+      await expect(group.getByRole("tabpanel")).toContainText("app.js");
+      await group.getByRole("button", { name: "Copy JavaScript", exact: true }).click();
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toContain(
+        'c.text("Hello")',
+      );
+      await expect(page.locator(".hx-tabs").first().getByRole("tabpanel")).toHaveText(
+        "pnpm add honoxpress",
+      );
+      const image = page.locator(".hx-figure img");
+      await image.scrollIntoViewIfNeeded();
+      await expect(image).toHaveAttribute("width", "720");
+      await expect(image).toHaveAttribute("height", "240");
+      expect(
+        await image.evaluate(
+          (element: HTMLImageElement) => element.complete && element.naturalWidth > 0,
+        ),
+      ).toBe(true);
+      const dimensions = await image.boundingBox();
+      expect(dimensions!.width / dimensions!.height).toBeCloseTo(3, 1);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
+        false,
+      );
+      for (const [name, selector] of [
+        ["file-tree", ".hx-file-tree"],
+        ["type-table", ".hx-type-table"],
+        ["code-group", ".hx-code-group"],
+        ["figure", ".hx-figure"],
+      ]) {
+        await page
+          .locator(selector)
+          .screenshot({ path: testInfo.outputPath(`${name}-${width}-${colorScheme}.png`) });
+      }
+    }
+  }
+  await page.emulateMedia({ forcedColors: "active" });
+  await page.keyboard.press("Tab");
+  await page.locator(".hx-folder-summary").first().focus();
+  await expect(page.locator(".hx-folder-summary").first()).toHaveCSS("outline-style", "solid");
+});
+
+test("native file disclosures and all code examples remain usable without JavaScript", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
+  try {
+    const page = await context.newPage();
+    await page.goto("/docs/components");
+    const tree = page.getByRole("group", { name: "Documentation project" });
+    await tree
+      .locator("summary")
+      .filter({ hasText: /^routes$/ })
+      .click();
+    await expect(tree.getByRole("link", { name: "components.mdx" })).toBeVisible();
+    await expect(page.locator(".hx-code-group .code-block")).toHaveCount(2);
+    await expect(page.locator(".hx-code-group .code-block").nth(0)).toBeVisible();
+    await expect(page.locator(".hx-code-group .code-block").nth(1)).toBeVisible();
+    await expect(page.getByRole("table", { name: "Figure properties" })).toBeVisible();
+  } finally {
+    await context.close();
+  }
 });

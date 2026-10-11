@@ -23,7 +23,7 @@ pnpm exec honoxpress add tabs
 pnpm exec honoxpress list
 ```
 
-Available groups are `callout`, `cards`, `steps`, `accordion`, `tabs`, `code-block`, `demo-frame`, and `layout`. `init` is shorthand for all groups. `add` adds the group's files and refreshes only the managed registry block in `app/mdx-components.ts`; local code outside that block is preserved. Do not edit the lines between the `honoxpress:components` markers: a later `add` replaces that generated block. Put custom imports and registry additions outside it. `--dry-run` prints the complete proposed changes without writing files.
+Available groups are `callout`, `cards`, `steps`, `accordion`, `tabs`, `code-block`, `demo-frame`, `file-tree`, `type-table`, `code-group`, `figure`, and `layout`. `init` is shorthand for all groups. `add` adds the group's files and refreshes only the managed registry block in `app/mdx-components.ts`; local code outside that block is preserved. Do not edit the lines between the `honoxpress:components` markers: a later `add` replaces that generated block. Put custom imports and registry additions outside it. `--dry-run` prints the complete proposed changes without writing files. `add code-group` also installs the `tabs` and `code-block` groups when they are missing; previously installed, locally edited islands are preserved.
 
 Content groups such as `callout` or `tabs` also install `public/components.css` and its shared `public/tokens.css` on first addition. The `layout` group installs `public/style.css`, which imports that component stylesheet. Either run `add layout` as well, or link the component stylesheet from your own layout with `<link rel="stylesheet" href="/components.css" />`. `CodeBlock` also uses the base code-toolbar styles from `docs.css`; if you skip the layout group, copy and load both stylesheets or provide equivalent styles in your own CSS.
 
@@ -88,6 +88,12 @@ The generated `useMDXComponents` provider accepts `Record<string, unknown>` over
 | `TabPanel`      | Content associated with a `Tabs` label by its index              | `index: number` (required), children                                                                        |
 | `CodeBlock`     | Copyable command or code sample island                           | `code: string` (required), `language?`, `tokens?`, `filename?`, `copyLabel?`, `copiedLabel?`, `errorLabel?` |
 | `DemoFrame`     | Lazy iframe with a caption and direct link                       | `title?`, `src?` (default `/demo/clock`), `linkLabel?`                                                      |
+| `FileTree`      | Accessible nested file list                                      | `label?` (default `"Project files"`), children                                                              |
+| `Folder`        | Native collapsible folder inside a file tree                     | `name`, `open?` (default `true`), children                                                                  |
+| `File`          | File name, with optional link or emphasis                        | `name`, `href?`, `highlighted?` (default `false`)                                                           |
+| `TypeTable`     | Semantic property reference table                                | `properties: TypeProperty[]`, `caption?` (default `"Properties"`), `emptyLabel?`                            |
+| `CodeGroup`     | Tabbed code samples using the existing islands                   | `samples: CodeSample[]`, `ariaLabel?` (default `"Code examples"`), `selectedIndex?`                         |
+| `Figure`        | Responsive image and optional caption                            | `src`, `alt`, intrinsic `width` and `height`, `caption?`, `loading?` (default `"lazy"`)                     |
 
 Children are ordinary MDX content. Language-labelled Markdown fences are highlighted by `remarkDocsCode`. Use `CodeBlock` with `language` when a copy button and filename toolbar are useful.
 
@@ -126,6 +132,70 @@ Children are ordinary MDX content. Language-labelled Markdown fences are highlig
 ```
 
 `Tabs` is a HonoX island in `app/islands/tabs.tsx`; its static `TabPanel` is in `app/components/docs-content.tsx`. Before hydration, every tab panel is present in the server-rendered page. When the island hydrates, it activates the selected panel and enables keyboard navigation. `Accordion` uses native `<details>` and `<summary>` elements and works without JavaScript. `CodeBlock` is the MDX registry name for the copy-code island at `app/islands/copy-code.tsx`. HonoX discovers islands by their application file paths, so do not import an island directly from the honoxpress package. The other content elements are Hono JSX components under `app/components`.
+
+## Authoring components
+
+Install the new authoring groups individually or with `init`:
+
+```sh
+pnpm exec honoxpress add file-tree
+pnpm exec honoxpress add type-table
+pnpm exec honoxpress add code-group
+pnpm exec honoxpress add figure
+```
+
+FileTree, TypeTable, and Figure live in separate application-owned files under `app/components`: `file-tree.tsx`, `type-table.tsx`, and `figure.tsx`. `CodeGroup` lives in `app/islands/code-group.tsx` and reuses the app's Tabs and CodeBlock implementations. A single island owns tab navigation and copying to avoid nested island hydration. Adding a group updates the same MDX registry, so no page-level imports are required. Before hydration all code panels remain visible; the selected panel and keyboard navigation become active when Tabs hydrates. Groups do not synchronize their selection across the page.
+
+**Existing installations:** `add` preserves your owned stylesheets. If your copied `components.css` predates these components, merge the authoring styles from `honoxpress/templates/components.css` and keep its `tokens.css` import before using the new groups. Fresh installations include those styles automatically. This is a manual source upgrade, rather than an automatic overwrite of local styles.
+
+```mdx
+<FileTree label="Project structure">
+  <Folder name="app">
+    <Folder name="routes" open={false}>
+      <File name="getting-started.mdx" href="/docs/getting-started" />
+    </Folder>
+    <File name="mdx-components.ts" highlighted={true} />
+  </Folder>
+  <File name="vite.config.ts" />
+</FileTree>
+
+<TypeTable
+  caption="Callout properties"
+  properties={[
+    {
+      name: "type",
+      type: '"info" | "tip" | "warning" | "danger"',
+      defaultValue: '"info"',
+      description: "Semantic tone of the note.",
+    },
+    { name: "title", type: "string", description: "Optional heading." },
+  ]}
+/>
+
+<CodeGroup
+  ariaLabel="Install command"
+  samples={[
+    { label: "pnpm", language: "bash", filename: "Terminal", code: "pnpm add honoxpress" },
+    { label: "npm", language: "bash", filename: "Terminal", code: "npm install honoxpress" },
+  ]}
+/>
+
+<Figure
+  src="/images/example.png"
+  alt="Describe the screenshot's relevant content."
+  width={1440}
+  height={900}
+  caption="The documentation layout on a wide screen."
+/>
+```
+
+`FileTree` uses nested lists rather than an ARIA tree widget. Each `Folder` uses native `details` and `summary`, so it opens with Enter or Space and works with JavaScript disabled. Use `File.highlighted` to mark a file discussed in the text; it does not set `aria-current` or imply a selected navigation destination. Icons are inline SVG and require no icon font.
+
+`TypeTable.properties` accepts entries with `name: string`, `type: string`, optional `description: Child`, `required: boolean`, `defaultValue: string`, and `deprecated: boolean`. `TypeProperty` is exported from the copied `type-table.tsx` for typed application data. Missing `required` means optional; a supplied empty default string is still displayed. An empty array renders `emptyLabel` (default `"No properties."`) instead of an empty table. The table keeps property names as row headers and wraps long names and types at narrow widths. Table headers and required/optional labels are English defaults that can be localized in the owned source.
+
+`CodeGroup.samples` takes entries with `label: string`, `code: string`, and optional `language`, `filename`, `tokens`, `copyLabel`, `copiedLabel`, and `errorLabel`, matching CodeBlock. `CodeSample` is exported from the copied island. An empty array renders nothing. Static array/object literals receive syntax tokens from `remarkDocsCode`; dynamic arrays are left untouched and may provide tokens generated with the server/build helper `highlightDocsCode`. No expressions or spreads are evaluated by the plugin.
+
+`Figure` renders a native image with the provided intrinsic dimensions to reserve its aspect ratio. It scales to its container without cropping. Write informative `alt` text; use `alt=""` only for a decorative image. Use `loading="eager"` for an image visible when the page opens. Caption content may include links or ordinary MDX, passed as a JSX expression. The component does not optimize images or provide zoom; serve appropriately sized image files from your application.
 
 ## Layout and site configuration
 
@@ -236,7 +306,7 @@ Run `pnpm check:theme` from this repository to report the actual OKLCH coordinat
 
 ## Syntax highlighting
 
-Add `remarkDocsCode` to the MDX `remarkPlugins` list as shown above. The generated starter includes it. Shiki tokenizes language-labelled fences and `<CodeBlock language="ts" code={"const count = 1"} />` during compilation. Tokens use the shared `--docs-code-keyword`, `-string`, `-number`, `-function`, `-type`, `-comment`, and `-punctuation` roles, so light/dark and forced-colors changes work without re-tokenizing. Shiki and its grammars stay out of the client and Worker bundles.
+Add `remarkDocsCode` to the MDX `remarkPlugins` list as shown above. The generated starter includes it. Shiki tokenizes language-labelled fences, `<CodeBlock language="ts" code={"const count = 1"} />`, and static CodeGroup sample arrays during compilation. Tokens use the shared `--docs-code-keyword`, `-string`, `-number`, `-function`, `-type`, `-comment`, and `-punctuation` roles, so light/dark and forced-colors changes work without re-tokenizing. Shiki and its grammars stay out of the client and Worker bundles.
 
 Static `code` and `language` attributes may be strings, string literals in braces, or template literals without interpolation. Dynamic expressions and attribute spreads are not evaluated by the plugin. For server-generated code, call `await highlightDocsCode(code, language)` from `honoxpress/build` and pass the returned `tokens` to `CodeBlock`. Keep that helper on the server/build side. Missing or unsupported languages render as plain text. If code changes without matching tokens, the component falls back to plain text. Copy always uses the original `code` string, and token content is rendered as escaped text.
 

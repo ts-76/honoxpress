@@ -108,7 +108,64 @@ function staticString(value: unknown): string | undefined {
   return undefined;
 }
 
-/** Highlight fences and static CodeBlock props while MDX is compiled. */
+type SampleExpression = {
+  type: string;
+  elements?: SampleExpression[];
+  properties?: {
+    type: string;
+    key?: { type: string; name?: string; value?: unknown };
+    value?: SampleExpression;
+    kind?: string;
+    computed?: boolean;
+    method?: boolean;
+    shorthand?: boolean;
+  }[];
+};
+
+/** Read only string-valued object literals; never execute MDX expressions. */
+function staticSamples(value: unknown): Record<string, string>[] | undefined {
+  const input = value as
+    | { data?: { estree?: { body?: { expression?: SampleExpression }[] } } }
+    | undefined;
+  const array = input?.data?.estree?.body?.[0]?.expression;
+  if (array?.type !== "ArrayExpression" || !array.elements) return undefined;
+  const fields = new Set([
+    "label",
+    "code",
+    "language",
+    "filename",
+    "copyLabel",
+    "copiedLabel",
+    "errorLabel",
+  ]);
+  const samples: Record<string, string>[] = [];
+  for (const item of array.elements) {
+    if (!item || item.type !== "ObjectExpression" || !item.properties) return undefined;
+    const entries: [string, string][] = [];
+    for (const property of item.properties) {
+      if (
+        property.type !== "Property" ||
+        property.kind !== "init" ||
+        property.computed ||
+        property.method ||
+        property.shorthand
+      )
+        return undefined;
+      const key = property.key?.type === "Identifier" ? property.key.name : property.key?.value;
+      if (typeof key !== "string" || !fields.has(key) || entries.some(([name]) => name === key))
+        return undefined;
+      const text = staticString({ data: { estree: { body: [{ expression: property.value }] } } });
+      if (text === undefined) return undefined;
+      entries.push([key, text]);
+    }
+    const sample = Object.fromEntries(entries);
+    if (sample.label === undefined || sample.code === undefined) return undefined;
+    samples.push(sample);
+  }
+  return samples;
+}
+
+/** Highlight fences, static CodeBlock props, and literal CodeGroup samples at compile time. */
 export function remarkDocsCode() {
   return async (tree: Node) => {
     async function visit(node: Node): Promise<void> {
@@ -149,6 +206,32 @@ export function remarkDocsCode() {
               },
             });
             node.attributes = attributes;
+          }
+        }
+      }
+      if (node.type === "mdxJsxFlowElement" && node.name === "CodeGroup") {
+        const attributes = node.attributes ?? [];
+        if (attributes.every((attr) => attr.type === "mdxJsxAttribute")) {
+          const samplesAttribute = attributes.find((attr) => attr.name === "samples");
+          const samples = staticSamples(samplesAttribute?.value);
+          if (samplesAttribute && samples) {
+            const highlighted = await Promise.all(
+              samples.map(async (sample) => ({
+                ...sample,
+                tokens: await highlightDocsCode(sample.code, sample.language),
+              })),
+            );
+            samplesAttribute.value = {
+              type: "mdxJsxAttributeValueExpression",
+              value: JSON.stringify(highlighted),
+              data: {
+                estree: {
+                  type: "Program",
+                  sourceType: "module",
+                  body: [{ type: "ExpressionStatement", expression: expression(highlighted) }],
+                },
+              },
+            };
           }
         }
       }

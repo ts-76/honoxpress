@@ -14,7 +14,17 @@ import {
 import Tabs from "./islands/tabs";
 import CodeBlock from "./islands/copy-code";
 import DemoFrame from "./components/demo-frame";
+import { FileTree, File, Folder } from "./components/file-tree";
+import { TypeTable } from "./components/type-table";
+import CodeGroup from "./islands/code-group";
+import { Figure } from "./components/figure";
 export const standardComponents = {
+  FileTree,
+  File,
+  Folder,
+  TypeTable,
+  CodeGroup,
+  Figure,
   Accordion,
   AccordionItem,
   Callout,

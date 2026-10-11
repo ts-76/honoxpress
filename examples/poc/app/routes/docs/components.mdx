@@ -140,6 +140,95 @@ Props: `src` and `title` are required, with optional `linkLabel`. Demo routes re
 <DemoFrame src="/demo/clock" title="Clock" />
 ```
 
+## File tree
+
+<FileTree label="Documentation project">
+  <Folder name="app">
+    <Folder name="components">
+      <File name="file-tree.tsx" />
+      <File name="type-table.tsx" />
+    </Folder>
+    <Folder name="routes" open={false}>
+      <File name="components.mdx" href="/docs/components" />
+    </Folder>
+    <File name="mdx-components.ts" highlighted={true} />
+  </Folder>
+  <File name="vite.config.ts" />
+</FileTree>
+
+`FileTree` takes an accessible `label`. Nest `File` and `Folder` inside it. Folders start open unless `open={false}`; files accept optional `href` and `highlighted`. Folder disclosures work without JavaScript.
+
+## Type table
+
+<TypeTable
+  caption="Figure properties"
+  properties={[
+    { name: "src", type: "string", required: true, description: "URL of the image." },
+    {
+      name: "alt",
+      type: "string",
+      required: true,
+      description: "Describe the image for readers who cannot see it.",
+    },
+    {
+      name: "width",
+      type: "number",
+      required: true,
+      description: "Intrinsic image width in pixels.",
+    },
+    {
+      name: "height",
+      type: "number",
+      required: true,
+      description: "Intrinsic image height in pixels.",
+    },
+    {
+      name: "loading",
+      type: '"lazy" | "eager"',
+      defaultValue: '"lazy"',
+      description: "Use eager for an image visible when the page opens.",
+    },
+  ]}
+/>
+
+Pass a `properties` array with `name`, `type`, optional `description`, `required`, `defaultValue`, and `deprecated`. A semantic table keeps property names associated with their descriptions on every screen size.
+
+## Code group
+
+<CodeGroup
+  ariaLabel="Endpoint language"
+  samples={[
+    {
+      label: "TypeScript",
+      language: "ts",
+      filename: "app.ts",
+      copyLabel: "Copy TypeScript",
+      code: 'import { Hono } from "hono";\nconst app = new Hono();\napp.get("/hello", (c) => c.json({ message: "Hello" }));',
+    },
+    {
+      label: "JavaScript",
+      language: "js",
+      filename: "app.js",
+      copyLabel: "Copy JavaScript",
+      code: 'import { Hono } from "hono";\nconst app = new Hono();\napp.get("/hello", (c) => c.text("Hello"));',
+    },
+  ]}
+/>
+
+`CodeGroup` takes a `samples` array with `label`, `code`, and optional `language`, `filename`, and copy labels. `ariaLabel` names the tab list and `selectedIndex` sets the initial tab. Arrow keys, Home, and End switch examples independently of other tabs. Both examples remain readable before hydration; static samples are highlighted at build time.
+
+## Figure
+
+<Figure
+  src="/component-flow.svg"
+  alt="MDX source passes through the shared component registry to produce a documentation page."
+  width={720}
+  height={240}
+  caption="Register a component once, then use it throughout the documentation."
+/>
+
+Provide `src`, `alt`, and the image's intrinsic `width` and `height`. The image keeps its aspect ratio without cropping. Optional `caption` accepts MDX content; `loading` defaults to `lazy`.
+
 ## Your components
 
 <ProjectNote>A custom component is registered once and used here without an import.</ProjectNote>
