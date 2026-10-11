@@ -190,25 +190,25 @@ The layout and standard components import one shared `public/tokens.css`. It sep
 
 ```css
 :root {
-  --docs-accent: #9a431b;
-  --docs-tint: #f8eee6;
-  --docs-panel-padding: 1.5rem;
-  --docs-title-gap: 0.75rem;
+  --docs-accent: #894a2d;
+  --docs-tint: #fbede7;
+  --docs-panel-padding: 1.25rem;
+  --docs-title-gap: 0.5rem;
   --docs-title-size: 1.125rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --docs-accent: #e7a479;
-    --docs-tint: #34281f;
+    --docs-accent: #e8a587;
+    --docs-tint: #362821;
   }
 }
 ```
 
 | Role                            | Token                                                  | Default                                      |
 | ------------------------------- | ------------------------------------------------------ | -------------------------------------------- |
-| Reading canvas                  | `--docs-bg`                                            | Warm off-white / warm charcoal               |
-| Component panels                | `--docs-panel`                                         | White / raised charcoal                      |
+| Reading canvas                  | `--docs-bg`                                            | `#F4F5F7` / cool charcoal                    |
+| Component panels                | `--docs-panel`                                         | White / raised cool charcoal                 |
 | Code and hover surfaces         | `--docs-surface`                                       | Subtle neutral surface                       |
 | Text / secondary text / borders | `--docs-text`, `--docs-muted`, `--docs-line`           | Separate contrast levels in each theme       |
 | Links, selection, and focus     | `--docs-accent`, `--docs-tint`                         | Rust accent with a soft tint                 |
@@ -216,18 +216,22 @@ The layout and standard components import one shared `public/tokens.css`. It sep
 | Page / section headings         | `--docs-page-title-size`, `--docs-section-title-size`  | Responsive 32–40 / 24px                      |
 | Card / step titles              | `--docs-title-size`                                    | 18px, independent of article headings        |
 | Controls / code / metadata      | `--docs-ui-size`, `--docs-code-size`, `--docs-text-xs` | 14 / 14 / 12px                               |
-| Panel inner padding             | `--docs-panel-padding`                                 | 24px; 20px on mobile                         |
-| Title-to-content spacing        | `--docs-title-gap`                                     | 12px                                         |
-| Component / section spacing     | `--docs-block-gap`, `--docs-section-gap`               | 32 / 64px; section spacing is 48px on mobile |
-| Paragraph spacing               | `--docs-paragraph-gap`                                 | 20px                                         |
+| Panel inner padding             | `--docs-panel-padding`                                 | 20px; 16px on mobile                         |
+| Title-to-content spacing        | `--docs-title-gap`                                     | 8px                                          |
+| Component / section spacing     | `--docs-block-gap`, `--docs-section-gap`               | 20 / 40px; section spacing is 32px on mobile |
+| Paragraph spacing               | `--docs-paragraph-gap`                                 | 16px                                         |
 | Panel / control radius          | `--docs-radius`, `--docs-control-radius`               | 8 / 6px                                      |
 | Reading measure                 | `--docs-measure`                                       | 72ch maximum article column                  |
 
-The foundation uses `--docs-space-1`, `-2`, `-3`, `-4`, `-5`, `-6`, `-8`, `-12`, and `-16` for 4, 8, 12, 16, 20, 24, 32, 48, and 64px. Existing `--docs-space-xs`, `-sm`, `-md`, and `-lg` remain aliases for 4, 8, 16, and 24px. Prefer semantic roles for site customization. One system font family serves headings and reading text; monospace is reserved for code. Plain Markdown fences and `CodeBlock` share code size, leading, and padding.
+The foundation uses `--docs-space-1`, `-2`, `-3`, `-4`, `-5`, `-6`, `-8`, `-10`, `-12`, and `-16` for 4, 8, 12, 16, 20, 24, 32, 40, 48, and 64px. Existing `--docs-space-xs`, `-sm`, `-md`, and `-lg` remain aliases for 4, 8, 16, and 24px. Prefer semantic roles for site customization. One system font family serves headings and reading text; monospace is reserved for code. Plain Markdown fences and `CodeBlock` share code size, leading, and padding. Code blocks use `--docs-code-padding-block` (12px) vertically and panel padding horizontally; disclosure summaries use `--docs-disclosure-padding` (12px) vertically.
 
 Callout colors retain their meanings through `--docs-info`, `--docs-tip`, `--docs-warning`, and `--docs-danger`. Their restrained fills support the content. Keep text and focus contrast readable when changing colors in either theme. Forced-colors mode restores system colors.
 
 Controls distinguish hover, pressed, selected, disabled, and keyboard-focus states. Focus uses a shared 2px accent outline; scrollable tabs and code areas inset it to keep the outline visible. Card links remain on their titles. Cards collapse to one column at the layout's 760px mobile breakpoint. Low-specificity article selectors preserve component titles and internal spacing.
+
+The light canvas is pinned to `#F4F5F7`. Neutral surfaces use a low-chroma OKLCH hue near 260°, while the rust accent keeps a hue near 45°. The light accent targets lightness 0.48 and chroma 0.095; its dark counterpart targets 0.78 and 0.09. The stylesheet ships rounded sRGB hex colors. Chroma describes perceptual color intensity; it is separate from the relative luminance used for contrast.
+
+Run `pnpm check:theme` from this repository to report the actual OKLCH coordinates, relative luminance, and contrast of both palettes. This is also part of `pnpm verify`: normal text pairs must reach 4.5:1, and focus colors must reach 3:1 against the supported surfaces. It checks the default tokens and standard Callout fills, rather than claiming complete accessibility conformance. The calculations follow [CSS Color 4](https://www.w3.org/TR/css-color-4/#ok-lab) and [WCAG 2.2 relative luminance](https://www.w3.org/TR/WCAG22/#dfn-relative-luminance).
 
 ## Start a new site
 

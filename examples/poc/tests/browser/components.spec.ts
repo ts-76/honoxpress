@@ -60,23 +60,26 @@ test("component styles retain their hierarchy and share the docs theme across si
           overflow: document.documentElement.scrollWidth > innerWidth,
         };
       });
-      const accent = colorScheme === "light" ? "rgb(154, 67, 27)" : "rgb(231, 164, 121)";
+      const accent = colorScheme === "light" ? "rgb(137, 74, 45)" : "rgb(232, 165, 135)";
       expect(styles.headings).toEqual([
-        { size: "18px", top: "0px", bottom: "12px" },
-        { size: "18px", top: "0px", bottom: "12px" },
+        { size: "18px", top: "0px", bottom: "8px" },
+        { size: "18px", top: "0px", bottom: "8px" },
       ]);
-      expect(styles.calloutGap).toBe("12px");
+      expect(styles.calloutGap).toBe("8px");
       expect(new Set(styles.radii)).toEqual(new Set(["8px"]));
       expect(new Set(styles.borders).size).toBe(1);
       expect(new Set(styles.backgrounds).size).toBe(1);
       expect(styles.backgrounds[0]).not.toBe(styles.canvas);
+      expect(styles.canvas).toBe(
+        colorScheme === "light" ? "rgb(244, 245, 247)" : "rgb(24, 27, 31)",
+      );
       expect(styles.typeRoles).toEqual(["18px", "24px", "14px"]);
-      expect(styles.blockGap).toBe("32px");
-      expect(styles.sectionGap).toBe(width <= 760 ? "48px" : "64px");
-      const panelPadding = width <= 760 ? "20px" : "24px";
+      expect(styles.blockGap).toBe("20px");
+      expect(styles.sectionGap).toBe(width <= 760 ? "32px" : "40px");
+      const panelPadding = width <= 760 ? "16px" : "20px";
       expect(styles.panelPadding).toBe(panelPadding);
       expect(styles.codeSizes).toEqual(["14px", "14px"]);
-      expect(styles.codePadding).toEqual([panelPadding, panelPadding]);
+      expect(styles.codePadding).toEqual([`12px ${panelPadding}`, `12px ${panelPadding}`]);
       expect(styles.selectedColor).toBe(accent);
       expect(styles.stepColor).toBe(accent);
       expect(styles.columns).toBe(width <= 760 ? 1 : 2);
@@ -102,12 +105,12 @@ test("component styles retain their hierarchy and share the docs theme across si
         await selected.hover();
         await expect(selected).toHaveCSS(
           "background-color",
-          colorScheme === "light" ? "rgb(244, 242, 238)" : "rgb(38, 36, 31)",
+          colorScheme === "light" ? "rgb(235, 238, 243)" : "rgb(39, 42, 48)",
         );
         await page.mouse.down();
         await expect(selected).toHaveCSS(
           "background-color",
-          colorScheme === "light" ? "rgb(248, 238, 230)" : "rgb(52, 40, 31)",
+          colorScheme === "light" ? "rgb(251, 237, 231)" : "rgb(54, 40, 33)",
         );
         await page.mouse.up();
       }
@@ -140,7 +143,7 @@ test("component styles retain their hierarchy and share the docs theme across si
   await expect(page.locator(".hx-card").first()).toHaveCSS("border-radius", "12px");
   await expect(page.locator(".code-block")).toHaveCSS("border-radius", "12px");
   await expect(page.locator(".hx-card").first()).toHaveCSS("padding", "28px");
-  await expect(page.locator(".code-block pre")).toHaveCSS("padding", "28px");
+  await expect(page.locator(".code-block pre")).toHaveCSS("padding", "12px 28px");
   await expect(page.locator(".hx-card-title").first()).toHaveCSS("font-size", "19px");
   await expect(page.locator(".hx-step-title").first()).toHaveCSS("margin-bottom", "10px");
   await page.emulateMedia({ forcedColors: "active" });
@@ -179,7 +182,7 @@ test("copy feedback remains readable during pending and failure states", async (
     );
     await expect(page.locator(".copy-error")).toHaveCSS(
       "color",
-      colorScheme === "light" ? "rgb(162, 61, 61)" : "rgb(237, 170, 170)",
+      colorScheme === "light" ? "rgb(144, 70, 75)" : "rgb(225, 166, 166)",
     );
   }
 });

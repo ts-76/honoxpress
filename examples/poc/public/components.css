@@ -119,7 +119,7 @@
   color: var(--docs-text, CanvasText);
 }
 .hx-accordion-summary {
-  padding: var(--docs-panel-padding);
+  padding: var(--docs-disclosure-padding) var(--docs-panel-padding);
   border-radius: var(--docs-radius);
   cursor: pointer;
   font-size: var(--docs-text-md);
@@ -151,7 +151,7 @@
 .hx-tab {
   flex: 0 0 auto;
   min-height: 44px;
-  padding: var(--docs-space-3) var(--docs-space-md);
+  padding: var(--docs-space-sm) var(--docs-space-md);
   border: 0;
   border-block-end: 2px solid transparent;
   border-radius: var(--docs-control-radius) var(--docs-control-radius) 0 0;
@@ -169,7 +169,7 @@
   color: var(--docs-accent, LinkText);
 }
 .hx-tab-panels {
-  padding-block: var(--docs-space-lg);
+  padding-block: var(--docs-space-md);
 }
 .hx-tab-panel {
   min-width: 0;

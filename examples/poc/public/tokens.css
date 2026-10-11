@@ -3,19 +3,21 @@
 :root {
   color-scheme: light dark;
 
-  /* Warm neutral surfaces; the accent belongs to links and interaction. */
-  --docs-bg: #fcfbf9;
+  /* Canvas is pinned to #F4F5F7. Cool neutrals use OKLCH hue 260;
+     the rust accent uses hue 45 with restrained chroma. Hex values are
+     rounded sRGB outputs; check-theme.mjs reports their actual metrics. */
+  --docs-bg: #f4f5f7;
   --docs-panel: #ffffff;
-  --docs-surface: #f4f2ee;
-  --docs-text: #292622;
-  --docs-muted: #706960;
-  --docs-line: #e3dfd9;
-  --docs-accent: #9a431b;
-  --docs-tint: #f8eee6;
-  --docs-info: #3e6295;
-  --docs-tip: #3f7359;
-  --docs-warning: #986719;
-  --docs-danger: #a23d3d;
+  --docs-surface: #ebeef3;
+  --docs-text: #262c34;
+  --docs-muted: #5f6773;
+  --docs-line: #d0d5de;
+  --docs-accent: #894a2d;
+  --docs-tint: #fbede7;
+  --docs-info: #485e82;
+  --docs-tip: #416753;
+  --docs-warning: #7b5d31;
+  --docs-danger: #90464b;
 
   /* A four-pixel foundation. Aliases retain the existing customization API. */
   --docs-space-1: 0.25rem;
@@ -25,6 +27,7 @@
   --docs-space-5: 1.25rem;
   --docs-space-6: 1.5rem;
   --docs-space-8: 2rem;
+  --docs-space-10: 2.5rem;
   --docs-space-12: 3rem;
   --docs-space-16: 4rem;
   --docs-space-xs: var(--docs-space-1);
@@ -32,11 +35,13 @@
   --docs-space-md: var(--docs-space-4);
   --docs-space-lg: var(--docs-space-6);
   --docs-space-xl: var(--docs-space-8);
-  --docs-panel-padding: var(--docs-space-lg);
-  --docs-title-gap: var(--docs-space-3);
-  --docs-block-gap: var(--docs-space-xl);
-  --docs-section-gap: var(--docs-space-16);
-  --docs-paragraph-gap: var(--docs-space-5);
+  --docs-panel-padding: var(--docs-space-5);
+  --docs-title-gap: var(--docs-space-2);
+  --docs-block-gap: var(--docs-space-5);
+  --docs-section-gap: var(--docs-space-10);
+  --docs-paragraph-gap: var(--docs-space-4);
+  --docs-disclosure-padding: var(--docs-space-3);
+  --docs-code-padding-block: var(--docs-space-3);
 
   /* One family, with separate reading, component, and utility roles. */
   --docs-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -71,24 +76,24 @@
 }
 @media (max-width: 760px) {
   :root {
-    --docs-panel-padding: var(--docs-space-5);
-    --docs-section-gap: var(--docs-space-12);
+    --docs-panel-padding: var(--docs-space-4);
+    --docs-section-gap: var(--docs-space-8);
   }
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --docs-bg: #191815;
-    --docs-panel: #201f1b;
-    --docs-surface: #26241f;
-    --docs-text: #eeece6;
-    --docs-muted: #b0aa9e;
-    --docs-line: #3b3831;
-    --docs-accent: #e7a479;
-    --docs-tint: #34281f;
-    --docs-info: #9eb9dc;
-    --docs-tip: #9ecdb2;
-    --docs-warning: #e4c089;
-    --docs-danger: #edaaaa;
+    --docs-bg: #181b1f;
+    --docs-panel: #1e2125;
+    --docs-surface: #272a30;
+    --docs-text: #e5e8ed;
+    --docs-muted: #a0a8b6;
+    --docs-line: #383d46;
+    --docs-accent: #e8a587;
+    --docs-tint: #362821;
+    --docs-info: #a5b9d8;
+    --docs-tip: #9fc1ae;
+    --docs-warning: #d1ba9b;
+    --docs-danger: #e1a6a6;
   }
 }
 @media (forced-colors: active) {
