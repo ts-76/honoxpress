@@ -147,15 +147,15 @@ button:disabled {
 .docs-layout {
   display: grid;
   grid-template-columns: 220px minmax(0, var(--docs-measure)) 190px;
-  gap: var(--docs-space-12);
+  gap: var(--docs-space-8);
   max-width: 1310px;
   margin: 0 auto;
-  padding: var(--docs-space-12) var(--docs-space-8) 0;
+  padding: var(--docs-space-8) var(--docs-space-8) 0;
 }
 .docs-sidebar,
 .toc-rail {
   position: sticky;
-  top: calc(var(--docs-header-height) + var(--docs-space-12));
+  top: calc(var(--docs-header-height) + var(--docs-space-8));
   align-self: start;
   max-height: calc(100vh - 130px);
   overflow-y: auto;
@@ -252,14 +252,14 @@ button:disabled {
   font-size: var(--docs-page-title-size);
   line-height: var(--docs-leading-heading);
   letter-spacing: var(--docs-heading-tracking);
-  margin: 0 0 var(--docs-space-lg);
+  margin: 0 0 var(--docs-space-md);
   font-weight: var(--docs-weight-heading);
 }
 :where(.prose) h2 {
   font-size: var(--docs-section-title-size);
   line-height: 1.4;
   letter-spacing: var(--docs-heading-tracking);
-  margin: var(--docs-section-gap) 0 var(--docs-space-lg);
+  margin: var(--docs-section-gap) 0 var(--docs-space-3);
   font-weight: var(--docs-weight-heading);
 }
 :where(.prose) h3 {
@@ -267,12 +267,12 @@ button:disabled {
   line-height: 1.4;
   font-weight: var(--docs-weight-heading);
   letter-spacing: var(--docs-heading-tracking);
-  margin: var(--docs-space-12) 0 var(--docs-space-md);
+  margin: var(--docs-space-8) 0 var(--docs-space-3);
 }
 :where(.prose) h1,
 :where(.prose) h2,
 :where(.prose) h3 {
-  scroll-margin-top: calc(var(--docs-header-height) + var(--docs-space-12));
+  scroll-margin-top: calc(var(--docs-header-height) + var(--docs-space-8));
 }
 :where(.prose) h2:target,
 :where(.prose) h3:target {
@@ -316,7 +316,7 @@ button:disabled {
   align-items: center;
   justify-content: space-between;
   gap: var(--docs-space-md);
-  padding: var(--docs-space-3) var(--docs-panel-padding);
+  padding: var(--docs-space-sm) var(--docs-panel-padding);
   border-bottom: 1px solid var(--docs-line);
   font-size: var(--docs-text-xs);
   line-height: 1.4;
@@ -380,7 +380,7 @@ button:disabled {
   border-radius: var(--docs-control-radius);
   color: var(--docs-text);
   background: var(--docs-surface);
-  padding: var(--docs-space-3) var(--docs-panel-padding);
+  padding: var(--docs-space-sm) var(--docs-panel-padding);
   font-size: var(--docs-ui-size);
   font-weight: var(--docs-weight-heading);
 }
@@ -397,7 +397,7 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: var(--docs-space-sm);
-  padding: var(--docs-space-3) var(--docs-panel-padding);
+  padding: var(--docs-space-sm) var(--docs-panel-padding);
   border-bottom: 1px solid var(--docs-line);
   background: var(--docs-surface);
   color: var(--docs-muted);
@@ -499,7 +499,7 @@ button:disabled {
   }
   .docs-layout {
     display: block;
-    padding: var(--docs-space-xl) var(--docs-space-5) 0;
+    padding: var(--docs-space-lg) var(--docs-space-5) 0;
   }
   .breadcrumbs {
     margin-bottom: 20px;
@@ -574,7 +574,7 @@ button:disabled {
 .code-block pre {
   max-width: 100%;
   overflow-x: auto;
-  padding: var(--docs-panel-padding);
+  padding: var(--docs-code-padding-block) var(--docs-panel-padding);
   font: var(--docs-code-size) / var(--docs-leading-code) var(--docs-code-font);
   tab-size: 2;
 }
