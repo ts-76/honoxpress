@@ -130,6 +130,14 @@ const app = new Hono();
 app.get("/hello", (c) => c.json({ message: "Hello", count: 1 }));
 ```
 
+長いファイル名は折り返し、コピーボタンは一行で表示します。
+
+<CodeBlock
+  language="ts"
+  filename="app/components/documentation/generated-site-navigation.ts"
+  code={'export const navigation = [{ title: "Guide", href: "/docs/getting-started" }];'}
+/>
+
 ## Demo frame
 
 <DemoFrame src="/demo/clock" title="Component clock demo" />
@@ -139,6 +147,23 @@ Props: `src` and `title` are required, with optional `linkLabel`. Demo routes re
 ```tsx
 <DemoFrame src="/demo/clock" title="Clock" />
 ```
+
+## API reference
+
+<APIReference
+  name="ThemeSwitch"
+  importFrom="./components/theme-switch"
+  description="ネイティブの選択欄でライト・ダーク・システムを切り替えます。"
+  usage="独自のレイアウトでは ThemeScript と組み合わせて配置します。"
+  labels={{ usage: "使い方", guide: "ガイド", source: "ソース" }}
+/>
+<APIReference
+  name="ThemeScript"
+  importFrom="./components/theme-switch"
+  description="保存したテーマをスタイルシートの読み込み前に適用します。"
+  usage="ドキュメントの head に配置します。"
+  labels={{ usage: "使い方", guide: "ガイド", source: "ソース" }}
+/>
 
 ## Your components
 

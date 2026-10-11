@@ -51,7 +51,7 @@ test("MDX save updates body, title, nav and TOC, then rehydrates the island", as
     ),
   );
   await expect(page.getByText("Registry override applied", { exact: true })).toBeVisible();
-  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(6);
   await page.getByRole("tab", { name: "npm", exact: true }).click();
   await expect(page.locator(".hx-tabs").first().getByRole("tabpanel")).toHaveText(
     "npm install honoxpress",
@@ -86,7 +86,7 @@ export default function RuntimeProbe() {
   );
   const probe = page.getByRole("button", { name: "New island count: 0", exact: true });
   await expect(probe).toBeVisible();
-  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(6);
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(7);
   await probe.click();
   await expect(
     page.getByRole("button", { name: "New island count: 1", exact: true }),
