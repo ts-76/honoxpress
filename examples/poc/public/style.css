@@ -294,7 +294,7 @@ button:disabled {
   background: var(--docs-surface);
   border: 1px solid var(--docs-line);
   border-radius: var(--docs-control-radius);
-  padding: 2px 5px;
+  padding: var(--docs-inline-code-padding);
 }
 .code-block {
   margin: var(--docs-block-gap) 0;

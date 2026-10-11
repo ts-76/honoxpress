@@ -49,6 +49,7 @@
   --docs-paragraph-gap: var(--docs-space-4);
   --docs-disclosure-padding: var(--docs-space-3);
   --docs-code-padding-block: var(--docs-space-3);
+  --docs-inline-code-padding: 2px 5px;
 
   /* One family, with separate reading, component, and utility roles. */
   --docs-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;

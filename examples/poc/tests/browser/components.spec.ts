@@ -308,6 +308,13 @@ test("authoring components support code switching, responsive tables, figures, a
       const table = page.getByRole("table", { name: "Figure properties" });
       await expect(table.getByRole("rowheader", { name: "src Required" })).toBeVisible();
       await expect(table.getByRole("row")).toHaveCount(6);
+      const codePadding = await page.evaluate(() =>
+        [".hx-type-table code", ".hx-type-table + p code"].map(
+          (selector) => getComputedStyle(document.querySelector(selector)!).padding,
+        ),
+      );
+      expect(codePadding[0]).toBe(codePadding[1]);
+      expect(Number.parseFloat(codePadding[0])).toBeGreaterThan(0);
       const group = page.locator(".hx-code-group");
       await expect(group.getByRole("tabpanel")).toContainText("app.ts");
       await expect(group.locator(".hx-syntax-keyword").first()).toBeVisible();
@@ -315,7 +322,15 @@ test("authoring components support code switching, responsive tables, figures, a
       await page.keyboard.press("End");
       await expect(group.getByRole("tab", { name: "JavaScript", exact: true })).toBeFocused();
       await expect(group.getByRole("tabpanel")).toContainText("app.js");
-      await group.getByRole("button", { name: "Copy JavaScript", exact: true }).click();
+      const copy = group.getByRole("button", { name: "Copy JavaScript", exact: true });
+      const copyBounds = await copy.boundingBox();
+      const tabBounds = await group.getByRole("tablist").boundingBox();
+      expect(copyBounds!.height).toBeGreaterThanOrEqual(44);
+      expect(copyBounds!.width).toBeGreaterThanOrEqual(44);
+      expect(copyBounds!.y).toBeCloseTo(tabBounds!.y, 0);
+      expect(copyBounds!.x).toBeGreaterThanOrEqual(tabBounds!.x + tabBounds!.width - 52);
+      await copy.click();
+      await expect(copy).toHaveAttribute("title", "Copied");
       expect(await page.evaluate(() => navigator.clipboard.readText())).toContain(
         'c.text("Hello")',
       );

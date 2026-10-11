@@ -175,7 +175,7 @@
   padding: var(--docs-space-sm) var(--docs-space-md);
   border: 0;
   border-block-end: 2px solid transparent;
-  border-radius: var(--docs-control-radius) var(--docs-control-radius) 0 0;
+  border-radius: 0;
   background: transparent;
   color: var(--docs-muted, CanvasText);
   font: inherit;
@@ -378,8 +378,10 @@
 }
 .hx-type-table code {
   font-size: var(--docs-code-size);
-  background: transparent;
-  padding: 0;
+  background: var(--docs-surface);
+  border: 1px solid var(--docs-line);
+  border-radius: var(--docs-control-radius);
+  padding: var(--docs-inline-code-padding);
   color: var(--docs-text);
   white-space: normal;
 }
@@ -419,6 +421,7 @@
 }
 .hx-code-group > .hx-tabs {
   margin: 0;
+  position: relative;
 }
 .hx-code-group .hx-tab-list {
   padding-inline: var(--docs-space-2);
@@ -435,6 +438,30 @@
 }
 .hx-code-group .hx-tab-panel:focus-visible {
   outline-offset: -4px;
+}
+/* Once tabs activate, copying shares the tab row; filenames sit beside the code. */
+.hx-code-group [data-hx-tabs-ready] .hx-tab-list {
+  padding-inline-end: calc(44px + var(--docs-space-2) * 2);
+}
+.hx-code-group [data-hx-tabs-ready] .code-toolbar {
+  padding-block: var(--docs-space-1);
+  border-block-end: 0;
+  background: transparent;
+}
+.hx-code-group [data-hx-tabs-ready] .code-toolbar button {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: var(--docs-space-2);
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  justify-content: center;
+}
+.hx-code-group [data-hx-tabs-ready] .code-copy-label {
+  display: none;
+}
+.hx-code-group .code-filename {
+  overflow-wrap: anywhere;
 }
 .hx-figure {
   margin: var(--docs-block-gap) 0;

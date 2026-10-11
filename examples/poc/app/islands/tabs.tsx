@@ -76,6 +76,7 @@ export default function Tabs({
       const hasTab = Number.isInteger(index) && index >= 0 && index < labels.length;
       if (!hasTab) panel.hidden = true;
     });
+    root.dataset.hxTabsReady = "true";
   }, [id, initialIndex, labels.length]);
 
   return (
