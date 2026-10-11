@@ -14,7 +14,7 @@ pnpm add honoxpress hono
 
 The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX, Vite Plus, MDX, and SSG adapters are application dependencies. See the [compatibility guide](https://github.com/ts-76/honoxpress/blob/main/docs/compatibility.md) for tested versions.
 
-The component installer and runnable starter are under active development. The currently published npm `honoxpress@0.1.4` provides the metadata API and exported templates, but does not include the `honoxpress` CLI. The `init`, `add`, `list`, and `init --starter` commands documented in the repository require a built or packed candidate from the development branch and will be included only after a later release. The [component guide](https://github.com/ts-76/honoxpress/blob/main/docs/components.md#start-a-new-site) gives the exact candidate workflow.
+The component installer, runnable starter, and syntax-highlighting helpers are under active development. The currently published npm `honoxpress@0.1.4` provides the metadata API and exported templates, but does not include the `honoxpress` CLI. The `init`, `add`, `list`, and `init --starter` commands documented in the repository require a built or packed candidate from the development branch and will be included only after a later release. The [component guide](https://github.com/ts-76/honoxpress/blob/main/docs/components.md#start-a-new-site) gives the exact candidate workflow.
 
 ## Runtime API
 
@@ -80,13 +80,15 @@ Nested paths and Unicode filenames are supported. In a renderer, use `new URL(c.
 
 Import build helpers from `honoxpress/build` in your Vite/build configuration.
 
-| Export                                                   | Purpose                                                                  |
-| -------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `docsMetadataPlugin(options)`                            | Discover MDX frontmatter/TOC and expose `virtual:honoxpress/catalog`     |
-| `remarkDocsHeadings`                                     | Generate heading anchors and a named `toc` export during MDX compilation |
-| `remarkDocsComponents(options)`                          | Validate MDX component tags against the application's shared registry    |
-| `docsOnlyPlugin(options, report?)`                       | Filter Hono SSG requests to documentation routes before execution        |
-| `DocsBuildOptions`, `DocsComponentsOptions`, `SSGReport` | Types for plugin options and route/component reporting                   |
+| Export                                                   | Purpose                                                                                |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `docsMetadataPlugin(options)`                            | Discover MDX frontmatter/TOC and expose `virtual:honoxpress/catalog`                   |
+| `remarkDocsHeadings`                                     | Generate heading anchors and a named `toc` export during MDX compilation               |
+| `remarkDocsCode`                                         | Highlight language-labelled fences and static CodeBlock samples during MDX compilation |
+| `highlightDocsCode(code, language)`                      | Prepare serializable syntax tokens on the build/server side                            |
+| `remarkDocsComponents(options)`                          | Validate MDX component tags against the application's shared registry                  |
+| `docsOnlyPlugin(options, report?)`                       | Filter Hono SSG requests to documentation routes before execution                      |
+| `DocsBuildOptions`, `DocsComponentsOptions`, `SSGReport` | Types for plugin options and route/component reporting                                 |
 
 Register the metadata plugin before HonoX. Register `remarkDocsHeadings` after the frontmatter plugins in `@mdx-js/rollup`. The `worker` option is a required boolean:
 

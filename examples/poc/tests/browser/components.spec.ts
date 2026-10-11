@@ -84,6 +84,15 @@ test("component styles retain their hierarchy and share the docs theme across si
       expect(styles.stepColor).toBe(accent);
       expect(styles.columns).toBe(width <= 760 ? 1 : 2);
       expect(styles.overflow).toBe(false);
+      await expect(page.locator(".code-block .hx-syntax-function")).toHaveText("pnpm");
+      await expect(
+        page.locator(".prose > pre code.language-ts .hx-syntax-keyword").first(),
+      ).toBeVisible();
+      await expect(page.locator(".code-block code")).toHaveText("pnpm add honoxpress");
+      await expect(page.locator(".hx-callout-info")).toHaveCSS(
+        "border-top-color",
+        colorScheme === "light" ? "rgb(72, 94, 130)" : "rgb(165, 185, 216)",
+      );
 
       const tab = page.getByRole("tab", { name: "pnpm", exact: true });
       await tab.press("ArrowRight");
@@ -122,6 +131,9 @@ test("component styles retain their hierarchy and share the docs theme across si
         });
         await page.locator(".hx-cards").screenshot({
           path: testInfo.outputPath(`cards-${width}-${colorScheme}.png`),
+        });
+        await page.locator(".prose > pre:has(code.language-ts)").screenshot({
+          path: testInfo.outputPath(`syntax-${width}-${colorScheme}.png`),
         });
       }
     }

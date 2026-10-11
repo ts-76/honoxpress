@@ -1,5 +1,57 @@
 import { test, expect } from "vite-plus/test";
-import { remarkDocsComponents } from "honoxpress/build";
+import { remarkDocsComponents, remarkDocsCode, highlightDocsCode } from "honoxpress/build";
+
+test("syntax tokens preserve code, aliases, line endings, and literal HTML", async () => {
+  const code = 'const value = "</script><script>alert(1)</script>"; // note\r\n';
+  const tokens = await highlightDocsCode(code, "ts");
+  expect(tokens.map((token) => token.content).join("")).toBe(code);
+  expect(tokens.some((token) => token.kind === "keyword")).toBe(true);
+  expect(tokens.some((token) => token.kind === "string")).toBe(true);
+  expect(tokens.some((token) => token.kind === "comment")).toBe(true);
+  expect((await highlightDocsCode("pnpm dev", "bash"))[0].kind).toBe("function");
+});
+
+test("unlabelled and unsupported code remains readable plain text", async () => {
+  for (const language of [undefined, "text", "unlisted-language"])
+    expect(await highlightDocsCode("<not markup>\n", language)).toEqual([
+      { content: "<not markup>\n", kind: "plain" },
+    ]);
+});
+
+test("MDX highlights static props and fences without evaluating dynamic expressions", async () => {
+  const staticBlock = {
+    type: "mdxJsxFlowElement",
+    name: "CodeBlock",
+    attributes: [
+      { type: "mdxJsxAttribute", name: "code", value: 'const value = "hello"' },
+      { type: "mdxJsxAttribute", name: "language", value: "ts" },
+    ],
+  };
+  const dynamicBlock = {
+    type: "mdxJsxFlowElement",
+    name: "CodeBlock",
+    attributes: [
+      {
+        type: "mdxJsxAttribute",
+        name: "code",
+        value: { type: "mdxJsxAttributeValueExpression", value: "runSideEffect()" },
+      },
+    ],
+  };
+  const spreadBlock = {
+    ...staticBlock,
+    attributes: [...staticBlock.attributes, { type: "mdxJsxExpressionAttribute", value: "props" }],
+  };
+  const fence = { type: "code", lang: "js", value: "const value = 1", data: {} };
+  await remarkDocsCode()({
+    type: "root",
+    children: [staticBlock, dynamicBlock, spreadBlock, fence],
+  });
+  expect(staticBlock.attributes.at(-1)?.name).toBe("tokens");
+  expect(dynamicBlock.attributes).toHaveLength(1);
+  expect(spreadBlock.attributes.at(-1)?.type).toBe("mdxJsxExpressionAttribute");
+  expect(fence.data).toHaveProperty("hChildren");
+});
 
 const tag = (name: string) => ({ type: "mdxJsxFlowElement", name });
 const root = (...children: ReturnType<typeof tag>[]) => ({ type: "root", children });

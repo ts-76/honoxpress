@@ -85,7 +85,7 @@ marked registry block and its own installation manifest.
 For an existing HonoX app, connect MDX with providerImportSource:
   providerImportSource: "/app/mdx-components"
 and remarkDocsComponents using Object.keys(components) from that registry.
-Import docsMetadataPlugin and remarkDocsHeadings from "honoxpress/build" in Vite,
+Import docsMetadataPlugin, remarkDocsHeadings, and remarkDocsCode from "honoxpress/build" in Vite,
 and mount DocsLayout in your renderer. Edit app/docs.config.ts for locale labels.
 
 The CLI does not edit existing routes or Vite config, install dependencies, run

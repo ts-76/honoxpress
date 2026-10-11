@@ -6,6 +6,8 @@ import { resolve, relative } from "node:path";
 import type { Heading } from "./catalog.js";
 
 export { remarkDocsComponents } from "./mdx-components.js";
+export { remarkDocsCode, highlightDocsCode } from "./code-highlight.js";
+export type { DocsCodeToken } from "./code-highlight.js";
 export type { DocsComponentsOptions } from "./mdx-components.js";
 
 export interface DocsBuildOptions {

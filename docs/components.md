@@ -35,7 +35,7 @@ The generated `app/mdx-components.ts` exports the `components` map and `useMDXCo
 
 ```ts
 import { components } from "./app/mdx-components";
-import { remarkDocsComponents, remarkDocsHeadings } from "honoxpress/build";
+import { remarkDocsComponents, remarkDocsHeadings, remarkDocsCode } from "honoxpress/build";
 import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
@@ -47,6 +47,7 @@ mdx({
     remarkFrontmatter,
     [remarkMdxFrontmatter, { name: "frontmatter" }],
     remarkDocsHeadings,
+    remarkDocsCode,
     [remarkDocsComponents, { names: Object.keys(components) }],
   ],
 });
@@ -74,21 +75,21 @@ The generated `useMDXComponents` provider accepts `Record<string, unknown>` over
 
 ## Component gallery and props
 
-| Component       | What it renders                                                  | Props                                                                                                    |
-| --------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `Callout`       | Semantic note with `info`, `tip`, `warning`, or `danger` styling | `type?`, `title?`, children                                                                              |
-| `Cards`         | Responsive card grid                                             | `columns?: 2 \| 3` (default `2`), children                                                               |
-| `Card`          | A titled card with optional link                                 | `title` (required), `href?`, children                                                                    |
-| `Steps`         | Numbered sequence                                                | children                                                                                                 |
-| `Step`          | One item in `Steps`                                              | `title?`, children                                                                                       |
-| `Accordion`     | Container for disclosure items                                   | children                                                                                                 |
-| `AccordionItem` | Native expandable disclosure                                     | `title` (required), `open?` (default `false`), children                                                  |
-| `Tabs`          | Keyboard-operable tab navigation island                          | `labels: string[]` (required), `ariaLabel?` (default `"Tabs"`), `selectedIndex?` (default `0`), children |
-| `TabPanel`      | Content associated with a `Tabs` label by its index              | `index: number` (required), children                                                                     |
-| `CodeBlock`     | Copyable command or code sample island                           | `code: string` (required), `filename?`, `copyLabel?`, `copiedLabel?`, `errorLabel?`                      |
-| `DemoFrame`     | Lazy iframe with a caption and direct link                       | `title?`, `src?` (default `/demo/clock`), `linkLabel?`                                                   |
+| Component       | What it renders                                                  | Props                                                                                                       |
+| --------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `Callout`       | Semantic note with `info`, `tip`, `warning`, or `danger` styling | `type?`, `title?`, children                                                                                 |
+| `Cards`         | Responsive card grid                                             | `columns?: 2 \| 3` (default `2`), children                                                                  |
+| `Card`          | A titled card with optional link                                 | `title` (required), `href?`, children                                                                       |
+| `Steps`         | Numbered sequence                                                | children                                                                                                    |
+| `Step`          | One item in `Steps`                                              | `title?`, children                                                                                          |
+| `Accordion`     | Container for disclosure items                                   | children                                                                                                    |
+| `AccordionItem` | Native expandable disclosure                                     | `title` (required), `open?` (default `false`), children                                                     |
+| `Tabs`          | Keyboard-operable tab navigation island                          | `labels: string[]` (required), `ariaLabel?` (default `"Tabs"`), `selectedIndex?` (default `0`), children    |
+| `TabPanel`      | Content associated with a `Tabs` label by its index              | `index: number` (required), children                                                                        |
+| `CodeBlock`     | Copyable command or code sample island                           | `code: string` (required), `language?`, `tokens?`, `filename?`, `copyLabel?`, `copiedLabel?`, `errorLabel?` |
+| `DemoFrame`     | Lazy iframe with a caption and direct link                       | `title?`, `src?` (default `/demo/clock`), `linkLabel?`                                                      |
 
-Children are ordinary MDX content. Native Markdown code fences remain available; use `CodeBlock` when a copy button and filename toolbar are useful.
+Children are ordinary MDX content. Language-labelled Markdown fences are highlighted by `remarkDocsCode`. Use `CodeBlock` with `language` when a copy button and filename toolbar are useful.
 
 ```mdx
 <Callout type="warning" title="Trusted content">
@@ -119,7 +120,7 @@ Children are ordinary MDX content. Native Markdown code fences remain available;
   <TabPanel index={1}>Run `npm install`.</TabPanel>
 </Tabs>
 
-<CodeBlock code="pnpm dev" filename="Terminal" />
+<CodeBlock language="bash" code="pnpm dev" filename="Terminal" />
 
 <DemoFrame title="Live Worker route" src="/demo/clock" linkLabel="Open demo" />
 ```
@@ -225,13 +226,19 @@ The layout and standard components import one shared `public/tokens.css`. It sep
 
 The foundation uses `--docs-space-1`, `-2`, `-3`, `-4`, `-5`, `-6`, `-8`, `-10`, `-12`, and `-16` for 4, 8, 12, 16, 20, 24, 32, 40, 48, and 64px. Existing `--docs-space-xs`, `-sm`, `-md`, and `-lg` remain aliases for 4, 8, 16, and 24px. Prefer semantic roles for site customization. One system font family serves headings and reading text; monospace is reserved for code. Plain Markdown fences and `CodeBlock` share code size, leading, and padding. Code blocks use `--docs-code-padding-block` (12px) vertically and panel padding horizontally; disclosure summaries use `--docs-disclosure-padding` (12px) vertically.
 
-Callout colors retain their meanings through `--docs-info`, `--docs-tip`, `--docs-warning`, and `--docs-danger`. Their restrained fills support the content. Keep text and focus contrast readable when changing colors in either theme. Forced-colors mode restores system colors.
+Callout colors retain their meanings through `--docs-info`, `--docs-tip`, `--docs-warning`, and `--docs-danger`. Their 12% semantic fills, solid semantic borders, and colored titles make each note distinguishable from the canvas. Keep text and focus contrast readable when changing colors in either theme. Forced-colors mode restores system colors.
 
 Controls distinguish hover, pressed, selected, disabled, and keyboard-focus states. Focus uses a shared 2px accent outline; scrollable tabs and code areas inset it to keep the outline visible. Card links remain on their titles. Cards collapse to one column at the layout's 760px mobile breakpoint. Low-specificity article selectors preserve component titles and internal spacing.
 
 The light canvas is pinned to `#F4F5F7`. Neutral surfaces use a low-chroma OKLCH hue near 260°, while the rust accent keeps a hue near 45°. The light accent targets lightness 0.48 and chroma 0.095; its dark counterpart targets 0.78 and 0.09. The stylesheet ships rounded sRGB hex colors. Chroma describes perceptual color intensity; it is separate from the relative luminance used for contrast.
 
-Run `pnpm check:theme` from this repository to report the actual OKLCH coordinates, relative luminance, and contrast of both palettes. This is also part of `pnpm verify`: normal text pairs must reach 4.5:1, and focus colors must reach 3:1 against the supported surfaces. It checks the default tokens and standard Callout fills, rather than claiming complete accessibility conformance. The calculations follow [CSS Color 4](https://www.w3.org/TR/css-color-4/#ok-lab) and [WCAG 2.2 relative luminance](https://www.w3.org/TR/WCAG22/#dfn-relative-luminance).
+Run `pnpm check:theme` from this repository to report the actual OKLCH coordinates, relative luminance, and contrast of both palettes. This is also part of `pnpm verify`: normal text pairs must reach 4.5:1, and focus colors must reach 3:1 against the supported surfaces. It checks the default tokens, standard Callout text/title/border pairs, and syntax colors, rather than claiming complete accessibility conformance. The calculations follow [CSS Color 4](https://www.w3.org/TR/css-color-4/#ok-lab) and [WCAG 2.2 relative luminance](https://www.w3.org/TR/WCAG22/#dfn-relative-luminance).
+
+## Syntax highlighting
+
+Add `remarkDocsCode` to the MDX `remarkPlugins` list as shown above. The generated starter includes it. Shiki tokenizes language-labelled fences and `<CodeBlock language="ts" code={"const count = 1"} />` during compilation. Tokens use the shared `--docs-code-keyword`, `-string`, `-number`, `-function`, `-type`, `-comment`, and `-punctuation` roles, so light/dark and forced-colors changes work without re-tokenizing. Shiki and its grammars stay out of the client and Worker bundles.
+
+Static `code` and `language` attributes may be strings, string literals in braces, or template literals without interpolation. Dynamic expressions and attribute spreads are not evaluated by the plugin. For server-generated code, call `await highlightDocsCode(code, language)` from `honoxpress/build` and pass the returned `tokens` to `CodeBlock`. Keep that helper on the server/build side. Missing or unsupported languages render as plain text. If code changes without matching tokens, the component falls back to plain text. Copy always uses the original `code` string, and token content is rendered as escaped text.
 
 ## Start a new site
 

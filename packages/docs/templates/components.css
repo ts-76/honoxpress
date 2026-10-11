@@ -4,9 +4,9 @@
   --hx-callout-accent: var(--docs-info);
   margin-block: var(--docs-block-gap);
   padding: var(--docs-panel-padding);
-  border: 1px solid color-mix(in srgb, var(--hx-callout-accent) 24%, var(--docs-line, CanvasText));
+  border: 1px solid var(--hx-callout-accent, CanvasText);
   border-radius: var(--docs-radius);
-  background: color-mix(in srgb, var(--hx-callout-accent) 4%, var(--docs-panel, Canvas));
+  background: color-mix(in srgb, var(--hx-callout-accent) 12%, var(--docs-panel, Canvas));
   color: var(--docs-text, CanvasText);
 }
 .hx-callout-info {
@@ -23,8 +23,29 @@
 }
 .hx-callout-title {
   margin: 0 0 var(--docs-title-gap);
-  color: var(--docs-text, CanvasText);
+  color: var(--hx-callout-accent, CanvasText);
   font-weight: var(--docs-weight-heading);
+}
+.hx-syntax-keyword {
+  color: var(--docs-code-keyword);
+}
+.hx-syntax-string {
+  color: var(--docs-code-string);
+}
+.hx-syntax-number {
+  color: var(--docs-code-number);
+}
+.hx-syntax-function {
+  color: var(--docs-code-function);
+}
+.hx-syntax-type {
+  color: var(--docs-code-type);
+}
+.hx-syntax-comment {
+  color: var(--docs-code-comment);
+}
+.hx-syntax-punctuation {
+  color: var(--docs-code-punctuation);
 }
 .hx-callout-content > :first-child,
 .hx-card-content > :first-child,
@@ -216,6 +237,9 @@
   }
 }
 @media (forced-colors: active) {
+  [class^="hx-syntax-"] {
+    color: CanvasText;
+  }
   .hx-callout,
   .hx-card,
   .hx-accordion-item,

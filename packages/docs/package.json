@@ -43,6 +43,9 @@
   "scripts": {
     "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json"
   },
+  "dependencies": {
+    "shiki": "4.5.0"
+  },
   "peerDependencies": {
     "hono": "^4.13.12",
     "vite-plus": "^1.0.0"

@@ -203,6 +203,7 @@ export async function verifyStarter({ tarball, run, artifacts }) {
       "hx-accordion",
       "hx-tabs",
       "code-block",
+      "hx-syntax-function",
       "/demo/clock",
     ])
       assert.ok(html.includes(expected), `static docs page is missing ${expected}`);
@@ -217,7 +218,7 @@ export async function verifyStarter({ tarball, run, artifacts }) {
     assert.match(worker, /Worker clock|demo\/clock/);
     assert.doesNotMatch(
       worker,
-      /@mdx-js\/(?:rollup|mdx)|remark-frontmatter|remark-mdx-frontmatter|remarkDocsHeadings/,
+      /@mdx-js\/(?:rollup|mdx)|remark-frontmatter|remark-mdx-frontmatter|remarkDocsHeadings|shiki|code-highlight/,
     );
     assert.doesNotMatch(worker, /Write your documentation in MDX/);
     evidence.staticDocsAndComponents = true;

@@ -25,7 +25,7 @@ These examples use the shared `app/mdx-components.ts` registry. No per-page impo
 
 Props: `type` (`info`, `tip`, `warning`, `danger`; default `info`), optional `title`, and children.
 
-```mdx
+```tsx
 <Callout type="tip" title="Tip">
   Your content.
 </Callout>
@@ -42,7 +42,7 @@ Props: `type` (`info`, `tip`, `warning`, `danger`; default `info`), optional `ti
 
 Props: `Cards.columns` is `2` (default) or `3`. `Card` takes `title`, optional `href`, and children.
 
-```mdx
+```tsx
 <Cards columns={2}>
   <Card title="Guide" href="/docs/getting-started">
     Read more.
@@ -64,7 +64,7 @@ Props: `Cards.columns` is `2` (default) or `3`. `Card` takes `title`, optional `
 
 Props: `labels` is a non-empty array, `ariaLabel` names the tab list, `selectedIndex` defaults to `0`. Each `TabPanel.index` matches its label. Arrow keys, Home, and End select tabs.
 
-```mdx
+```tsx
 <Tabs labels={["First", "Second"]} ariaLabel="Example">
   <TabPanel index={0}>First content</TabPanel>
   <TabPanel index={1}>Second content</TabPanel>
@@ -81,7 +81,7 @@ Props: `labels` is a non-empty array, `ariaLabel` names the tab list, `selectedI
 
 Props: `Steps` wraps `Step` children; `Step.title` is optional.
 
-```mdx
+```tsx
 <Steps>
   <Step title="Install">Add the package.</Step>
 </Steps>
@@ -100,7 +100,7 @@ Props: `Steps` wraps `Step` children; `Step.title` is optional.
 
 Props: `AccordionItem.title` labels the summary; `open` defaults to `false`.
 
-```mdx
+```tsx
 <Accordion>
   <AccordionItem title="Question">Answer.</AccordionItem>
 </Accordion>
@@ -109,16 +109,25 @@ Props: `AccordionItem.title` labels the summary; `open` defaults to `false`.
 ## Code block
 
 <CodeBlock
+  language="bash"
   code="pnpm add honoxpress"
   filename="Terminal"
   copyLabel="Copy example"
   copiedLabel="Copied example"
 />
 
-Props: `code` is required; optional `filename`, `copyLabel`, and `copiedLabel`. Plain Markdown fences remain plain code; use this component when you need a copy button.
+Props: `code` is required; optional `language`, `filename`, `copyLabel`, and `copiedLabel`. Fences with a language and static CodeBlock samples are highlighted at build time; use this component when you need a copy button.
 
-```mdx
-<CodeBlock code="pnpm add honoxpress" filename="Terminal" />
+```tsx
+<CodeBlock language="bash" code="pnpm add honoxpress" filename="Terminal" />
+```
+
+```ts
+import { Hono } from "hono";
+
+// Define a typed JSON endpoint.
+const app = new Hono();
+app.get("/hello", (c) => c.json({ message: "Hello", count: 1 }));
 ```
 
 ## Demo frame
@@ -127,7 +136,7 @@ Props: `code` is required; optional `filename`, `copyLabel`, and `copiedLabel`. 
 
 Props: `src` and `title` are required, with optional `linkLabel`. Demo routes remain dynamic and are excluded before SSG execution.
 
-```mdx
+```tsx
 <DemoFrame src="/demo/clock" title="Clock" />
 ```
 

@@ -117,7 +117,7 @@ The layout and styles include responsive navigation and TOC disclosures, visible
 
 ## Build model and scope
 
-`honoxpress` provides runtime metadata APIs. `honoxpress/build` provides build-time MDX discovery, heading transformation, and SSG filtering. Your HonoX application configures its router and renderer.
+`honoxpress` provides runtime metadata APIs. `honoxpress/build` provides build-time MDX discovery, heading transformation, syntax highlighting, and SSG filtering. Your HonoX application configures its router and renderer.
 
 - MDX can execute JavaScript. Use trusted local files.
 - `worker: true` stops metadata discovery from importing MDX. To also exclude MDX bodies from the Worker, use `honox/server/base` with explicit globs selecting dynamic routes. The SSG filter alone does not remove those imports.

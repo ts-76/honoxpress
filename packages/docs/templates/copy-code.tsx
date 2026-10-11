@@ -4,12 +4,16 @@ import { useState } from "hono/jsx";
 // Copy into app/islands. HonoX detects islands by the consumer-owned file path.
 export default function CopyCode({
   code,
+  language = "text",
+  tokens,
   filename = "Terminal",
   copyLabel = "Copy code",
   copiedLabel = "Copied",
   errorLabel = "Copy failed. Select and copy the code manually.",
 }: {
   code: string;
+  language?: string;
+  tokens?: readonly { content: string; kind: string }[];
   filename?: string;
   copyLabel?: string;
   copiedLabel?: string;
@@ -17,6 +21,7 @@ export default function CopyCode({
 }) {
   const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
   const [pending, setPending] = useState(false);
+  const highlighted = tokens?.map((token) => token.content).join("") === code ? tokens : undefined;
   const copy = async () => {
     setPending(true);
     try {
@@ -44,7 +49,13 @@ export default function CopyCode({
         </button>
       </figcaption>
       <pre tabIndex={0} aria-label={filename}>
-        <code>{code}</code>
+        <code class={`language-${language}`}>
+          {highlighted
+            ? highlighted.map((token) => (
+                <span class={`hx-syntax-${token.kind}`}>{token.content}</span>
+              ))
+            : code}
+        </code>
       </pre>
       <span role="status" aria-live="polite" class={status === "error" ? "copy-error" : "sr-only"}>
         {status === "copied" ? copiedLabel : status === "error" ? errorLabel : ""}

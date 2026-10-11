@@ -18,6 +18,13 @@
   --docs-tip: #416753;
   --docs-warning: #7b5d31;
   --docs-danger: #90464b;
+  --docs-code-keyword: var(--docs-accent);
+  --docs-code-string: var(--docs-tip);
+  --docs-code-number: var(--docs-danger);
+  --docs-code-function: var(--docs-info);
+  --docs-code-type: var(--docs-info);
+  --docs-code-comment: var(--docs-muted);
+  --docs-code-punctuation: var(--docs-muted);
 
   /* A four-pixel foundation. Aliases retain the existing customization API. */
   --docs-space-1: 0.25rem;

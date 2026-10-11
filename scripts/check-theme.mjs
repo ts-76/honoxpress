@@ -10,10 +10,29 @@ const source = await readFile(
 );
 const [light, rest] = source.split("@media (prefers-color-scheme: dark)");
 const [dark] = rest.split("@media (forced-colors: active)");
-const colors = (css) =>
-  Object.fromEntries(
-    [...css.matchAll(/--docs-([a-z-]+): (#[\da-f]{6});/g)].map((m) => [m[1], m[2]]),
+const colors = (css, inherited = {}) => {
+  const entries = {
+    ...inherited,
+    ...Object.fromEntries(
+      [...css.matchAll(/--docs-([a-z-]+): (#[\da-f]{6}|var\(--docs-[a-z-]+\));/g)].map((m) => [
+        m[1],
+        m[2],
+      ]),
+    ),
+  };
+  const resolve = (key, seen = new Set()) => {
+    assert.ok(!seen.has(key), `Cyclic color alias: ${key}`);
+    const value = entries[key];
+    if (!value) return undefined;
+    const target = value.match(/^var\(--docs-([a-z-]+)\)$/)?.[1];
+    return target ? resolve(target, new Set([...seen, key])) : value;
+  };
+  return Object.fromEntries(
+    Object.keys(entries)
+      .map((key) => [key, resolve(key)])
+      .filter(([, value]) => value),
   );
+};
 const rgb = (hex) => [1, 3, 5].map((i) => Number.parseInt(hex.slice(i, i + 2), 16) / 255);
 const linear = (value) => (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
 const luminance = (color) => {
@@ -45,7 +64,9 @@ const metrics = (hex) => {
 };
 
 const report = {};
-for (const [name, palette] of Object.entries({ light: colors(light), dark: colors(dark) })) {
+// Dark mode overrides base colors while retaining the syntax aliases from :root.
+const lightPalette = colors(light);
+for (const [name, palette] of Object.entries({ light: lightPalette, dark: colors(light + dark) })) {
   const checks = [];
   const check = (label, foreground, background, minimum = 4.5) => {
     const ratio = contrast(foreground, background);
@@ -61,12 +82,17 @@ for (const [name, palette] of Object.entries({ light: colors(light), dark: color
   check("selected text on tint", rgb(palette.accent), rgb(palette.tint));
   check("focus on tint", rgb(palette.accent), rgb(palette.tint), 3);
   for (const semantic of ["info", "tip", "warning", "danger"]) {
-    // The standard Callout uses color-mix(in srgb, semantic 4%, panel).
+    // The standard Callout uses color-mix(in srgb, semantic 12%, panel).
     const fill = rgb(palette[semantic]).map(
-      (channel, i) => channel * 0.04 + rgb(palette.panel)[i] * 0.96,
+      (channel, i) => channel * 0.12 + rgb(palette.panel)[i] * 0.88,
     );
     check(`callout text on ${semantic} fill`, rgb(palette.text), fill);
+    check(`callout title on ${semantic} fill`, rgb(palette[semantic]), fill);
+    check(`callout border on ${semantic} fill`, rgb(palette[semantic]), fill, 3);
+    check(`callout border on canvas (${semantic})`, rgb(palette[semantic]), rgb(palette.bg), 3);
   }
+  for (const role of Object.keys(palette).filter((key) => key.startsWith("code-")))
+    check(`syntax ${role} on code`, rgb(palette[role]), rgb(palette.surface));
   report[name] = {
     colors: Object.fromEntries(Object.entries(palette).map(([role, hex]) => [role, metrics(hex)])),
     checks,

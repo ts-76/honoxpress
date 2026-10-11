@@ -10,11 +10,11 @@ const json = async (p) => JSON.parse(await read(p));
 
 async function assertArtifacts() {
   const { default: mdx } = await import("@mdx-js/rollup");
-  const { remarkDocsComponents } = await import("honoxpress/build");
+  const { remarkDocsComponents, remarkDocsCode } = await import("honoxpress/build");
   const compiler = mdx({
     jsxImportSource: "hono/jsx",
     providerImportSource: "/app/mdx-components",
-    remarkPlugins: [[remarkDocsComponents, { names: ["Callout"] }]],
+    remarkPlugins: [remarkDocsCode, [remarkDocsComponents, { names: ["Callout", "CodeBlock"] }]],
   });
   await assert.rejects(compiler.transform("<Missing />", "/fixture.mdx"), /Register Missing/);
   for (const source of ["<$Missing />", "<_Missing />", "<ui.Missing />"])
@@ -35,6 +35,13 @@ async function assertArtifacts() {
   await compiler.transform("{[() => null].map((LocalView) => <LocalView />)}", "/fixture.mdx");
   const registered = await compiler.transform("<Callout>Content</Callout>", "/fixture.mdx");
   assert.match(registered.code, /useMDXComponents/);
+  const highlighted = await compiler.transform(
+    '```ts\nconst value = "hello";\n```\n\n<CodeBlock language="ts" code={"const value = 1"} />',
+    "/highlight.mdx",
+  );
+  assert.match(highlighted.code, /hx-syntax-keyword/);
+  assert.match(highlighted.code, /tokens:/);
+  assert.match(highlighted.code, /"?kind"?: "keyword"/);
   await compiler.transform('import Custom from "./custom";\n\n<Custom />', "/fixture.mdx");
   const manifest = await json("dist/evidence/client-manifest.json");
   assert.ok(manifest["app/client.ts"].isEntry);
@@ -57,8 +64,9 @@ async function assertArtifacts() {
     const evidence = await json(`dist/evidence/${target}-modules.json`);
     assert.ok(evidence.loaded.length > 0);
     assert.equal(
-      evidence.loaded.filter((id) => /\.mdx|@mdx-js|remark-|\/routes\/(?:ja\/)?docs\//.test(id))
-        .length,
+      evidence.loaded.filter((id) =>
+        /\.mdx|@mdx-js|remark-|shiki|code-highlight|\/routes\/(?:ja\/)?docs\//.test(id),
+      ).length,
       0,
     );
   }

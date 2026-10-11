@@ -8,7 +8,12 @@ import ssg from "@hono/vite-ssg";
 import worker from "@hono/vite-build/cloudflare-workers";
 import { defaultPlugin } from "hono/ssg";
 import { mkdir, writeFile } from "node:fs/promises";
-import { docsMetadataPlugin, remarkDocsHeadings, remarkDocsComponents } from "honoxpress/build";
+import {
+  docsMetadataPlugin,
+  remarkDocsHeadings,
+  remarkDocsComponents,
+  remarkDocsCode,
+} from "honoxpress/build";
 import { components } from "./app/mdx-components";
 import { docsOnlyPlugin } from "./build/docs-only.ts";
 
@@ -109,6 +114,7 @@ export default defineConfig(({ mode }) => {
                 remarkFrontmatter,
                 [remarkMdxFrontmatter, { name: "frontmatter" }],
                 remarkDocsHeadings,
+                remarkDocsCode,
                 [remarkDocsComponents, { names: Object.keys(components) }],
               ],
             }),
