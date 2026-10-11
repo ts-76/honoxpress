@@ -48,6 +48,11 @@ void test("component installation is idempotent and preserves registry extension
   withProject((directory) => {
     const first = invoke(directory, "add", "callout");
     assert.equal(first.status, 0, first.stderr);
+    const tokensPath = join(directory, "public/tokens.css");
+    const tokens = readFileSync(tokensPath, "utf8");
+    assert.match(readFileSync(join(directory, "public/components.css"), "utf8"), /tokens\.css/);
+    const customTokens = `${tokens}\n:root { --docs-panel-padding: 2rem; }\n`;
+    writeFileSync(tokensPath, customTokens);
     const registryPath = join(directory, "app/mdx-components.ts");
     const original = readFileSync(registryPath, "utf8");
     assert.match(original, /import \{ Callout \} from "\.\/components\/docs-content"/);
@@ -61,6 +66,7 @@ void test("component installation is idempotent and preserves registry extension
 
     const addTabs = invoke(directory, "add", "tabs");
     assert.equal(addTabs.status, 0, addTabs.stderr);
+    assert.equal(readFileSync(tokensPath, "utf8"), customTokens);
     const extended = readFileSync(registryPath, "utf8");
     assert.match(extended, /export const ProjectCallout = \(\) => "consumer-owned";/);
     assert.match(extended, /\.\.\.standardComponents, Callout: ProjectCallout/);
@@ -161,5 +167,6 @@ void test("init starter dry-run includes the runnable project scaffold", () => {
     assert.equal(generated.dependencies.honoxpress, packageVersion);
     assert.ok(existsSync(join(directory, "vite.config.ts")));
     assert.ok(existsSync(join(directory, ".gitignore")));
+    assert.ok(existsSync(join(directory, "public/tokens.css")));
   });
 });

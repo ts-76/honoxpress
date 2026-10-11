@@ -38,8 +38,15 @@ test("component styles retain their hierarchy and share the docs theme across si
           borders: [".hx-card", ".hx-accordion-item", ".code-block", ".demo-frame"].map(
             (selector) => style(selector).borderTopColor,
           ),
-          backgrounds: ["body", ".hx-card", ".hx-accordion-item"].map(
+          backgrounds: [".hx-card", ".hx-accordion-item"].map(
             (selector) => style(selector).backgroundColor,
+          ),
+          canvas: style("body").backgroundColor,
+          panelPadding: style(".hx-card").padding,
+          blockGap: style(".hx-cards").marginTop,
+          sectionGap: style(".prose > h2").marginTop,
+          typeRoles: [".prose > p", ".prose > h2", ".hx-tab"].map(
+            (selector) => style(selector).fontSize,
           ),
           codeSizes: [".prose > pre", ".code-block pre"].map(
             (selector) => style(selector).fontSize,
@@ -53,17 +60,23 @@ test("component styles retain their hierarchy and share the docs theme across si
           overflow: document.documentElement.scrollWidth > innerWidth,
         };
       });
-      const accent = colorScheme === "light" ? "rgb(167, 65, 19)" : "rgb(241, 162, 119)";
+      const accent = colorScheme === "light" ? "rgb(154, 67, 27)" : "rgb(231, 164, 121)";
       expect(styles.headings).toEqual([
-        { size: "17px", top: "0px", bottom: "8px" },
-        { size: "17px", top: "0px", bottom: "8px" },
+        { size: "18px", top: "0px", bottom: "12px" },
+        { size: "18px", top: "0px", bottom: "12px" },
       ]);
-      expect(styles.calloutGap).toBe("8px");
+      expect(styles.calloutGap).toBe("12px");
       expect(new Set(styles.radii)).toEqual(new Set(["8px"]));
       expect(new Set(styles.borders).size).toBe(1);
       expect(new Set(styles.backgrounds).size).toBe(1);
-      expect(styles.codeSizes).toEqual(["13px", "13px"]);
-      expect(styles.codePadding).toEqual(["16px", "16px"]);
+      expect(styles.backgrounds[0]).not.toBe(styles.canvas);
+      expect(styles.typeRoles).toEqual(["18px", "24px", "14px"]);
+      expect(styles.blockGap).toBe("32px");
+      expect(styles.sectionGap).toBe(width <= 760 ? "48px" : "64px");
+      const panelPadding = width <= 760 ? "20px" : "24px";
+      expect(styles.panelPadding).toBe(panelPadding);
+      expect(styles.codeSizes).toEqual(["14px", "14px"]);
+      expect(styles.codePadding).toEqual([panelPadding, panelPadding]);
       expect(styles.selectedColor).toBe(accent);
       expect(styles.stepColor).toBe(accent);
       expect(styles.columns).toBe(width <= 760 ? 1 : 2);
@@ -89,12 +102,12 @@ test("component styles retain their hierarchy and share the docs theme across si
         await selected.hover();
         await expect(selected).toHaveCSS(
           "background-color",
-          colorScheme === "light" ? "rgb(247, 247, 248)" : "rgb(32, 33, 38)",
+          colorScheme === "light" ? "rgb(244, 242, 238)" : "rgb(38, 36, 31)",
         );
         await page.mouse.down();
         await expect(selected).toHaveCSS(
           "background-color",
-          colorScheme === "light" ? "rgb(255, 242, 235)" : "rgb(51, 37, 30)",
+          colorScheme === "light" ? "rgb(248, 238, 230)" : "rgb(52, 40, 31)",
         );
         await page.mouse.up();
       }
@@ -112,7 +125,10 @@ test("component styles retain their hierarchy and share the docs theme across si
   }
 
   // A site-level customization must reach navigation and interactive components alike.
-  await page.addStyleTag({ content: ":root { --docs-accent: #94612f; --docs-radius: 12px; }" });
+  await page.addStyleTag({
+    content:
+      ":root { --docs-accent: #94612f; --docs-radius: 12px; --docs-panel-padding: 28px; --docs-title-size: 19px; --docs-title-gap: 10px; }",
+  });
   await expect(page.locator('.docs-nav a[aria-current="page"]').first()).toHaveCSS(
     "color",
     "rgb(148, 97, 47)",
@@ -123,6 +139,10 @@ test("component styles retain their hierarchy and share the docs theme across si
   );
   await expect(page.locator(".hx-card").first()).toHaveCSS("border-radius", "12px");
   await expect(page.locator(".code-block")).toHaveCSS("border-radius", "12px");
+  await expect(page.locator(".hx-card").first()).toHaveCSS("padding", "28px");
+  await expect(page.locator(".code-block pre")).toHaveCSS("padding", "28px");
+  await expect(page.locator(".hx-card-title").first()).toHaveCSS("font-size", "19px");
+  await expect(page.locator(".hx-step-title").first()).toHaveCSS("margin-bottom", "10px");
   await page.emulateMedia({ forcedColors: "active" });
   await expect(page.locator(".hx-card").first()).toHaveCSS("border-top-style", "solid");
   await expect(page.locator('.hx-tab[aria-selected="true"]').first()).toHaveCSS(
@@ -159,7 +179,7 @@ test("copy feedback remains readable during pending and failure states", async (
     );
     await expect(page.locator(".copy-error")).toHaveCSS(
       "color",
-      colorScheme === "light" ? "rgb(185, 28, 28)" : "rgb(252, 165, 165)",
+      colorScheme === "light" ? "rgb(162, 61, 61)" : "rgb(237, 170, 170)",
     );
   }
 });

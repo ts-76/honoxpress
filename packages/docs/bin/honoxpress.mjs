@@ -276,6 +276,7 @@ function install({ command, target, cwd, dryRun, starter }) {
   }
   if (added.some((name) => visualGroups.includes(name)) && !visualsAlreadyInstalled) {
     addSource(join(templateRoot, "components.css"), "public/components.css");
+    addSource(join(templateRoot, "tokens.css"), "public/tokens.css");
   }
   if (added.includes("layout")) {
     addSource(join(templateRoot, "docs.css"), "public/style.css");
@@ -296,6 +297,7 @@ function install({ command, target, cwd, dryRun, starter }) {
       "app/islands/copy-code.tsx",
       "public/style.css",
       "public/components.css",
+      "public/tokens.css",
     ]);
     for (const rel of listFiles(scaffoldRoot)) {
       if (generatedByInit.has(rel)) continue;

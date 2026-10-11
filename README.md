@@ -103,12 +103,13 @@ Write your documentation here.
 
 Templates are exported as files through `honoxpress/templates/*`:
 
-| Template         | Destination in your app         |
-| ---------------- | ------------------------------- |
-| `docs-ui.tsx`    | `app/components/docs-ui.tsx`    |
-| `copy-code.tsx`  | `app/islands/copy-code.tsx`     |
-| `demo-frame.tsx` | `app/components/demo-frame.tsx` |
-| `docs.css`       | Your public stylesheet          |
+| Template         | Destination in your app                     |
+| ---------------- | ------------------------------------------- |
+| `docs-ui.tsx`    | `app/components/docs-ui.tsx`                |
+| `copy-code.tsx`  | `app/islands/copy-code.tsx`                 |
+| `demo-frame.tsx` | `app/components/demo-frame.tsx`             |
+| `docs.css`       | Your public stylesheet                      |
+| `tokens.css`     | Shared theme, typography, and spacing roles |
 
 For the complete component list, props, MDX registry setup, CLI workflow, and starter, see the [component system guide](docs/components.md). The upcoming CLI installs Hono JSX components and islands into your app, then validates MDX tags using the same registry supplied to `providerImportSource`.
 

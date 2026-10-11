@@ -25,7 +25,7 @@ pnpm exec honoxpress list
 
 Available groups are `callout`, `cards`, `steps`, `accordion`, `tabs`, `code-block`, `demo-frame`, and `layout`. `init` is shorthand for all groups. `add` adds the group's files and refreshes only the managed registry block in `app/mdx-components.ts`; local code outside that block is preserved. Do not edit the lines between the `honoxpress:components` markers: a later `add` replaces that generated block. Put custom imports and registry additions outside it. `--dry-run` prints the complete proposed changes without writing files.
 
-Content groups such as `callout` or `tabs` also install `public/components.css` on first addition. The `layout` group installs `public/style.css`, which imports that component stylesheet. Either run `add layout` as well, or link the component stylesheet from your own layout with `<link rel="stylesheet" href="/components.css" />`. `CodeBlock` also uses the base code-toolbar styles from `docs.css`; if you skip the layout group, copy and load both stylesheets or provide equivalent styles in your own CSS.
+Content groups such as `callout` or `tabs` also install `public/components.css` and its shared `public/tokens.css` on first addition. The `layout` group installs `public/style.css`, which imports that component stylesheet. Either run `add layout` as well, or link the component stylesheet from your own layout with `<link rel="stylesheet" href="/components.css" />`. `CodeBlock` also uses the base code-toolbar styles from `docs.css`; if you skip the layout group, copy and load both stylesheets or provide equivalent styles in your own CSS.
 
 After installation, finish the MDX and Vite setup in the next section. Existing apps need to connect the component registry to their MDX plugin themselves; the CLI deliberately leaves build configuration in the application's hands.
 
@@ -186,30 +186,48 @@ export default docsSite;
 
 ## Theme and interaction styles
 
-The layout and standard components share the same CSS custom properties. Override them after the default stylesheet to change the site consistently:
+The layout and standard components import one shared `public/tokens.css`. It separates the four-pixel spacing foundation, typography scale, surface colors, and semantic roles. Component styles consume roles such as panel padding or title spacing, so a single customization reaches every component. Override semantic properties after the default stylesheet:
 
 ```css
 :root {
-  --docs-accent: #a74113;
-  --docs-tint: #fff2eb;
-  --docs-radius: 0.5rem;
+  --docs-accent: #9a431b;
+  --docs-tint: #f8eee6;
+  --docs-panel-padding: 1.5rem;
+  --docs-title-gap: 0.75rem;
+  --docs-title-size: 1.125rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --docs-accent: #f1a277;
-    --docs-tint: #33251e;
+    --docs-accent: #e7a479;
+    --docs-tint: #34281f;
   }
 }
 ```
 
-`--docs-bg`, `--docs-surface`, `--docs-text`, `--docs-muted`, and `--docs-line` control the page and component surfaces. `--docs-accent` and `--docs-tint` also control selected tabs, step numbers, links, and keyboard focus. Keep text and focus contrast readable when changing these colors in either theme.
+| Role                            | Token                                                  | Default                                      |
+| ------------------------------- | ------------------------------------------------------ | -------------------------------------------- |
+| Reading canvas                  | `--docs-bg`                                            | Warm off-white / warm charcoal               |
+| Component panels                | `--docs-panel`                                         | White / raised charcoal                      |
+| Code and hover surfaces         | `--docs-surface`                                       | Subtle neutral surface                       |
+| Text / secondary text / borders | `--docs-text`, `--docs-muted`, `--docs-line`           | Separate contrast levels in each theme       |
+| Links, selection, and focus     | `--docs-accent`, `--docs-tint`                         | Rust accent with a soft tint                 |
+| Body / lead paragraph           | `--docs-text-md`, `--docs-text-lg`                     | 16 / 18px                                    |
+| Page / section headings         | `--docs-page-title-size`, `--docs-section-title-size`  | Responsive 32–40 / 24px                      |
+| Card / step titles              | `--docs-title-size`                                    | 18px, independent of article headings        |
+| Controls / code / metadata      | `--docs-ui-size`, `--docs-code-size`, `--docs-text-xs` | 14 / 14 / 12px                               |
+| Panel inner padding             | `--docs-panel-padding`                                 | 24px; 20px on mobile                         |
+| Title-to-content spacing        | `--docs-title-gap`                                     | 12px                                         |
+| Component / section spacing     | `--docs-block-gap`, `--docs-section-gap`               | 32 / 64px; section spacing is 48px on mobile |
+| Paragraph spacing               | `--docs-paragraph-gap`                                 | 20px                                         |
+| Panel / control radius          | `--docs-radius`, `--docs-control-radius`               | 8 / 6px                                      |
+| Reading measure                 | `--docs-measure`                                       | 72ch maximum article column                  |
 
-The standard panel radius is 8px (`--docs-radius`); small controls use 4px (`--docs-control-radius`). Spacing uses 4, 8, 16, and 24px (`--docs-space-xs`, `--docs-space-sm`, `--docs-space-md`, and `--docs-space-lg`). Panels share 16px inner padding and 24px outer spacing. Plain Markdown fences and `CodeBlock` share `--docs-code-size` and `--docs-code-font`. Card and step titles use `--docs-title-size` independently of article headings.
+The foundation uses `--docs-space-1`, `-2`, `-3`, `-4`, `-5`, `-6`, `-8`, `-12`, and `-16` for 4, 8, 12, 16, 20, 24, 32, 48, and 64px. Existing `--docs-space-xs`, `-sm`, `-md`, and `-lg` remain aliases for 4, 8, 16, and 24px. Prefer semantic roles for site customization. One system font family serves headings and reading text; monospace is reserved for code. Plain Markdown fences and `CodeBlock` share code size, leading, and padding.
 
-Callout colors retain their meanings through `--docs-info`, `--docs-tip`, `--docs-warning`, and `--docs-danger`. The component stylesheet uses system-color fallbacks when loaded without the docs shell and preserves system colors in forced-colors mode.
+Callout colors retain their meanings through `--docs-info`, `--docs-tip`, `--docs-warning`, and `--docs-danger`. Their restrained fills support the content. Keep text and focus contrast readable when changing colors in either theme. Forced-colors mode restores system colors.
 
-Controls distinguish hover, pressed, selected, and keyboard-focus states. Focus uses a shared 2px accent outline; scrollable tabs and code areas inset it to keep the outline visible. Card links remain on their titles. Cards collapse to one column at the layout's 760px mobile breakpoint. The copied article styles use low-specificity selectors so they do not override component titles or internal spacing.
+Controls distinguish hover, pressed, selected, disabled, and keyboard-focus states. Focus uses a shared 2px accent outline; scrollable tabs and code areas inset it to keep the outline visible. Card links remain on their titles. Cards collapse to one column at the layout's 760px mobile breakpoint. Low-specificity article selectors preserve component titles and internal spacing.
 
 ## Start a new site
 
@@ -232,6 +250,6 @@ After a release includes the CLI, a new project can use `pnpm dlx honoxpress@<ve
 
 ## Ownership, updates, and design references
 
-Installed files become application source. Change components and layout directly to fit your routes, content, and design system. The default `public/style.css` imports `./components.css`; keep that import if you want the standard component styles, or replace both stylesheets with your own. The CLI records the installed groups and file hashes in `.honoxpress.json`; later additions refresh only the registry's marked block and stop on conflicting destination files. They do not overwrite your copied component implementation.
+Installed files become application source. Change components and layout directly to fit your routes, content, and design system. The default `public/style.css` imports `./components.css`; keep that import if you want the standard component styles, and its import of `tokens.css`, or replace the three stylesheets with your own. To update a previously copied theme manually, copy `tokens.css` alongside the updated stylesheets; `add` preserves existing application-owned CSS. The CLI records the installed groups and file hashes in `.honoxpress.json`; later additions refresh only the registry's marked block and stop on conflicting destination files. They do not overwrite your copied component implementation.
 
 Nimbus and Fumapress informed the layout hierarchy and component patterns. The Hono JSX, CSS, and icons in these templates are independently implemented; no upstream source code or assets were copied. Preserve the repository's MIT license and notice when distributing copied template files.
