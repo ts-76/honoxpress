@@ -49,6 +49,7 @@ const virtualId = "virtual:honoxpress/catalog";
 const resolvedId = `\0${virtualId}`;
 export function docsMetadataPlugin(options: DocsBuildOptions): Plugin {
   let routeRoot = "";
+  let honoxRestartsOnAddUnlink = false;
   let routeRestart: Promise<void> | undefined;
   let routeRevision = 0;
   const config = { locales: options.locales, defaultLocale: options.defaultLocale };
@@ -56,6 +57,8 @@ export function docsMetadataPlugin(options: DocsBuildOptions): Plugin {
     name: "honoxpress-metadata",
     configResolved(vite) {
       routeRoot = resolve(vite.root, options.routeRoot ?? "app/routes");
+      honoxRestartsOnAddUnlink =
+        vite.plugins?.some((plugin) => plugin.name === "restart-on-add-unlink") ?? false;
     },
     resolveId(id) {
       if (id === virtualId) return resolvedId;
@@ -115,7 +118,12 @@ export function docsMetadataPlugin(options: DocsBuildOptions): Plugin {
       // create/delete updates. Its default SSR reload races the route restart.
       order: "post",
       async handler({ type, file, server, read }) {
-        if (options.worker || !file.startsWith(`${routeRoot}/`) || !file.endsWith(".mdx")) return;
+        if (options.worker) return;
+        // HonoX restarts on every watched addition/removal, including islands.
+        // Import-glob can reload the old document while that listener is closed.
+        // Let the restart's reconnect reload it once the server is serving again.
+        if (type !== "update" && honoxRestartsOnAddUnlink) return [];
+        if (!file.startsWith(`${routeRoot}/`) || !file.endsWith(".mdx")) return;
         if (type !== "update" || routeRestart) return [];
         const revision = routeRevision;
         await read(); // Editors can emit a filesystem event before a save completes.

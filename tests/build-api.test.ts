@@ -103,8 +103,11 @@ test("metadata discovery follows HonoX exclusions and Worker never discovers fil
 
 test("route restarts suppress eager-router reloads and saves that overlap the restart", async () => {
   const plugin = docsMetadataPlugin({ locales: ["en"], defaultLocale: "en", worker: false });
-  const configure = plugin.configResolved as (config: { root: string }) => void;
-  configure({ root: "/fixture" });
+  const configure = plugin.configResolved as unknown as (config: {
+    root: string;
+    plugins: { name: string }[];
+  }) => void;
+  configure({ root: "/fixture", plugins: [{ name: "restart-on-add-unlink" }] });
   const hook = plugin.hotUpdate;
   if (!hook || typeof hook === "function") throw new Error("Expected the ordered update hook");
   expect(hook.order).toBe("post");
@@ -149,6 +152,17 @@ test("route restarts suppress eager-router reloads and saves that overlap the re
   for (const type of ["create", "delete"] as const)
     for (const environment of ["client", "ssr"])
       expect(await update.call(context(environment), change(type))).toEqual([]);
+  // The same import-glob/restart race occurs for a newly added island. Ordinary
+  // island saves must still use Vite's normal HMR, and without HonoX's restart
+  // plugin this hook must not suppress their creation either.
+  const island = { ...change("create"), file: "/fixture/app/islands/probe.tsx" };
+  for (const type of ["create", "delete"] as const)
+    for (const environment of ["client", "ssr"])
+      expect(await update.call(context(environment), { ...island, type })).toEqual([]);
+  expect(await update.call(context("client"), { ...island, type: "update" })).toBeUndefined();
+  configure({ root: "/fixture", plugins: [] });
+  expect(await update.call(context("client"), island)).toBeUndefined();
+  configure({ root: "/fixture", plugins: [{ name: "restart-on-add-unlink" }] });
   expect(send).not.toHaveBeenCalled();
   // A save can start reading before the add event begins its restart.
   const save = update.call(
