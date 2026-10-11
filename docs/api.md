@@ -1,6 +1,6 @@
 # Integrating honoxpress with HonoX
 
-This guide connects the metadata API, local MDX routes, renderer, and build pipeline in an existing HonoX application. For public exports, see the [package README](../packages/docs/README.md). The [example app](../examples/poc) contains a complete client/SSG/Worker configuration.
+This guide connects the metadata API, local MDX routes, renderer, and build pipeline in an existing HonoX application. For the standard components, shared MDX registry, layout configuration, CLI, and runnable starter, see [MDX components and starter](components.md). For public exports, see the [package README](../packages/docs/README.md). The [example app](../examples/poc) contains a complete client/SSG/Worker configuration.
 
 ## Install the package
 
@@ -11,6 +11,8 @@ pnpm add honoxpress hono
 Keep HonoX, Vite Plus, `@mdx-js/rollup`, `remark-frontmatter`, `remark-mdx-frontmatter`, and the Hono SSG/Worker adapters as explicit application dependencies. The [example package.json](../examples/poc/package.json) and [compatibility guide](compatibility.md) record the tested combination. Add dependencies and generated output to the application's `.gitignore`.
 
 For local package development, `pnpm pack:docs` in this repository creates a tarball under `artifacts/package`. Install that tarball in a separate app to test the actual distribution without workspace links.
+
+The component CLI and runnable starter require the unreleased development version. Published npm `honoxpress@0.1.4` has no `honoxpress` executable; `init`, `add`, and `list` require a built or packed candidate until a later release.
 
 ## Add MDX routes
 
@@ -47,28 +49,34 @@ Write your documentation here.
 The following excerpt shows the plugins to add to an existing Vite configuration; it is not a complete build configuration:
 
 ```ts
-import { docsMetadataPlugin, remarkDocsHeadings } from "honoxpress/build";
+import { components } from "./app/mdx-components";
+import docsSite from "./app/docs.config";
+import { docsMetadataPlugin, remarkDocsComponents, remarkDocsHeadings } from "honoxpress/build";
 import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 
 // Place this before the HonoX plugins.
 docsMetadataPlugin({
-  locales: ["en", "ja"],
-  defaultLocale: "en",
+  locales: Object.keys(docsSite.localeLabels),
+  defaultLocale: docsSite.defaultLocale,
   worker: mode === "worker",
 });
 
 // Add this in dev/SSG; omit MDX compilation from the Worker target.
 mdx({
   jsxImportSource: "hono/jsx",
+  providerImportSource: "/app/mdx-components",
   remarkPlugins: [
     remarkFrontmatter,
     [remarkMdxFrontmatter, { name: "frontmatter" }],
     remarkDocsHeadings,
+    [remarkDocsComponents, { names: Object.keys(components) }],
   ],
 });
 ```
+
+Point the provider and validator at the same registry. The provider makes registered components available to all MDX pages without page-level imports; the validator reports unknown tags during compilation. Add application-owned components to the exported registry so `Object.keys(components)` includes them.
 
 `worker` must be an explicit boolean. Development and SSG read the MDX route exports. Worker mode creates an empty catalog without discovering or importing MDX. `routeRoot` defaults to `app/routes` relative to the Vite root.
 
@@ -100,35 +108,37 @@ Use `pages` for navigation, `current?.headings` for the TOC, and `translations` 
 
 The [example renderer](../examples/poc/app/routes/_renderer.tsx) composes these values with the copied UI components, title/description, and client script.
 
-## Copy and customize the UI
+## Install the component system
 
-Run this script from the application root after installing honoxpress:
+For a complete list of built-in components, their props, the `DocsLayout` configuration, and MDX examples, see [MDX components and starter](components.md).
 
-```js
-import { copyFile, mkdir } from "node:fs/promises";
-import { constants } from "node:fs";
-import { dirname } from "node:path";
+The CLI can add the editable files to an existing app, or install a runnable HonoX scaffold into a new directory. Preview the destinations before writing:
 
-const templates = [
-  ["docs-ui.tsx", "app/components/docs-ui.tsx"],
-  ["copy-code.tsx", "app/islands/copy-code.tsx"],
-  ["demo-frame.tsx", "app/components/demo-frame.tsx"],
-  ["docs.css", "public/docs.css"],
-];
-
-for (const [source, destination] of templates) {
-  await mkdir(dirname(destination), { recursive: true });
-  await copyFile(
-    new URL(import.meta.resolve(`honoxpress/templates/${source}`)),
-    destination,
-    constants.COPYFILE_EXCL,
-  );
-}
+```sh
+pnpm exec honoxpress init --dry-run
+pnpm exec honoxpress init
+pnpm exec honoxpress add tabs --dry-run
+pnpm exec honoxpress add tabs
 ```
 
-The script stops if a destination already exists. Choose unused paths or merge the templates into your files manually. Load the copied CSS from your renderer, for example with `<link rel="stylesheet" href="/docs.css" />`.
+Use `honoxpress list` to print component groups. `init` installs all groups; `add` accepts one group such as `callout`, `cards`, `steps`, `accordion`, `tabs`, `code-block`, `demo-frame`, or `layout`. The CLI does not install dependencies, edit existing routes or Vite configuration, access credentials, or deploy. It never overwrites existing files; a differing destination stops the plan before files are written.
 
-The copy-code component must live under `app/islands` for HonoX to discover it. Importing it directly from the package does not register an application island. Edit names, links, wording, and layout in your owned files. Template updates require manual review and migration; keep the MIT copyright and permission notice with distributed copies.
+To try the unreleased CLI against the current checkout, build and pack the package, then create the new app from that local candidate:
+
+```sh
+pnpm build:package
+mkdir -p /tmp/honoxpress-candidate
+pnpm --dir packages/docs pack --pack-destination /tmp/honoxpress-candidate
+mkdir /tmp/my-docs
+node packages/docs/bin/honoxpress.mjs init --starter --cwd /tmp/my-docs
+cd /tmp/my-docs
+pnpm add /tmp/honoxpress-candidate/honoxpress-0.1.4.tgz
+pnpm dev
+```
+
+The starter sets up the HonoX routes, shared MDX registry, and client → docs SSG → Worker build stages. The standard `public/style.css` imports `components.css`; retain the import when keeping the supplied component styles. After a release includes the CLI, use `pnpm dlx honoxpress@<version> init --starter --cwd /path/to/new-docs`; replace `<version>` with that release. Published `honoxpress@0.1.4` predates these commands.
+
+These commands require a built or packed candidate from the development branch until a later release. They are not included in published npm `honoxpress@0.1.4`.
 
 ## Build client, static docs, and Worker separately
 
@@ -149,10 +159,17 @@ During SSG, place the documentation filter before Hono's `defaultPlugin()`:
 ```ts
 import { docsOnlyPlugin } from "honoxpress/build";
 import { defaultPlugin } from "hono/ssg";
+import docsSite from "./app/docs.config";
 
 const report = { accepted: [], skipped: [] };
 const plugins = [
-  docsOnlyPlugin({ locales: ["en", "ja"], defaultLocale: "en" }, report),
+  docsOnlyPlugin(
+    {
+      locales: Object.keys(docsSite.localeLabels),
+      defaultLocale: docsSite.defaultLocale,
+    },
+    report,
+  ),
   defaultPlugin(),
 ];
 ```

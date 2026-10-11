@@ -49,6 +49,9 @@ test("owned UI: active nav, TOC, real clipboard, failure state, mobile, keyboard
       .getByRole("navigation", { name: "Documentation", exact: true })
       .getByRole("link", { name: "Getting started", exact: true }),
   ).toBeVisible();
+  await page
+    .locator(".mobile-nav .docs-nav")
+    .screenshot({ path: testInfo.outputPath("mobile-menu.png") });
   await page.locator("details.mobile-nav > summary").click();
   await page.locator("details.mobile-toc > summary").click();
   await page

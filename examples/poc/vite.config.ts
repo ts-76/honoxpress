@@ -8,7 +8,14 @@ import ssg from "@hono/vite-ssg";
 import worker from "@hono/vite-build/cloudflare-workers";
 import { defaultPlugin } from "hono/ssg";
 import { mkdir, writeFile } from "node:fs/promises";
-import { docsMetadataPlugin, remarkDocsHeadings } from "honoxpress/build";
+import {
+  docsMetadataPlugin,
+  remarkDocsHeadings,
+  remarkDocsComponents,
+  remarkDocsCode,
+} from "honoxpress/build";
+import { components } from "./app/mdx-components";
+import docsSite from "./app/docs.config";
 import { docsOnlyPlugin } from "./build/docs-only.ts";
 
 function audit(target: string): Plugin {
@@ -62,6 +69,18 @@ export default defineConfig(({ mode }) => {
     };
   const ssgReport = { accepted: [] as string[], skipped: [] as string[] };
   return {
+    optimizeDeps: {
+      noDiscovery: true,
+      include: [
+        "honox/client",
+        "honox/vite/components",
+        "honox/server/components",
+        "hono/jsx",
+        "hono/jsx/jsx-runtime",
+        "hono/jsx/jsx-dev-runtime",
+        "hono/jsx/dom",
+      ],
+    },
     fmt: {
       ignorePatterns: [
         "dist/**",
@@ -84,17 +103,24 @@ export default defineConfig(({ mode }) => {
       options: { typeAware: true, typeCheck: true },
     },
     plugins: lazyPlugins(async () => [
-      docsMetadataPlugin({ locales: ["en", "ja"], defaultLocale: "en", worker: mode === "worker" }),
+      docsMetadataPlugin({
+        locales: Object.keys(docsSite.localeLabels),
+        defaultLocale: docsSite.defaultLocale,
+        worker: mode === "worker",
+      }),
       honox({ entry: mode === "worker" ? "./app/worker.ts" : "./app/server.ts" }),
       ...(mode === "worker"
         ? []
         : [
             mdx({
               jsxImportSource: "hono/jsx",
+              providerImportSource: "/app/mdx-components",
               remarkPlugins: [
                 remarkFrontmatter,
                 [remarkMdxFrontmatter, { name: "frontmatter" }],
                 remarkDocsHeadings,
+                remarkDocsCode,
+                [remarkDocsComponents, { names: Object.keys(components) }],
               ],
             }),
           ]),

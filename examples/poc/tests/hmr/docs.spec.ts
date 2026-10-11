@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFile, writeFile, unlink } from "node:fs/promises";
 import { join } from "node:path";
-import { gotoConnected, routeStatus } from "./ready";
+import { gotoConnected, waitConnected, routeStatus } from "./ready";
 
 test("MDX save updates body, title, nav and TOC, then rehydrates the island", async ({ page }) => {
   const { root } = JSON.parse(await readFile("dist/evidence/hmr-root.json", "utf8")) as {
@@ -37,6 +37,60 @@ test("MDX save updates body, title, nav and TOC, then rehydrates the island", as
     await page.getByRole("button", { name: button, exact: true }).click();
     await expect(page.getByTestId("count")).toHaveText("1");
   }
+  // The registry is also a Vite config dependency. Editing a provider override
+  // must refresh an open MDX page, including its islands, without a manual reload.
+  await gotoConnected(page, "/docs/components");
+  await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
+  const registryPath = join(root, "app/mdx-components.ts");
+  const registry = await readFile(registryPath, "utf8");
+  await writeFile(
+    registryPath,
+    registry.replace(
+      "...standardComponents, ProjectNote",
+      '...standardComponents, ProjectNote: () => ProjectNote({ children: "Registry override applied" })',
+    ),
+  );
+  await expect(page.getByText("Registry override applied", { exact: true })).toBeVisible();
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
+  await page.getByRole("tab", { name: "npm", exact: true }).click();
+  await expect(page.locator(".hx-tabs").first().getByRole("tabpanel")).toHaveText(
+    "npm install honoxpress",
+  );
+  // The registry edit restarts Vite. Hydrated HTML can arrive before the new
+  // watcher's initial scan finishes; creating a file then can be ignored as an
+  // initial file rather than an addition. Require watcher readiness in the same
+  // open document before starting the next independent edit.
+  await waitConnected(page, "/docs/components");
+  // Add an island after this browser has cached the prebundled HonoX client.
+  // App-owned globs must discover it without clearing the browser's cache.
+  // An unreferenced source need not navigate the page. Wait until it is part of
+  // the live watch graph before the separate MDX import; no manual reload occurs.
+  await writeFile(
+    join(root, "app/islands/runtime-probe.tsx"),
+    `/** @jsxImportSource hono/jsx */
+import { useState } from "hono/jsx";
+export default function RuntimeProbe() {
+  const [count, setCount] = useState(0);
+  return <button type="button" onClick={() => setCount(count + 1)}>New island count: {count}</button>;
+}
+`,
+  );
+  await waitConnected(page, "/docs/components", "app/islands/runtime-probe.tsx");
+  await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
+  await expect(page.getByText("Registry override applied", { exact: true })).toBeVisible();
+  const componentsPath = join(root, "app/routes/docs/components.mdx");
+  const components = await readFile(componentsPath, "utf8");
+  await writeFile(
+    componentsPath,
+    components + '\nimport RuntimeProbe from "../../islands/runtime-probe";\n\n<RuntimeProbe />\n',
+  );
+  const probe = page.getByRole("button", { name: "New island count: 0", exact: true });
+  await expect(probe).toBeVisible();
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(6);
+  await probe.click();
+  await expect(
+    page.getByRole("button", { name: "New island count: 1", exact: true }),
+  ).toBeVisible();
 });
 
 test("Japanese MDX add/unlink refreshes navigation, routing and real 404", async ({

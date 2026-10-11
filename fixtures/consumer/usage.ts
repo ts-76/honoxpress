@@ -1,5 +1,10 @@
 import { createDocsCatalog, resolveClientScript, type DocsCatalog } from "honoxpress";
-import { docsMetadataPlugin, docsOnlyPlugin, remarkDocsHeadings } from "honoxpress/build";
+import {
+  docsMetadataPlugin,
+  docsOnlyPlugin,
+  remarkDocsHeadings,
+  remarkDocsComponents,
+} from "honoxpress/build";
 import type { Plugin } from "vite-plus";
 
 const docs: DocsCatalog = createDocsCatalog({
@@ -17,6 +22,9 @@ docs.navigation("en");
 docs.translations("/docs/start");
 docsOnlyPlugin({ locales: ["en"], defaultLocale: "en" });
 remarkDocsHeadings();
+remarkDocsComponents({ names: ["Callout", "Custom"] });
+// @ts-expect-error registered component names must be strings
+remarkDocsComponents({ names: [123] });
 void plugin;
 // @ts-expect-error title is required by the package's emitted types
 createDocsCatalog({ locales: ["en"], defaultLocale: "en", entries: [{ route: "docs/a.mdx" }] });

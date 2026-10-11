@@ -1,5 +1,5 @@
 import { test, expect } from "vite-plus/test";
-import { createDocsCatalog } from "honoxpress";
+import { createDocsCatalog, defineDocsConfig, resolveDocsLocale } from "honoxpress";
 
 const options = {
   locales: ["en", "ja"],
@@ -11,6 +11,46 @@ const options = {
     { route: "docs/only-en.mdx", title: "English only", order: 3 },
   ],
 };
+test("site configuration rejects inconsistent language settings before building pages", () => {
+  const config = {
+    name: "My docs",
+    defaultLocale: "ja",
+    localeLabels: { en: "English", ja: "日本語" },
+  };
+  expect(defineDocsConfig(config)).toBe(config);
+  const invalidLabels: Record<string, string>[] = [{}, { "../ja": "日本語" }, { ja: " " }];
+  for (const localeLabels of invalidLabels)
+    expect(() => defineDocsConfig({ ...config, localeLabels })).toThrow("docs.config.ts");
+  expect(() => defineDocsConfig({ ...config, defaultLocale: "fr" })).toThrow("defaultLocale");
+});
+
+test("Japanese default and additional languages share route identities and locale resolution", () => {
+  const config = defineDocsConfig({
+    name: "My docs",
+    defaultLocale: "ja",
+    localeLabels: { en: "English", ja: "日本語", fr: "Français" },
+  });
+  const docs = createDocsCatalog({
+    locales: Object.keys(config.localeLabels),
+    defaultLocale: config.defaultLocale,
+    entries: [
+      { route: "docs/start.mdx", title: "はじめに" },
+      { route: "en/docs/start.mdx", title: "Start" },
+      { route: "fr/docs/start.mdx", title: "Démarrer" },
+    ],
+  });
+  expect(docs.page("/docs/start")?.locale).toBe("ja");
+  expect(docs.translations("/docs/start")).toEqual([
+    { locale: "en", href: "/en/docs/start" },
+    { locale: "ja", href: "/docs/start" },
+    { locale: "fr", href: "/fr/docs/start" },
+  ]);
+  for (const pathname of ["/", "/docs/start", "/missing", "/english/docs/start", "/fr-other"])
+    expect(resolveDocsLocale(pathname, config)).toBe("ja");
+  expect(resolveDocsLocale("/en", config)).toBe("en");
+  expect(resolveDocsLocale("/en/docs/start", config)).toBe("en");
+  expect(resolveDocsLocale("/fr/missing", config)).toBe("fr");
+});
 test("route identities, nested URLs, nav order and translations require no frontmatter id", () => {
   const docs = createDocsCatalog(options);
   expect(docs.navigation("en").map((page) => page.href)).toEqual([

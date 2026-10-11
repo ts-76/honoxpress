@@ -182,7 +182,6 @@ button:disabled {
 .docs-nav a {
   display: flex;
   align-items: center;
-  gap: 11px;
   border-radius: 6px;
   padding: 8px 11px;
   margin-bottom: 4px;
@@ -199,14 +198,6 @@ button:disabled {
   background: var(--docs-tint);
   color: var(--docs-accent);
   font-weight: 600;
-}
-.nav-mark {
-  width: 9px;
-  height: 11px;
-  border: 1px solid currentColor;
-  border-radius: 2px;
-  opacity: 0.7;
-  flex-shrink: 0;
 }
 .sidebar-note {
   margin: 32px 11px 0;

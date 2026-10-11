@@ -1,14 +1,15 @@
 import type { NotFoundHandler } from "hono";
+import { resolveDocsLocale } from "honoxpress";
+import docsSite from "../docs.config";
 const notFound: NotFoundHandler = (c) =>
   c.html(
-    <html lang="en">
+    <html lang={resolveDocsLocale(c.req.path, docsSite)}>
       <head>
-        <title>404 · honoxpress</title>
+        <title>404 · {docsSite.name}</title>
       </head>
       <body>
         <h1>404 — Page not found</h1>
-        <a href="/docs/getting-started">English docs</a>
-        <a href="/ja/docs/getting-started">日本語ドキュメント</a>
+        <a href={docsSite.docsHref ?? "/docs/getting-started"}>Open the documentation</a>
       </body>
     </html>,
     404,

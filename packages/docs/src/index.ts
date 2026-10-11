@@ -10,3 +10,5 @@ export type {
 
 export { resolveClientScript } from "./client.js";
 export type { ClientManifest } from "./client.js";
+export { defineDocsConfig, resolveDocsLocale } from "./site-config.js";
+export type { DocsSiteConfig, DocsLayoutLabels } from "./site-config.js";

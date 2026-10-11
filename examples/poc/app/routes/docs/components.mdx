@@ -1,0 +1,306 @@
+---
+title: Components
+description: Standard documentation components and your own registry extensions.
+order: 2
+---
+
+# Components
+
+These examples use the shared `app/mdx-components.ts` registry. No per-page imports are required.
+
+## Callout
+
+<Callout type="info" title="Ready to write">
+  Standard components are included.
+</Callout>
+<Callout type="tip" title="Tip">
+  Edit the copied components to match your site.
+</Callout>
+<Callout type="warning" title="Warning">
+  Review changes before publishing.
+</Callout>
+<Callout type="danger" title="Danger">
+  This is a visual severity, not a confirmation dialog.
+</Callout>
+
+Props: `type` (`info`, `tip`, `warning`, `danger`; default `info`), optional `title`, and children.
+
+```tsx
+<Callout type="tip" title="Tip">
+  Your content.
+</Callout>
+```
+
+## Cards
+
+<Cards columns={2}>
+  <Card title="Getting started" href="/docs/getting-started">
+    Read the guide.
+  </Card>
+  <Card title="Your components">You own their source and styles.</Card>
+</Cards>
+
+Props: `Cards.columns` is `2` (default) or `3`. `Card` takes `title`, optional `href`, and children.
+
+```tsx
+<Cards columns={2}>
+  <Card title="Guide" href="/docs/getting-started">
+    Read more.
+  </Card>
+</Cards>
+```
+
+## Tabs
+
+<Tabs labels={["pnpm", "npm"]} ariaLabel="Package manager">
+  <TabPanel index={0}>pnpm add honoxpress</TabPanel>
+  <TabPanel index={1}>npm install honoxpress</TabPanel>
+</Tabs>
+
+<Tabs labels={["Preview", "Source"]} ariaLabel="Example view" selectedIndex={1}>
+  <TabPanel index={0}>Preview content</TabPanel>
+  <TabPanel index={1}>Source content</TabPanel>
+</Tabs>
+
+Props: `labels` is a non-empty array, `ariaLabel` names the tab list, `selectedIndex` defaults to `0`. Each `TabPanel.index` matches its label. Arrow keys, Home, and End select tabs.
+
+```tsx
+<Tabs labels={["First", "Second"]} ariaLabel="Example">
+  <TabPanel index={0}>First content</TabPanel>
+  <TabPanel index={1}>Second content</TabPanel>
+</Tabs>
+```
+
+## Steps
+
+<Steps>
+  <Step title="Install">Add honoxpress to your HonoX app.</Step>
+  <Step title="Configure">Connect the provider and remark plugin.</Step>
+  <Step title="Write">Use registered components in MDX.</Step>
+</Steps>
+
+Props: `Steps` wraps `Step` children; `Step.title` is optional.
+
+```tsx
+<Steps>
+  <Step title="Install">Add the package.</Step>
+</Steps>
+```
+
+## Accordion
+
+<Accordion>
+  <AccordionItem title="Who owns the components?">
+    Your application owns the copied source.
+  </AccordionItem>
+  <AccordionItem title="Does this need JavaScript?" open={true}>
+    Native details works without JavaScript.
+  </AccordionItem>
+</Accordion>
+
+Props: `AccordionItem.title` labels the summary; `open` defaults to `false`.
+
+```tsx
+<Accordion>
+  <AccordionItem title="Question">Answer.</AccordionItem>
+</Accordion>
+```
+
+## Code block
+
+<CodeBlock
+  language="bash"
+  code="pnpm add honoxpress"
+  filename="Terminal"
+  copyLabel="Copy example"
+  copiedLabel="Copied example"
+/>
+
+Props: `code` is required; optional `language`, `filename`, `copyLabel`, and `copiedLabel`. Fences with a language and static CodeBlock samples are highlighted at build time; use this component when you need a copy button.
+
+```tsx
+<CodeBlock language="bash" code="pnpm add honoxpress" filename="Terminal" />
+```
+
+```ts
+import { Hono } from "hono";
+
+// Define a typed JSON endpoint.
+const app = new Hono();
+app.get("/hello", (c) => c.json({ message: "Hello", count: 1 }));
+```
+
+## Demo frame
+
+<DemoFrame
+  src="/demo/clock"
+  href="/demo/clock?view=full"
+  title="Component clock demo"
+  aspectRatio={16 / 9}
+  allowFullscreen={true}
+  openInNewTab={true}
+/>
+
+Set `src` for the embed and `href` for the full demo link (defaults to `src`). Use `aspectRatio={16 / 9}` for slides, or a positive `height` in pixels for fixed-height examples. `height` takes precedence. `allowFullscreen` grants fullscreen permission; `openInNewTab` opens the link separately. Both default to `false`. `loading` defaults to `"lazy"`. Demo routes remain dynamic and are excluded before SSG execution.
+
+```tsx
+<DemoFrame src="/demo/clock" title="Clock" />
+```
+
+## File tree
+
+<FileTree label="Documentation project">
+  <Folder name="app">
+    <Folder name="components">
+      <File name="file-tree.tsx" />
+      <File name="type-table.tsx" />
+    </Folder>
+    <Folder name="routes" open={false}>
+      <File name="components.mdx" href="/docs/components" />
+    </Folder>
+    <File name="mdx-components.ts" highlighted={true} />
+  </Folder>
+  <File name="vite.config.ts" />
+</FileTree>
+
+`FileTree` takes an accessible `label`. Nest `File` and `Folder` inside it. Folders start open unless `open={false}`; files accept optional `href` and `highlighted`. Folder disclosures work without JavaScript.
+
+## Type table
+
+<TypeTable
+  caption="Figure properties"
+  properties={[
+    { name: "src", type: "string", required: true, description: "URL of the image." },
+    {
+      name: "alt",
+      type: "string",
+      required: true,
+      description: "Describe the image for readers who cannot see it.",
+    },
+    {
+      name: "width",
+      type: "number",
+      required: true,
+      description: "Intrinsic image width in pixels.",
+    },
+    {
+      name: "height",
+      type: "number",
+      required: true,
+      description: "Intrinsic image height in pixels.",
+    },
+    {
+      name: "loading",
+      type: '"lazy" | "eager"',
+      defaultValue: '"lazy"',
+      description: "Use eager for an image visible when the page opens.",
+    },
+  ]}
+/>
+
+Pass a `properties` array with `name`, `type`, optional `description`, `required`, `defaultValue`, and `deprecated`. A semantic table keeps property names associated with their descriptions on every screen size.
+
+## Code group
+
+<CodeGroup
+  ariaLabel="Endpoint language"
+  samples={[
+    {
+      label: "TypeScript",
+      language: "ts",
+      filename: "app.ts",
+      copyLabel: "Copy TypeScript",
+      code: 'import { Hono } from "hono";\nconst app = new Hono();\napp.get("/hello", (c) => c.json({ message: "Hello" }));',
+    },
+    {
+      label: "JavaScript",
+      language: "js",
+      filename: "app.js",
+      copyLabel: "Copy JavaScript",
+      code: 'import { Hono } from "hono";\nconst app = new Hono();\napp.get("/hello", (c) => c.text("Hello"));',
+    },
+  ]}
+/>
+
+`CodeGroup` takes a `samples` array with `label`, `code`, and optional `language`, `filename`, and copy labels. `ariaLabel` names the tab list and `selectedIndex` sets the initial tab. Arrow keys, Home, and End switch examples independently of other tabs. Both examples remain readable before hydration; static samples are highlighted at build time.
+
+## Figure
+
+<Figure
+  src="/component-flow.svg"
+  alt="MDX source passes through the shared component registry to produce a documentation page."
+  width={720}
+  height={240}
+  caption="Register a component once, then use it throughout the documentation."
+/>
+
+Provide `src`, `alt`, and the image's intrinsic `width` and `height`. The image keeps its aspect ratio without cropping. Optional `caption` accepts MDX content; `loading` defaults to `lazy`.
+
+## Theme switch
+
+Choose Light, Dark, or System from the header. On a phone, open Menu to find the same control. The choice is remembered across pages; System follows the device appearance.
+
+`DocsLayout` includes `ThemeSwitch` and its early `ThemeScript`. For a custom layout, place `ThemeScript` in the document head before the stylesheet and render `<ThemeSwitch locale="en" />` wherever readers expect the control. Theme changes affect the documentation, while embedded demos keep their own theme.
+
+## Definition list
+
+<DefinitionList
+  label="Presentation configuration"
+  items={[
+    { term: <code>theme</code>, description: "The presentation's authored colors and typography." },
+    {
+      term: <code>basePath</code>,
+      description: "The URL prefix where the presentation is served.",
+    },
+    { term: "Documentation theme", description: "The reader's Light, Dark, or System preference." },
+  ]}
+/>
+
+Pass `items` with `term` and `description`. Both accept JSX content, including inline code and links. The native definition list stacks terms above descriptions on small screens; an empty list renders nothing. Use Type Table for typed API properties.
+
+## API reference
+
+<APIReference
+  name="DemoFrame"
+  importFrom="./components/demo-frame"
+  description="Embed an interactive example alongside its documentation."
+  usage="Use it when readers need to try a demo without leaving the guide."
+  guideHref="#demo-frame"
+  sourceHref="https://github.com/ts-76/honoxpress/blob/main/packages/docs/templates/demo-frame.tsx"
+>
+  <CodeBlock
+    language="tsx"
+    filename="components.mdx"
+    copyLabel="Copy demo example"
+    code={
+      '<DemoFrame src="/demo/product/embed" href="/demo/product" aspectRatio={16 / 9} allowFullscreen />'
+    }
+  />
+  <TypeTable
+    caption="Demo frame sizing"
+    properties={[
+      {
+        name: "aspectRatio",
+        type: "number",
+        description: "Positive width-to-height ratio, such as 16 / 9.",
+      },
+      {
+        name: "height",
+        type: "number",
+        description: "Positive pixel height; overrides aspectRatio.",
+      },
+    ]}
+  />
+</APIReference>
+
+`APIReference` groups an API `name`, optional `importFrom`, `description`, `usage`, guide/source links, and ordinary children. Compose CodeBlock, TypeTable, and prose inside it. The optional `labels` object localizes usage and link labels. Add a Markdown section heading for automatic TOC discovery; `id` can provide a direct anchor for the reference itself.
+
+## Your components
+
+<ProjectNote>A custom component is registered once and used here without an import.</ProjectNote>
+
+Add an import and an entry to the registry. `useMDXComponents(overrides)` merges per-render overrides after the defaults. Unknown or incorrectly cased component names fail during MDX compilation when `remarkDocsComponents` is configured.
+
+## Acknowledgments
+
+The component delivery approach was informed by [Nimbus](https://github.com/cloudflare/nimbus) and [Fumapress](https://github.com/fuma-nama/fumapress). These Hono JSX templates were implemented independently.

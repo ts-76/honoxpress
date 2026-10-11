@@ -12,7 +12,7 @@ export default defineConfig({
     ],
   },
   lint: {
-    ignorePatterns: ["pilots/**"],
+    ignorePatterns: ["pilots/**", "packages/docs/scaffold/**", "packages/docs/starter/**"],
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     rules: { "vite-plus/prefer-vite-plus-imports": "error" },
     options: { typeAware: true, typeCheck: true },

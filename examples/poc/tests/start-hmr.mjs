@@ -25,6 +25,10 @@ config = config.replace(
   "plugins: lazyPlugins(async () => [",
   `plugins: lazyPlugins(async () => [
   { name: "hmr-test-readiness", configureServer(server) {
+    let ready = false;
+    server.watcher.once("ready", () => { ready = true; });
+    const restarting = (file) => { if (file.includes("/app/")) ready = false; };
+    server.watcher.on("add", restarting).on("unlink", restarting);
     server.watcher.on("all", (event, file) => {
       if (file.endsWith(".mdx")) console.info("[hmr-fixture]", JSON.stringify({ id: ${JSON.stringify(id)}, event, file }));
     });
@@ -33,10 +37,11 @@ config = config.replace(
       const watched = Object.entries(server.watcher.getWatched());
       const paths = watched.flatMap(([dir, names]) => names.map((name) => (dir + "/" + name).split(String.fromCharCode(92)).join("/")));
       const watching = paths.some((file) => file.endsWith(suffix));
+      const sourceWatching = !data.sourcePath || paths.some((file) => file.endsWith("/" + data.sourcePath));
       if (!watching) console.info("[hmr-watch-not-ready]", JSON.stringify({ id: ${JSON.stringify(id)}, root: server.config.root,
         suffix, mdx: paths.filter((file) => file.endsWith(".mdx")), directories: watched.length,
         sample: watched.slice(0, 8).map(([dir]) => dir), options: { cwd: server.config.server.watch?.cwd, usePolling: server.config.server.watch?.usePolling } }));
-      client.send({ type: "custom", event: "honoxpress:test-ready-ack", data: { id: ${JSON.stringify(id)}, watching, diagnostics: { root: server.config.root, suffix, mdx: paths.filter((file) => file.endsWith(".mdx")), directories: watched.length, sample: watched.slice(0, 8).map(([dir]) => dir), watchOptions: server.config.server.watch, bundledDev: server.config.experimental.bundledDev } } });
+      client.send({ type: "custom", event: "honoxpress:test-ready-ack", data: { id: ${JSON.stringify(id)}, ready, watching, sourceWatching, diagnostics: { root: server.config.root, suffix, mdx: paths.filter((file) => file.endsWith(".mdx")), directories: watched.length, sample: watched.slice(0, 8).map(([dir]) => dir), watchOptions: server.config.server.watch, bundledDev: server.config.experimental.bundledDev } } });
     });
   } },`,
 );
