@@ -130,6 +130,14 @@ const app = new Hono();
 app.get("/hello", (c) => c.json({ message: "Hello", count: 1 }));
 ```
 
+Long filenames wrap while the copy action stays on one line.
+
+<CodeBlock
+  language="ts"
+  filename="app/components/documentation/generated-site-navigation.ts"
+  code={'export const navigation = [{ title: "Guide", href: "/docs/getting-started" }];'}
+/>
+
 ## Demo frame
 
 <DemoFrame
@@ -292,6 +300,14 @@ Pass `items` with `term` and `description`. Both accept JSX content, including i
     ]}
   />
 </APIReference>
+
+<APIReference
+  name="ThemeSwitch"
+  importFrom="./components/theme-switch"
+  description="Let readers choose Light, Dark, or System with a native select."
+  usage="Render with ThemeScript when using your own document layout."
+  guideHref="#theme-switch"
+/>
 
 `APIReference` groups an API `name`, optional `importFrom`, `description`, `usage`, guide/source links, and ordinary children. Compose CodeBlock, TypeTable, and prose inside it. The optional `labels` object localizes usage and link labels. Add a Markdown section heading for automatic TOC discovery; `id` can provide a direct anchor for the reference itself.
 

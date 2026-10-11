@@ -6,6 +6,10 @@ honoxpress can install a set of editable Hono JSX components into an application
 
 ## Install into an existing HonoX application
 
+For a site that already owns copied components and styles, see
+[Updating existing documentation sites](upgrading-owned-templates.md) for the
+responsive template fixes and a manual merge procedure.
+
 Once a candidate release is installed in the existing app, the CLI adds the complete component set and layout. First inspect the proposed file operations, then apply them:
 
 ```sh

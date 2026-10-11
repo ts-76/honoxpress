@@ -8,7 +8,7 @@ test("component styles retain their hierarchy and share the docs theme across si
     for (const width of [1280, 800, 390]) {
       await page.setViewportSize({ width, height: 844 });
       await page.goto("/docs/components");
-      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
+      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(6);
       await expect(page.getByRole("tab", { name: "pnpm", exact: true })).toHaveAttribute(
         "aria-selected",
         "true",
@@ -199,7 +199,7 @@ test("copy feedback remains readable during pending and failure states", async (
   for (const colorScheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme });
     await page.goto("/docs/components");
-    await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
+    await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(6);
     const copy = page.getByRole("button", { name: "Copy example", exact: true });
     await copy.click();
     await expect(copy).toBeDisabled();
@@ -224,7 +224,7 @@ test("registered components: hydration, isolated keyboard tabs, disclosures and 
   page.on("pageerror", (error) => errors.push(error.message));
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/docs/components");
-  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(6);
   await expect(page.locator(".hx-callout")).toHaveCount(5);
   await expect(page.locator(".hx-card")).toHaveCount(2);
   await expect(page.locator(".hx-step")).toHaveCount(3);
@@ -280,7 +280,7 @@ test("registered components: hydration, isolated keyboard tabs, disclosures and 
   });
   await page.goto("/ja/docs/components");
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
-  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(3);
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(4);
   await expect(page.getByRole("tab", { name: "npm", exact: true })).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -295,7 +295,7 @@ test("authoring components support code switching, responsive tables, figures, a
     for (const width of [1280, 390]) {
       await page.setViewportSize({ width, height: 844 });
       await page.goto("/docs/components");
-      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
+      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(6);
       const tree = page.getByRole("group", { name: "Documentation project" });
       const folder = tree.locator("summary").filter({ hasText: /^routes$/ });
       await folder.focus();

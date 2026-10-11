@@ -12,7 +12,7 @@ Upgrades to HonoX, Vite Plus, MDX adapters, or Cloudflare tooling require the fu
 
 ## Consumer-owned templates
 
-Copied routes, renderers, islands, and CSS belong to the consumer application. Package updates do not overwrite them. Compare the old and new template files, merge relevant changes manually, and rerun the application's type and browser checks. Preserve the bundled MIT copyright and permission notice in distributed copies.
+Copied routes, renderers, islands, and CSS belong to the consumer application. Package updates do not overwrite them. Compare the old and new template files, merge relevant changes manually, and rerun the application's type and browser checks. See [Updating existing documentation sites](upgrading-owned-templates.md) for the responsive fixes and a step-by-step merge procedure. Preserve the bundled MIT copyright and permission notice in distributed copies.
 
 Describe required template migrations in release notes, including changed imports, props, paths, or CSS tokens. Independent application customizations must remain intact.
 
