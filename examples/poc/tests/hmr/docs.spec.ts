@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFile, writeFile, unlink } from "node:fs/promises";
 import { join } from "node:path";
-import { gotoConnected, routeStatus } from "./ready";
+import { gotoConnected, waitConnected, routeStatus } from "./ready";
 
 test("MDX save updates body, title, nav and TOC, then rehydrates the island", async ({ page }) => {
   const { root } = JSON.parse(await readFile("dist/evidence/hmr-root.json", "utf8")) as {
@@ -56,16 +56,15 @@ test("MDX save updates body, title, nav and TOC, then rehydrates the island", as
   await expect(page.locator(".hx-tabs").first().getByRole("tabpanel")).toHaveText(
     "npm install honoxpress",
   );
+  // The registry edit restarts Vite. Hydrated HTML can arrive before the new
+  // watcher's initial scan finishes; creating a file then can be ignored as an
+  // initial file rather than an addition. Require watcher readiness in the same
+  // open document before starting the next independent edit.
+  await waitConnected(page, "/docs/components");
   // Add an island after this browser has cached the prebundled HonoX client.
   // App-owned globs must discover it without clearing the browser's cache.
-  // Adding the source triggers HonoX's restart. Observe its automatic document
-  // reload before the separate MDX save, so a reload cannot target a closed
-  // listener while both filesystem events are in flight. Browser cache stays intact.
-  const restarted = page.waitForEvent("framenavigated", {
-    predicate: (frame) =>
-      frame === page.mainFrame() && new URL(frame.url()).pathname === "/docs/components",
-    timeout: 15000,
-  });
+  // An unreferenced source need not navigate the page. Wait until it is part of
+  // the live watch graph before the separate MDX import; no manual reload occurs.
   await writeFile(
     join(root, "app/islands/runtime-probe.tsx"),
     `/** @jsxImportSource hono/jsx */
@@ -76,7 +75,7 @@ export default function RuntimeProbe() {
 }
 `,
   );
-  await restarted;
+  await waitConnected(page, "/docs/components", "app/islands/runtime-probe.tsx");
   await expect(page.locator("html")).toHaveAttribute("data-islands-ready", "true");
   await expect(page.getByText("Registry override applied", { exact: true })).toBeVisible();
   const componentsPath = join(root, "app/routes/docs/components.mdx");
