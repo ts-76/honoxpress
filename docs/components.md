@@ -31,6 +31,8 @@ After installation, finish the MDX and Vite setup in the next section. Existing 
 
 ## Use the shared registry in MDX
 
+The copied `app/client.ts` discovers islands with app-owned `import.meta.glob` calls and passes them to `createClient({ ISLAND_FILES })`. This keeps newly added islands discoverable even when the browser has cached the prebundled HonoX client. Retain that discovery when customizing the client entry.
+
 The generated `app/mdx-components.ts` exports the `components` map and `useMDXComponents` provider. Configure MDX to use that provider and validate tags against the same map:
 
 ```ts

@@ -56,6 +56,31 @@ test("MDX save updates body, title, nav and TOC, then rehydrates the island", as
   await expect(page.locator(".hx-tabs").first().getByRole("tabpanel")).toHaveText(
     "npm install honoxpress",
   );
+  // Add an island after this browser has cached the prebundled HonoX client.
+  // App-owned globs must discover it without clearing the browser's cache.
+  await writeFile(
+    join(root, "app/islands/runtime-probe.tsx"),
+    `/** @jsxImportSource hono/jsx */
+import { useState } from "hono/jsx";
+export default function RuntimeProbe() {
+  const [count, setCount] = useState(0);
+  return <button type="button" onClick={() => setCount(count + 1)}>New island count: {count}</button>;
+}
+`,
+  );
+  const componentsPath = join(root, "app/routes/docs/components.mdx");
+  const components = await readFile(componentsPath, "utf8");
+  await writeFile(
+    componentsPath,
+    components + '\nimport RuntimeProbe from "../../islands/runtime-probe";\n\n<RuntimeProbe />\n',
+  );
+  const probe = page.getByRole("button", { name: "New island count: 0", exact: true });
+  await expect(probe).toBeVisible();
+  await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(5);
+  await probe.click();
+  await expect(
+    page.getByRole("button", { name: "New island count: 1", exact: true }),
+  ).toBeVisible();
 });
 
 test("Japanese MDX add/unlink refreshes navigation, routing and real 404", async ({
