@@ -17,7 +17,6 @@ export function DocsNavigation({
         {pages.map((page) => (
           <li>
             <a href={page.href} aria-current={page.href === pathname ? "page" : undefined}>
-              <span class="nav-mark" aria-hidden="true" />
               {page.title}
             </a>
           </li>
