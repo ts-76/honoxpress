@@ -99,7 +99,7 @@ test("component styles retain their hierarchy and share the docs theme across si
       await expect(page.locator(".code-block code")).toHaveText("pnpm add honoxpress");
       await expect(page.locator(".hx-callout-info")).toHaveCSS(
         "border-top-color",
-        colorScheme === "light" ? "rgb(49, 95, 173)" : "rgb(149, 186, 255)",
+        colorScheme === "light" ? "rgb(28, 91, 195)" : "rgb(149, 186, 255)",
       );
 
       const tab = page.getByRole("tab", { name: "pnpm", exact: true });
@@ -202,7 +202,7 @@ test("copy feedback remains readable during pending and failure states", async (
     );
     await expect(page.locator(".copy-error")).toHaveCSS(
       "color",
-      colorScheme === "light" ? "rgb(176, 60, 75)" : "rgb(244, 161, 174)",
+      colorScheme === "light" ? "rgb(193, 27, 65)" : "rgb(255, 154, 171)",
     );
   }
 });

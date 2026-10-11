@@ -14,10 +14,10 @@
   --docs-line: #d9dfe8;
   --docs-accent: #a34222;
   --docs-tint: #fbede7;
-  --docs-info: #315fad;
-  --docs-tip: #20734f;
-  --docs-warning: #885d12;
-  --docs-danger: #b03c4b;
+  --docs-info: #1c5bc3;
+  --docs-tip: #00754c;
+  --docs-warning: #8a5c00;
+  --docs-danger: #c11b41;
   --docs-code-keyword: var(--docs-accent);
   --docs-code-string: var(--docs-tip);
   --docs-code-number: var(--docs-danger);
@@ -98,9 +98,9 @@
     --docs-accent: #ffad8c;
     --docs-tint: #362821;
     --docs-info: #95baff;
-    --docs-tip: #83cba4;
-    --docs-warning: #efc079;
-    --docs-danger: #f4a1ae;
+    --docs-tip: #6dd09e;
+    --docs-warning: #fabc59;
+    --docs-danger: #ff9aab;
   }
 }
 @media (forced-colors: active) {
