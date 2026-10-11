@@ -51,7 +51,7 @@ if (
 const cfBuild = await json("dist/evidence/cf-build.json");
 if (!cfBuild.passed) throw new Error("cf verification is incomplete");
 const browser = await json("dist/evidence/browser-tests.json");
-if (browser.stats.unexpected !== 0 || browser.stats.expected !== 8)
+if (browser.stats.unexpected !== 0 || browser.stats.expected !== 12)
   throw new Error("Browser verification is incomplete");
 const outputs = {};
 for (const file of [

@@ -184,6 +184,33 @@ export default docsSite;
 | `TableOfContents` | `headings: readonly Heading[]`, `label?: string`                                                               |
 | `LanguageLinks`   | `links: readonly LocaleLink[]`, `locale: string`, `labels: Readonly<Record<string, string>>`, `label?: string` |
 
+## Theme and interaction styles
+
+The layout and standard components share the same CSS custom properties. Override them after the default stylesheet to change the site consistently:
+
+```css
+:root {
+  --docs-accent: #a74113;
+  --docs-tint: #fff2eb;
+  --docs-radius: 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --docs-accent: #f1a277;
+    --docs-tint: #33251e;
+  }
+}
+```
+
+`--docs-bg`, `--docs-surface`, `--docs-text`, `--docs-muted`, and `--docs-line` control the page and component surfaces. `--docs-accent` and `--docs-tint` also control selected tabs, step numbers, links, and keyboard focus. Keep text and focus contrast readable when changing these colors in either theme.
+
+The standard panel radius is 8px (`--docs-radius`); small controls use 4px (`--docs-control-radius`). Spacing uses 4, 8, 16, and 24px (`--docs-space-xs`, `--docs-space-sm`, `--docs-space-md`, and `--docs-space-lg`). Panels share 16px inner padding and 24px outer spacing. Plain Markdown fences and `CodeBlock` share `--docs-code-size` and `--docs-code-font`. Card and step titles use `--docs-title-size` independently of article headings.
+
+Callout colors retain their meanings through `--docs-info`, `--docs-tip`, `--docs-warning`, and `--docs-danger`. The component stylesheet uses system-color fallbacks when loaded without the docs shell and preserves system colors in forced-colors mode.
+
+Controls distinguish hover, pressed, selected, and keyboard-focus states. Focus uses a shared 2px accent outline; scrollable tabs and code areas inset it to keep the outline visible. Card links remain on their titles. Cards collapse to one column at the layout's 760px mobile breakpoint. The copied article styles use low-specificity selectors so they do not override component titles or internal spacing.
+
 ## Start a new site
 
 Published npm `honoxpress@0.1.4` does not have this command. To try the current repository version from a clone, build and pack a candidate, then invoke its CLI source to create a new directory:

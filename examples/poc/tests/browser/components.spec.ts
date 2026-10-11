@@ -1,5 +1,165 @@
 import { test, expect } from "@playwright/test";
 
+test("component styles retain their hierarchy and share the docs theme across sizes", async ({
+  page,
+}, testInfo) => {
+  for (const colorScheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+    for (const width of [1280, 800, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto("/docs/components");
+      await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(3);
+      await expect(page.getByRole("tab", { name: "pnpm", exact: true })).toHaveAttribute(
+        "aria-selected",
+        "true",
+      );
+      const styles = await page.evaluate(() => {
+        const style = (selector: string, pseudo?: string) =>
+          getComputedStyle(document.querySelector(selector)!, pseudo);
+        return {
+          headings: [".hx-card-title", ".hx-step-title"].map((selector) => ({
+            size: style(selector).fontSize,
+            top: style(selector).marginTop,
+            bottom: style(selector).marginBottom,
+          })),
+          calloutGap: style(".hx-callout-title").marginBottom,
+          radii: [
+            ".hx-callout",
+            ".hx-card",
+            ".hx-accordion-item",
+            ".code-block",
+            ".demo-frame",
+          ].map((selector) => style(selector).borderRadius),
+          borders: [".hx-card", ".hx-accordion-item", ".code-block", ".demo-frame"].map(
+            (selector) => style(selector).borderTopColor,
+          ),
+          backgrounds: ["body", ".hx-card", ".hx-accordion-item"].map(
+            (selector) => style(selector).backgroundColor,
+          ),
+          codeSizes: [".prose > pre", ".code-block pre"].map(
+            (selector) => style(selector).fontSize,
+          ),
+          codePadding: [".prose > pre", ".code-block pre"].map(
+            (selector) => style(selector).padding,
+          ),
+          selectedColor: style('.hx-tab[aria-selected="true"]').borderBottomColor,
+          stepColor: style(".hx-step", "::before").color,
+          columns: style(".hx-cards").gridTemplateColumns.split(" ").length,
+          overflow: document.documentElement.scrollWidth > innerWidth,
+        };
+      });
+      const accent = colorScheme === "light" ? "rgb(167, 65, 19)" : "rgb(241, 162, 119)";
+      expect(styles.headings).toEqual([
+        { size: "17px", top: "0px", bottom: "8px" },
+        { size: "17px", top: "0px", bottom: "8px" },
+      ]);
+      expect(styles.calloutGap).toBe("8px");
+      expect(new Set(styles.radii)).toEqual(new Set(["8px"]));
+      expect(new Set(styles.borders).size).toBe(1);
+      expect(new Set(styles.backgrounds).size).toBe(1);
+      expect(styles.codeSizes).toEqual(["13px", "13px"]);
+      expect(styles.codePadding).toEqual(["16px", "16px"]);
+      expect(styles.selectedColor).toBe(accent);
+      expect(styles.stepColor).toBe(accent);
+      expect(styles.columns).toBe(width <= 760 ? 1 : 2);
+      expect(styles.overflow).toBe(false);
+
+      const tab = page.getByRole("tab", { name: "pnpm", exact: true });
+      await tab.focus();
+      await page.keyboard.press("ArrowRight");
+      const selected = page.getByRole("tab", { name: "npm", exact: true });
+      await expect(selected).toBeFocused();
+      await expect(selected).toHaveCSS("outline-color", accent);
+      await expect(selected).toHaveCSS("outline-width", "2px");
+      await expect(selected).toHaveCSS("outline-offset", "-4px");
+      await expect(page.locator(".hx-tabs").first().getByRole("tabpanel")).toHaveText(
+        "npm install honoxpress",
+      );
+      if (width === 1280) {
+        await page
+          .locator(".hx-tabs")
+          .first()
+          .screenshot({
+            path: testInfo.outputPath(`tabs-focus-${colorScheme}.png`),
+          });
+        await selected.hover();
+        await expect(selected).toHaveCSS(
+          "background-color",
+          colorScheme === "light" ? "rgb(247, 247, 248)" : "rgb(32, 33, 38)",
+        );
+        await page.mouse.down();
+        await expect(selected).toHaveCSS(
+          "background-color",
+          colorScheme === "light" ? "rgb(255, 242, 235)" : "rgb(51, 37, 30)",
+        );
+        await page.mouse.up();
+      }
+      await page.getByRole("heading", { name: "Components", exact: true }).click();
+      if (width !== 800) {
+        await page.screenshot({
+          path: testInfo.outputPath(`components-${width}-${colorScheme}.png`),
+          fullPage: true,
+        });
+        await page.locator(".hx-cards").screenshot({
+          path: testInfo.outputPath(`cards-${width}-${colorScheme}.png`),
+        });
+      }
+    }
+  }
+
+  // A site-level customization must reach navigation and interactive components alike.
+  await page.addStyleTag({ content: ":root { --docs-accent: #94612f; --docs-radius: 12px; }" });
+  await expect(page.locator('.docs-nav a[aria-current="page"]').first()).toHaveCSS(
+    "color",
+    "rgb(148, 97, 47)",
+  );
+  await expect(page.locator('.hx-tab[aria-selected="true"]').first()).toHaveCSS(
+    "border-bottom-color",
+    "rgb(148, 97, 47)",
+  );
+  await expect(page.locator(".hx-card").first()).toHaveCSS("border-radius", "12px");
+  await expect(page.locator(".code-block")).toHaveCSS("border-radius", "12px");
+  await page.emulateMedia({ forcedColors: "active" });
+  await expect(page.locator(".hx-card").first()).toHaveCSS("border-top-style", "solid");
+  await expect(page.locator('.hx-tab[aria-selected="true"]').first()).toHaveCSS(
+    "border-bottom-style",
+    "solid",
+  );
+});
+
+test("copy feedback remains readable during pending and failure states", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      value: {
+        writeText: () =>
+          new Promise((_, reject) => {
+            window.addEventListener("test-clipboard-denied", () => reject(new Error("Denied")), {
+              once: true,
+            });
+          }),
+      },
+    });
+  });
+  for (const colorScheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme });
+    await page.goto("/docs/components");
+    await expect(page.locator('[data-hono-hydrated="true"]')).toHaveCount(3);
+    const copy = page.getByRole("button", { name: "Copy example", exact: true });
+    await copy.click();
+    await expect(copy).toBeDisabled();
+    await expect(copy).toHaveCSS("cursor", "wait");
+    await page.evaluate(() => window.dispatchEvent(new Event("test-clipboard-denied")));
+    await expect(copy).toBeEnabled();
+    await expect(page.locator(".code-block").getByRole("status")).toHaveText(
+      "Copy failed. Select and copy the code manually.",
+    );
+    await expect(page.locator(".copy-error")).toHaveCSS(
+      "color",
+      colorScheme === "light" ? "rgb(185, 28, 28)" : "rgb(252, 165, 165)",
+    );
+  }
+});
+
 test("registered components: hydration, isolated keyboard tabs, disclosures and clipboard", async ({
   page,
   context,

@@ -66,7 +66,7 @@ const fixture = async (t) => {
       workspaceOrSourceLinks: false,
       packageStaleOutputRemoved: true,
     },
-    validation: { buildTests: 5, browserTests: 8, clientSSGWorker: "passed", cfBuild: "passed" },
+    validation: { buildTests: 5, browserTests: 12, clientSSGWorker: "passed", cfBuild: "passed" },
     starter: {
       packageInstalledFromTarball: true,
       cliInitStarter: true,

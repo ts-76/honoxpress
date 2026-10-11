@@ -84,7 +84,7 @@ export async function inspectArtifact({ root = process.cwd(), artifactRoot = roo
   assert.equal(evidence.externalConsumer.workspaceOrSourceLinks, false);
   assert.equal(evidence.externalConsumer.packageStaleOutputRemoved, true);
   assert.equal(evidence.validation.buildTests, 5);
-  assert.equal(evidence.validation.browserTests, 8);
+  assert.equal(evidence.validation.browserTests, 12);
   assert.equal(evidence.validation.clientSSGWorker, "passed");
   assert.equal(evidence.validation.cfBuild, "passed");
   for (const key of [
