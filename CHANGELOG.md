@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/ts-76/honoxpress/compare/v0.2.0...v0.2.1) (2026-10-11)
+
+
+### Bug Fixes
+
+* stabilize responsive docs component templates ([#31](https://github.com/ts-76/honoxpress/issues/31)) ([21cedda](https://github.com/ts-76/honoxpress/commit/21ceddaa24df8843829320fa992f5c7dde03a99a))
+
 ## [0.2.0](https://github.com/ts-76/honoxpress/compare/v0.1.4...v0.2.0) (2026-10-11)
 
 
