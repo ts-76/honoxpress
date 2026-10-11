@@ -4,20 +4,20 @@
   color-scheme: light dark;
 
   /* Canvas is pinned to #F4F5F7. Cool neutrals use OKLCH hue 260;
-     the rust accent uses hue 45 with restrained chroma. Hex values are
+     the rust accent and semantic colors carry deliberate chroma. Hex values are
      rounded sRGB outputs; check-theme.mjs reports their actual metrics. */
   --docs-bg: #f4f5f7;
   --docs-panel: #ffffff;
-  --docs-surface: #ebeef3;
-  --docs-text: #262c34;
-  --docs-muted: #5f6773;
-  --docs-line: #d0d5de;
-  --docs-accent: #894a2d;
+  --docs-surface: #fafbfd;
+  --docs-text: #202833;
+  --docs-muted: #515f72;
+  --docs-line: #d9dfe8;
+  --docs-accent: #a34222;
   --docs-tint: #fbede7;
-  --docs-info: #485e82;
-  --docs-tip: #416753;
-  --docs-warning: #7b5d31;
-  --docs-danger: #90464b;
+  --docs-info: #315fad;
+  --docs-tip: #20734f;
+  --docs-warning: #885d12;
+  --docs-danger: #b03c4b;
   --docs-code-keyword: var(--docs-accent);
   --docs-code-string: var(--docs-tip);
   --docs-code-number: var(--docs-danger);
@@ -95,12 +95,12 @@
     --docs-text: #e5e8ed;
     --docs-muted: #a0a8b6;
     --docs-line: #383d46;
-    --docs-accent: #e8a587;
+    --docs-accent: #ffad8c;
     --docs-tint: #362821;
-    --docs-info: #a5b9d8;
-    --docs-tip: #9fc1ae;
-    --docs-warning: #d1ba9b;
-    --docs-danger: #e1a6a6;
+    --docs-info: #95baff;
+    --docs-tip: #83cba4;
+    --docs-warning: #efc079;
+    --docs-danger: #f4a1ae;
   }
 }
 @media (forced-colors: active) {

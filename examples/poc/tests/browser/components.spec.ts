@@ -42,6 +42,10 @@ test("component styles retain their hierarchy and share the docs theme across si
             (selector) => style(selector).backgroundColor,
           ),
           canvas: style("body").backgroundColor,
+          header: style(".site-header").backgroundColor,
+          codeSurfaces: [".prose > pre", ".code-block"].map(
+            (selector) => style(selector).backgroundColor,
+          ),
           panelPadding: style(".hx-card").padding,
           blockGap: style(".hx-cards").marginTop,
           sectionGap: style(".prose > h2").marginTop,
@@ -60,7 +64,7 @@ test("component styles retain their hierarchy and share the docs theme across si
           overflow: document.documentElement.scrollWidth > innerWidth,
         };
       });
-      const accent = colorScheme === "light" ? "rgb(137, 74, 45)" : "rgb(232, 165, 135)";
+      const accent = colorScheme === "light" ? "rgb(163, 66, 34)" : "rgb(255, 173, 140)";
       expect(styles.headings).toEqual([
         { size: "18px", top: "0px", bottom: "8px" },
         { size: "18px", top: "0px", bottom: "8px" },
@@ -72,6 +76,10 @@ test("component styles retain their hierarchy and share the docs theme across si
       expect(styles.backgrounds[0]).not.toBe(styles.canvas);
       expect(styles.canvas).toBe(
         colorScheme === "light" ? "rgb(244, 245, 247)" : "rgb(24, 27, 31)",
+      );
+      expect(styles.header).toBe(styles.backgrounds[0]);
+      expect(styles.codeSurfaces).toEqual(
+        Array(2).fill(colorScheme === "light" ? "rgb(250, 251, 253)" : "rgb(39, 42, 48)"),
       );
       expect(styles.typeRoles).toEqual(["18px", "24px", "14px"]);
       expect(styles.blockGap).toBe("20px");
@@ -91,7 +99,7 @@ test("component styles retain their hierarchy and share the docs theme across si
       await expect(page.locator(".code-block code")).toHaveText("pnpm add honoxpress");
       await expect(page.locator(".hx-callout-info")).toHaveCSS(
         "border-top-color",
-        colorScheme === "light" ? "rgb(72, 94, 130)" : "rgb(165, 185, 216)",
+        colorScheme === "light" ? "rgb(49, 95, 173)" : "rgb(149, 186, 255)",
       );
 
       const tab = page.getByRole("tab", { name: "pnpm", exact: true });
@@ -114,7 +122,7 @@ test("component styles retain their hierarchy and share the docs theme across si
         await selected.hover();
         await expect(selected).toHaveCSS(
           "background-color",
-          colorScheme === "light" ? "rgb(235, 238, 243)" : "rgb(39, 42, 48)",
+          colorScheme === "light" ? "rgb(250, 251, 253)" : "rgb(39, 42, 48)",
         );
         await page.mouse.down();
         await expect(selected).toHaveCSS(
@@ -194,7 +202,7 @@ test("copy feedback remains readable during pending and failure states", async (
     );
     await expect(page.locator(".copy-error")).toHaveCSS(
       "color",
-      colorScheme === "light" ? "rgb(144, 70, 75)" : "rgb(225, 166, 166)",
+      colorScheme === "light" ? "rgb(176, 60, 75)" : "rgb(244, 161, 174)",
     );
   }
 });
