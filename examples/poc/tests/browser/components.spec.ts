@@ -75,7 +75,7 @@ test("component styles retain their hierarchy and share the docs theme across si
       expect(new Set(styles.backgrounds).size).toBe(1);
       expect(styles.backgrounds[0]).not.toBe(styles.canvas);
       expect(styles.canvas).toBe(
-        colorScheme === "light" ? "rgb(244, 245, 247)" : "rgb(24, 27, 31)",
+        colorScheme === "light" ? "rgb(249, 250, 251)" : "rgb(24, 27, 31)",
       );
       expect(styles.header).toBe(styles.backgrounds[0]);
       expect(styles.codeSurfaces).toEqual(

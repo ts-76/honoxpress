@@ -112,7 +112,7 @@ For the tested HonoX 0.1.61 / Vite Plus 1.0.0 setup, also copy the example's [wa
 
 The [component system guide](https://github.com/ts-76/honoxpress/blob/main/docs/components.md) documents the shared MDX registry, all built-in component props, the site layout and configuration, CLI commands, and the runnable HonoX starter. In MDX, register components once and use tags such as `<Callout>`, `<Cards>`, `<Tabs>`, and `<CodeBlock>` without per-page imports.
 
-Installed JSX, island, and CSS files belong to the application and can be edited directly. Keep interactive islands under `app/islands` so HonoX discovers and hydrates them. The default public `style.css` imports `components.css`, which imports `tokens.css`. The shared tokens define reading typography, cool neutral surfaces based on #F4F5F7, and semantic spacing roles; retain both imports to use the standard styles. Nimbus and Fumapress informed the independently implemented layout hierarchy and component patterns; no upstream source or assets were copied. Preserve the MIT notice when distributing copied templates.
+Installed JSX, island, and CSS files belong to the application and can be edited directly. Keep interactive islands under `app/islands` so HonoX discovers and hydrates them. The default public `style.css` imports `components.css`, which imports `tokens.css`. The shared tokens define reading typography, cool neutral surfaces based on #F9FAFB, and semantic spacing roles; retain both imports to use the standard styles. Nimbus and Fumapress informed the independently implemented layout hierarchy and component patterns; no upstream source or assets were copied. Preserve the MIT notice when distributing copied templates.
 
 ## Scope and compatibility
 

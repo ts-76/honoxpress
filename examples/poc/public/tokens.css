@@ -3,10 +3,10 @@
 :root {
   color-scheme: light dark;
 
-  /* Canvas is pinned to #F4F5F7. Cool neutrals use OKLCH hue 260;
+  /* Canvas is pinned to #F9FAFB. Surfaces use very low-chroma cool neutrals;
      the rust accent and semantic colors carry deliberate chroma. Hex values are
      rounded sRGB outputs; check-theme.mjs reports their actual metrics. */
-  --docs-bg: #f4f5f7;
+  --docs-bg: #f9fafb;
   --docs-panel: #ffffff;
   --docs-surface: #fafbfd;
   --docs-text: #202833;

@@ -208,7 +208,7 @@ The layout and standard components import one shared `public/tokens.css`. It sep
 
 | Role                            | Token                                                  | Default                                      |
 | ------------------------------- | ------------------------------------------------------ | -------------------------------------------- |
-| Reading canvas                  | `--docs-bg`                                            | `#F4F5F7` / cool charcoal                    |
+| Reading canvas                  | `--docs-bg`                                            | `#F9FAFB` / cool charcoal                    |
 | Component panels                | `--docs-panel`                                         | White / raised cool charcoal                 |
 | Code and hover surfaces         | `--docs-surface`                                       | Near-white code and hover surface            |
 | Text / secondary text / borders | `--docs-text`, `--docs-muted`, `--docs-line`           | Separate contrast levels in each theme       |
@@ -230,7 +230,7 @@ Callout colors retain their meanings through `--docs-info`, `--docs-tip`, `--doc
 
 Controls distinguish hover, pressed, selected, disabled, and keyboard-focus states. Focus uses a shared 2px accent outline; scrollable tabs and code areas inset it to keep the outline visible. Card links remain on their titles. Cards collapse to one column at the layout's 760px mobile breakpoint. Low-specificity article selectors preserve component titles and internal spacing.
 
-The light canvas is pinned to `#F4F5F7`. Neutral surfaces use a low-chroma OKLCH hue near 260°, while the rust accent keeps a hue near 40°. The rust accent and semantic colors use more chroma than the neutral canvas to distinguish navigation, callouts, and syntax. Code surfaces are near-white in the light theme; the header uses the white panel role. The stylesheet ships rounded sRGB hex colors. Chroma describes perceptual color intensity; it is separate from the relative luminance used for contrast.
+The light canvas is pinned to `#F9FAFB`. Neutral surfaces use very low-chroma cool hues, while the rust accent keeps a hue near 40°. The rust accent and semantic colors use more chroma than the neutral canvas to distinguish navigation, callouts, and syntax. Code surfaces are near-white in the light theme; the header uses the white panel role. The stylesheet ships rounded sRGB hex colors. Chroma describes perceptual color intensity; it is separate from the relative luminance used for contrast.
 
 Run `pnpm check:theme` from this repository to report the actual OKLCH coordinates, relative luminance, and contrast of both palettes. This is also part of `pnpm verify`: normal text pairs must reach 4.5:1, and focus colors must reach 3:1 against the supported surfaces. It checks the default tokens, standard Callout text/title/border pairs, and syntax colors, rather than claiming complete accessibility conformance. The calculations follow [CSS Color 4](https://www.w3.org/TR/css-color-4/#ok-lab) and [WCAG 2.2 relative luminance](https://www.w3.org/TR/WCAG22/#dfn-relative-luminance).
 
