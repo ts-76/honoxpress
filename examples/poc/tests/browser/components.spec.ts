@@ -419,6 +419,15 @@ test("theme choice persists before rendering, follows the OS, syncs tabs, and wo
   });
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/docs/components");
+  const propertyColumnRatio = await page
+    .locator(".hx-type-table table")
+    .first()
+    .evaluate(
+      (table) =>
+        table.querySelector("th")!.getBoundingClientRect().width /
+        table.getBoundingClientRect().width,
+    );
+  expect(propertyColumnRatio).toBeCloseTo(0.32, 2);
   const desktop = page.locator(".theme-desktop select");
   await expect(desktop).toHaveValue("system");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");

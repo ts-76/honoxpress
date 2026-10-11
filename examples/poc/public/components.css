@@ -366,7 +366,7 @@
   overflow-wrap: anywhere;
 }
 .hx-type-table th:first-child {
-  width: max(32%, 8rem);
+  width: 32%;
 }
 .hx-type-table thead {
   background: var(--docs-surface);
@@ -623,6 +623,9 @@
   min-height: 44px;
 }
 @media (max-width: 480px) {
+  .hx-type-table th:first-child {
+    width: 8.5rem;
+  }
   .hx-definition-row {
     grid-template-columns: 1fr;
     gap: var(--docs-space-1);
