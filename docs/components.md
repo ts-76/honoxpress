@@ -280,25 +280,34 @@ The layout group installs `DocsLayout` in `app/components/docs-layout.tsx`, its 
 The config template has this shape:
 
 ```ts
-import type { DocsSiteConfig } from "honoxpress/templates/docs-layout.tsx";
+import { defineDocsConfig } from "honoxpress";
 
-const docsSite = {
+const docsSite = defineDocsConfig({
   name: "Your project",
+  defaultLocale: "en",
   homeHref: "/",
+  docsHref: "/docs/getting-started",
   repositoryHref: "https://github.com/your-org/your-project",
   stylesheetHref: "/style.css",
+  themeSwitch: true,
   localeLabels: { en: "English", ja: "日本語" },
   labels: {
     en: { nav: "Documentation", toc: "On this page", skip: "Skip to content" },
     ja: { nav: "ドキュメント", toc: "このページの内容", skip: "本文へ移動" },
   },
   footer: "Documentation maintained by your team.",
-} satisfies DocsSiteConfig;
+});
 
 export default docsSite;
 ```
 
-`name` and `localeLabels` are required. `homeHref` defaults to `/`; `repositoryHref`, `footer`, and locale-specific `labels` are optional. `stylesheetHref` defaults to `/style.css`. The layout renders a responsive header, language links, sidebar, breadcrumbs, desktop and mobile TOCs, skip link, main content, and optional footer. `DocsNavigation`, `TableOfContents`, and `LanguageLinks` are also available from the copied `docs-ui.tsx` if your app composes a different layout.
+`name`, `defaultLocale`, and `localeLabels` are required. `defineDocsConfig` validates locale codes, display labels, and that the default belongs to the configured languages when the file is loaded. `DocsSiteConfig` and `DocsLayoutLabels` are exported from `honoxpress` (and re-exported by the layout template). `homeHref` defaults to `/`; `docsHref` selects the default-language documentation entry and defaults to `/docs/getting-started` in the starter. `repositoryHref`, `footer`, and locale-specific `labels` are optional. `stylesheetHref` defaults to `/style.css`. The layout renders a responsive header, language links, sidebar, breadcrumbs, desktop and mobile TOCs, skip link, main content, and optional footer. `DocsNavigation`, `TableOfContents`, and `LanguageLinks` are also available from the copied `docs-ui.tsx` if your app composes a different layout.
+
+The generated starter reads `app/docs.config.ts` in Vite, the docs-only SSG filter, the renderer, the home page, and the 404 handler. Change the site settings there; no separate language arrays or default-language constants need editing. Available languages come from `Object.keys(docsSite.localeLabels)`, and `resolveDocsLocale(pathname, docsSite)` handles complete locale path segments with the configured default as the fallback. Resolved documentation pages use their catalog locale.
+
+For Japanese as the default, set `defaultLocale: "ja"` while retaining `ja` in `localeLabels`. Author Japanese pages at `app/routes/docs/*.mdx` (URLs `/docs/*`) and English translations at `app/routes/en/docs/*.mdx` (URLs `/en/docs/*`). When changing the default on an existing multilingual site, move the previously prefixed default-language pages and prefix the former default's translations accordingly; changing configuration does not translate or move content. Add languages by adding labels and their MDX files, without editing build settings. `docsHref` always points to an existing default-language page without a locale prefix.
+
+**Existing installations:** add `defaultLocale` to the owned config and connect the renderer/build files to it as above (the CLI preserves existing files). Import `defineDocsConfig` and the config types from the updated package. Set `docsHref` when your first page uses a different slug. Cloudflare account, Worker names/domains, and deployment credentials remain in deployment configuration; CSS tokens and authored content remain application source.
 
 | Layout helper     | Props                                                                                                          |
 | ----------------- | -------------------------------------------------------------------------------------------------------------- |

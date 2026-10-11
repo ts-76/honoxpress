@@ -15,6 +15,7 @@ import {
   remarkDocsCode,
 } from "honoxpress/build";
 import { components } from "./app/mdx-components";
+import docsSite from "./app/docs.config";
 import { docsOnlyPlugin } from "./build/docs-only.ts";
 
 function audit(target: string): Plugin {
@@ -102,7 +103,11 @@ export default defineConfig(({ mode }) => {
       options: { typeAware: true, typeCheck: true },
     },
     plugins: lazyPlugins(async () => [
-      docsMetadataPlugin({ locales: ["en", "ja"], defaultLocale: "en", worker: mode === "worker" }),
+      docsMetadataPlugin({
+        locales: Object.keys(docsSite.localeLabels),
+        defaultLocale: docsSite.defaultLocale,
+        worker: mode === "worker",
+      }),
       honox({ entry: mode === "worker" ? "./app/worker.ts" : "./app/server.ts" }),
       ...(mode === "worker"
         ? []

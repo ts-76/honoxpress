@@ -7,6 +7,7 @@ import {
   readFile,
   readdir,
   realpath,
+  rename,
   rm,
   writeFile,
 } from "node:fs/promises";
@@ -40,7 +41,9 @@ async function availablePort() {
   return address.port;
 }
 
-async function smokeDevServer(directory, port) {
+async function smokeDevServer(directory, port, configuration) {
+  const docsPath = configuration?.docsHref ?? "/docs/getting-started";
+  const defaultLocale = configuration?.defaultLocale ?? "en";
   const child = spawn("pnpm", ["dev"], {
     cwd: directory,
     env: process.env,
@@ -61,7 +64,7 @@ async function smokeDevServer(directory, port) {
       if (child.exitCode !== null)
         throw new Error(`starter dev server exited early:\n${output.slice(-6000)}`);
       try {
-        docsResponse = await fetch(`http://127.0.0.1:${port}/docs/getting-started`, {
+        docsResponse = await fetch(`http://127.0.0.1:${port}${docsPath}`, {
           signal: AbortSignal.timeout(2_000),
         });
         if (docsResponse.status === 200) break;
@@ -78,6 +81,39 @@ async function smokeDevServer(directory, port) {
     const docsHtml = await docsResponse.text();
     assert.match(docsHtml, /Getting started/);
     assert.match(docsHtml, /hx-callout/);
+    assert.ok(
+      docsHtml.includes(`<html lang="${defaultLocale}"`),
+      "default document language must follow site config",
+    );
+    if (configuration) {
+      assert.ok(docsHtml.includes(`· ${configuration.name}</title>`));
+      assert.ok(docsHtml.includes(configuration.footer));
+      assert.ok(!docsHtml.includes("data-hx-theme-switch"), "themeSwitch=false must omit controls");
+      assert.ok(docsHtml.includes('href="/custom.css"'));
+      for (const locale of ["en", "fr"]) {
+        const pathname = `/${locale}${docsPath}`;
+        assert.ok(
+          docsHtml.includes(`href="${pathname}"`),
+          "language links must follow defaultLocale",
+        );
+        const response = await fetch(`http://127.0.0.1:${port}${pathname}`);
+        assert.equal(response.status, 200);
+        const translated = await response.text();
+        assert.ok(translated.includes(`<html lang="${locale}"`));
+        assert.ok(translated.includes(`href="${docsPath}"`));
+      }
+      const home = await (await fetch(`http://127.0.0.1:${port}/`)).text();
+      assert.ok(home.includes(`<html lang="${defaultLocale}"`));
+      assert.ok(home.includes(`<h1>${configuration.name}</h1>`));
+      assert.ok(home.includes(`href="${docsPath}"`));
+      const missing = await fetch(`http://127.0.0.1:${port}/fr/missing`);
+      assert.equal(missing.status, 404);
+      const missingHtml = await missing.text();
+      assert.ok(missingHtml.includes('<html lang="fr"'));
+      assert.ok(missingHtml.includes(`href="${docsPath}"`));
+      assert.ok(missingHtml.includes(`404 · ${configuration.name}</title>`));
+      assert.ok(missingHtml.includes('href="/custom.css"'));
+    }
     const demoResponse = await fetch(`http://127.0.0.1:${port}/demo/clock`, {
       signal: AbortSignal.timeout(5_000),
     });
@@ -128,6 +164,7 @@ export async function verifyStarter({ tarball, run, artifacts }) {
     workerCompilerIsolation: false,
     cloudflareDryRun: false,
     developmentHttp: null,
+    siteConfiguration: false,
     temporaryFixtureRemoved: false,
   };
 
@@ -231,12 +268,66 @@ export async function verifyStarter({ tarball, run, artifacts }) {
     manifest.scripts.dev = (manifest.scripts.dev ?? "").replace(/--port\s+\d+/, `--port ${port}`);
     await writeFile(packagePath, `${JSON.stringify(manifest, null, 2)}\n`);
     evidence.developmentHttp = await smokeDevServer(project, port);
+    // Change only site configuration for language/build/layout behavior. Content
+    // files remain authored separately and follow the chosen URL convention.
+    const siteConfigPath = path.join(project, "app/docs.config.ts");
+    const siteConfig = await readFile(siteConfigPath, "utf8");
+    await writeFile(
+      siteConfigPath,
+      siteConfig
+        .replace('name: "Your project"', 'name: "Configured documentation"')
+        .replace('defaultLocale: "en"', 'defaultLocale: "ja"')
+        .replace('docsHref: "/docs/getting-started"', 'docsHref: "/docs/welcome"')
+        .replace('stylesheetHref: "/style.css"', 'stylesheetHref: "/custom.css"')
+        .replace("themeSwitch: true", "themeSwitch: false")
+        .replace('en: "English",', 'en: "English", fr: "Français",')
+        .replace('footer: "Documentation maintained by your team."', 'footer: "Configured footer"'),
+    );
+    await rename(
+      path.join(project, "app/routes/docs/getting-started.mdx"),
+      path.join(project, "app/routes/docs/welcome.mdx"),
+    );
+    for (const locale of ["en", "fr"]) {
+      await mkdir(path.join(project, `app/routes/${locale}/docs`), { recursive: true });
+      await writeFile(
+        path.join(project, `app/routes/${locale}/docs/welcome.mdx`),
+        `---\ntitle: ${locale} translation\n---\n\n# ${locale} translation\n\nTranslated documentation.\n`,
+      );
+    }
+    await writeFile(
+      path.join(project, "public/custom.css"),
+      await readFile(path.join(project, "public/style.css")),
+    );
+    await run("pnpm", ["typecheck"], project);
+    await run("pnpm", ["build"], project);
+    const configuredHtmlPaths = [];
+    for (const [relative, locale] of [
+      ["docs", "ja"],
+      ["en/docs", "en"],
+      ["fr/docs", "fr"],
+    ]) {
+      const generated = (await filesBelow(dist)).filter(
+        (file) => path.relative(dist, file).replaceAll("\\", "/") === `${relative}/welcome.html`,
+      );
+      assert.equal(generated.length, 1, `missing configured ${locale} SSG page`);
+      configuredHtmlPaths.push(generated[0]);
+      const generatedHtml = await readFile(generated[0], "utf8");
+      assert.ok(generatedHtml.includes(`<html lang="${locale}"`));
+      assert.ok(generatedHtml.includes("Configured documentation"));
+    }
+    await smokeDevServer(project, port, {
+      docsHref: "/docs/welcome",
+      defaultLocale: "ja",
+      name: "Configured documentation",
+      footer: "Configured footer",
+    });
+    evidence.siteConfiguration = true;
     evidence.packageName = manifest.name;
     evidence.packageVersion = installedPackage.version;
     evidence.starterLockfileSha256 = createHash("sha256")
       .update(await readFile(path.join(project, "pnpm-lock.yaml")))
       .digest("hex");
-    evidence.buildOutputPages = htmlPaths.map((file) => path.relative(project, file));
+    evidence.buildOutputPages = configuredHtmlPaths.map((file) => path.relative(project, file));
     succeeded = true;
     console.log("Packed HonoXpress starter verification passed");
     return evidence;

@@ -97,6 +97,7 @@ export async function inspectArtifact({ root = process.cwd(), artifactRoot = roo
     "workerCompilerIsolation",
     "cloudflareDryRun",
     "temporaryFixtureRemoved",
+    "siteConfiguration",
   ])
     assert.equal(evidence.starter?.[key], true, `Starter verification missing: ${key}`);
   assert.equal(evidence.starter.developmentHttp.docsStatus, 200);
@@ -105,7 +106,7 @@ export async function inspectArtifact({ root = process.cwd(), artifactRoot = roo
     assert.deepEqual(evidence.graphs[target].docsCompilerOrBuildModules, []);
   const unit = await json(path.join(artifactRoot, "artifacts/package-tests.json"));
   assert.equal(unit.success, true);
-  assert.equal(unit.numPassedTests, 26);
+  assert.equal(unit.numPassedTests, 28);
   assert.equal(unit.numFailedTests, 0);
   return {
     pkg,

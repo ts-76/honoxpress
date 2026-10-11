@@ -42,11 +42,16 @@ This example supplies metadata directly. For an MDX application, `docsMetadataPl
 | Export                                                | Purpose                                                                                          |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | `createDocsCatalog(options)`                          | Validate metadata and build an immutable page catalog                                            |
+| `defineDocsConfig(config)`                            | Validate the app-owned site's default language and language labels                               |
+| `resolveDocsLocale(pathname, config)`                 | Resolve a full locale path segment, falling back to the configured default                       |
+| `DocsSiteConfig`, `DocsLayoutLabels`                  | Shared types for site identity, links, languages, layout labels, and theme controls              |
 | `resolveClientScript(manifest, entry)`                | Resolve a client script URL from its production build manifest; fail on missing or unsafe assets |
 | `DocsEntry`, `DocsPage`, `DocsOptions`, `DocsCatalog` | Types for catalog inputs, pages, options, and queries                                            |
 | `Heading`, `LocaleLink`, `ClientManifest`             | Types for headings, optional translation links, and client manifests                             |
 
 The runtime entry contains no Node API or MDX compiler.
+
+The generated starter reads site settings from `app/docs.config.ts` for Vite, docs SSG, rendering, home links, and 404 pages. Use `defineDocsConfig({ name, defaultLocale, localeLabels, ... })` there; `localeLabels` keys are the supported languages. The default language has unprefixed `/docs/*` URLs, while other languages use `/<locale>/docs/*`. `docsHref` selects the default-language entry page. Changing the default requires placing authored content in the corresponding directories, but no separate build/renderer language constants need editing. See the [configuration guide](https://github.com/ts-76/honoxpress/blob/main/docs/components.md#layout-and-site-configuration).
 
 ## Routes and frontmatter
 
@@ -94,11 +99,13 @@ Register the metadata plugin before HonoX. Register `remarkDocsHeadings` after t
 
 ```ts
 docsMetadataPlugin({
-  locales: ["en", "ja"],
-  defaultLocale: "en",
+  locales: Object.keys(docsSite.localeLabels),
+  defaultLocale: docsSite.defaultLocale,
   worker: mode === "worker",
 });
 ```
+
+Here `docsSite` is the default export of your `app/docs.config.ts`; use the same values in `docsOnlyPlugin` and your renderer.
 
 Development and SSG discover route metadata. Worker mode returns an empty catalog without reading or importing MDX. **HonoX's default eager router still imports MDX bodies:** to exclude them from the Worker, use `honox/server/base` with literal globs selecting only dynamic routes and layouts. The SSG filter does not remove Worker imports.
 

@@ -11,7 +11,9 @@ pnpm install
 pnpm dev
 ```
 
-Open <http://127.0.0.1:5173/docs/getting-started>. Edit `app/routes/docs/getting-started.mdx` to change the first page. Set the site name and language labels in `app/docs.config.ts`. Components are registered in `app/mdx-components.ts`; add or replace components there and use them without per-page imports.
+Open <http://127.0.0.1:5173/docs/getting-started>. Edit `app/routes/docs/getting-started.mdx` to change the first page. Set the site name, default language, language labels, documentation entry, repository link, stylesheet, footer, and theme control in `app/docs.config.ts`. Vite, SSG, and page rendering share that configuration. Components are registered in `app/mdx-components.ts`; add or replace components there and use them without per-page imports.
+
+The default-language pages live in `app/routes/docs` and have unprefixed `/docs` URLs. For `defaultLocale: "ja"`, put Japanese content there and English translations in `app/routes/en/docs` (`/en/docs` URLs). Changing the default on an existing site requires moving its content to match that convention. `localeLabels` controls the available languages; add a label and its translated MDX files to enable another language. `docsHref` controls the link from the home/404 pages to your default-language first page. `defineDocsConfig` validates the language settings when the application/build loads them.
 
 ## Build and preview
 

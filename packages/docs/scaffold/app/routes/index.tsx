@@ -8,7 +8,7 @@ export default createRoute((c) =>
       <p>A small, editable foundation for your project documentation.</p>
       <ul>
         <li>
-          <a href="/docs/getting-started">Get started</a>
+          <a href={docsSite.docsHref ?? "/docs/getting-started"}>Get started</a>
         </li>
         <li>
           <a href="/demo/clock">Open the live demo</a>

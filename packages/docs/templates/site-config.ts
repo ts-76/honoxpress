@@ -1,11 +1,14 @@
-import type { DocsSiteConfig } from "honoxpress/templates/docs-layout.tsx";
+import { defineDocsConfig } from "honoxpress";
 
 /** Copy to app/docs.config.ts and adjust these values for your site. */
-const docsSite = {
+const docsSite = defineDocsConfig({
   name: "Your project",
+  defaultLocale: "en",
   homeHref: "/",
+  docsHref: "/docs/getting-started",
   repositoryHref: "https://github.com/your-org/your-project",
   stylesheetHref: "/style.css",
+  themeSwitch: true,
   localeLabels: {
     en: "English",
     ja: "日本語",
@@ -23,6 +26,6 @@ const docsSite = {
     },
   },
   footer: "Documentation maintained by your team.",
-} satisfies DocsSiteConfig;
+});
 
 export default docsSite;

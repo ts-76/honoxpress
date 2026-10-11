@@ -43,7 +43,7 @@ if (unit.numPassedTests !== 5 || unit.numFailedTests !== 0 || !unit.success)
   throw new Error("Unit verification is incomplete");
 const packageTests = await json("../../artifacts/package-tests.json");
 if (
-  packageTests.numPassedTests !== 26 ||
+  packageTests.numPassedTests !== 28 ||
   packageTests.numFailedTests !== 0 ||
   !packageTests.success
 )

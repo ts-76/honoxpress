@@ -1,9 +1,10 @@
 import type { NotFoundHandler } from "hono";
+import { resolveDocsLocale } from "honoxpress";
 import docsSite from "../docs.config";
 
 const notFound: NotFoundHandler = (c) =>
   c.html(
-    <html lang="en">
+    <html lang={resolveDocsLocale(c.req.path, docsSite)}>
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -14,7 +15,7 @@ const notFound: NotFoundHandler = (c) =>
         <main class="home-main prose">
           <h1>Page not found</h1>
           <p>The page may have moved or the URL may be incorrect.</p>
-          <a href="/docs/getting-started">Open the documentation</a>
+          <a href={docsSite.docsHref ?? "/docs/getting-started"}>Open the documentation</a>
         </main>
       </body>
     </html>,

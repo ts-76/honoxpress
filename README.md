@@ -75,6 +75,8 @@ The build runs **client → docs SSG → Worker**. Local production preview uses
 
 ## Add MDX pages
 
+The generated starter centralizes site name, default language, language labels, documentation entry, links, and theme controls in `app/docs.config.ts` using `defineDocsConfig`. Vite, the SSG filter, and the renderer read the same configuration. Set `defaultLocale: "ja"` for Japanese at unprefixed `/docs/*` URLs; English translations then live under `app/routes/en/docs`. Existing content must follow the selected language's file-path convention. See the [site configuration guide](docs/components.md#layout-and-site-configuration).
+
 Place trusted local MDX under the standard `app/routes` directory. With `defaultLocale: "en"`:
 
 | File                                     | URL                        |

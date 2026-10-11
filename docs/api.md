@@ -50,6 +50,7 @@ The following excerpt shows the plugins to add to an existing Vite configuration
 
 ```ts
 import { components } from "./app/mdx-components";
+import docsSite from "./app/docs.config";
 import { docsMetadataPlugin, remarkDocsComponents, remarkDocsHeadings } from "honoxpress/build";
 import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";
@@ -57,8 +58,8 @@ import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 
 // Place this before the HonoX plugins.
 docsMetadataPlugin({
-  locales: ["en", "ja"],
-  defaultLocale: "en",
+  locales: Object.keys(docsSite.localeLabels),
+  defaultLocale: docsSite.defaultLocale,
   worker: mode === "worker",
 });
 
@@ -158,10 +159,17 @@ During SSG, place the documentation filter before Hono's `defaultPlugin()`:
 ```ts
 import { docsOnlyPlugin } from "honoxpress/build";
 import { defaultPlugin } from "hono/ssg";
+import docsSite from "./app/docs.config";
 
 const report = { accepted: [], skipped: [] };
 const plugins = [
-  docsOnlyPlugin({ locales: ["en", "ja"], defaultLocale: "en" }, report),
+  docsOnlyPlugin(
+    {
+      locales: Object.keys(docsSite.localeLabels),
+      defaultLocale: docsSite.defaultLocale,
+    },
+    report,
+  ),
   defaultPlugin(),
 ];
 ```

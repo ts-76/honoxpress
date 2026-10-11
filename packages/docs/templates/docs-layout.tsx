@@ -1,26 +1,8 @@
 import type { Child } from "hono/jsx";
-import type { DocsPage, LocaleLink } from "honoxpress";
+import type { DocsPage, LocaleLink, DocsSiteConfig, DocsLayoutLabels } from "honoxpress";
+export type { DocsSiteConfig, DocsLayoutLabels } from "honoxpress";
 import { ThemeScript, ThemeSwitch } from "./theme-switch";
 import { DocsNavigation, LanguageLinks, TableOfContents } from "./docs-ui";
-
-export interface DocsLayoutLabels {
-  readonly nav: string;
-  readonly toc: string;
-  readonly skip: string;
-}
-
-/** Site-specific labels and links for the consumer-owned documentation layout. */
-export interface DocsSiteConfig {
-  readonly name: string;
-  readonly homeHref?: string;
-  readonly repositoryHref?: string;
-  readonly stylesheetHref?: string;
-  readonly localeLabels: Readonly<Record<string, string>>;
-  readonly labels?: Readonly<Record<string, Partial<DocsLayoutLabels>>>;
-  readonly footer?: string;
-  /** Enable the Light / Dark / System control (default true). */
-  readonly themeSwitch?: boolean;
-}
 
 export interface DocsLayoutProps {
   readonly children: Child;

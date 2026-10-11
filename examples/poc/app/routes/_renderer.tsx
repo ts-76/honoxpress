@@ -1,4 +1,4 @@
-import { resolveClientScript } from "honoxpress";
+import { resolveClientScript, resolveDocsLocale } from "honoxpress";
 import { jsxRenderer } from "hono/jsx-renderer";
 import { docsCatalog } from "../docs-catalog";
 import { DocsLayout } from "../components/docs-layout";
@@ -12,8 +12,8 @@ const manifest = Object.values(manifests)[0]?.default;
 
 export default jsxRenderer(({ children }, c) => {
   const pathname = new URL(c.req.url).pathname;
-  const locale = pathname.startsWith("/ja/") ? "ja" : "en";
   const current = docsCatalog.page(pathname);
+  const locale = current?.locale ?? resolveDocsLocale(pathname, docsSite);
   const production = import.meta.env.PROD || import.meta.env.MODE === "ssg";
   const clientSrc = current
     ? production
@@ -28,10 +28,7 @@ export default jsxRenderer(({ children }, c) => {
       translations={
         current
           ? docsCatalog.translations(pathname)
-          : [
-              { locale: "en", href: "/docs/getting-started" },
-              { locale: "ja", href: "/ja/docs/getting-started" },
-            ]
+          : docsCatalog.translations(docsSite.docsHref ?? "/docs/getting-started")
       }
       locale={locale}
       clientSrc={clientSrc}

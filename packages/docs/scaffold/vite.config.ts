@@ -18,7 +18,7 @@ import docsSite from "./app/docs.config";
 import { docsOnlyPlugin } from "./build/docs-only.ts";
 
 const locales = Object.keys(docsSite.localeLabels);
-const defaultLocale = "en";
+const { defaultLocale } = docsSite;
 
 export default defineConfig(({ mode }) => {
   if (mode === "client") {

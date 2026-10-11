@@ -77,6 +77,7 @@ const fixture = async (t) => {
       workerCompilerIsolation: true,
       cloudflareDryRun: true,
       temporaryFixtureRemoved: true,
+      siteConfiguration: true,
       developmentHttp: { docsStatus: 200, demoStatus: 200 },
     },
     graphs: {
@@ -86,7 +87,7 @@ const fixture = async (t) => {
   });
   await save("artifacts/package-tests.json", {
     success: true,
-    numPassedTests: 26,
+    numPassedTests: 28,
     numFailedTests: 0,
   });
   return { root, tarball, commit: "fixture-commit", ref: `refs/tags/v${pkg.version}` };
