@@ -13,6 +13,11 @@ test("component styles retain their hierarchy and share the docs theme across si
         "aria-selected",
         "true",
       );
+      // SSR already marks the selected tab. Panel semantics are assigned by the
+      // client effect, after the hydrated island replaces the server buttons.
+      await expect(page.locator(".hx-tabs").first().getByRole("tabpanel")).toHaveText(
+        "pnpm add honoxpress",
+      );
       const styles = await page.evaluate(() => {
         const style = (selector: string, pseudo?: string) =>
           getComputedStyle(document.querySelector(selector)!, pseudo);
@@ -65,8 +70,7 @@ test("component styles retain their hierarchy and share the docs theme across si
       expect(styles.overflow).toBe(false);
 
       const tab = page.getByRole("tab", { name: "pnpm", exact: true });
-      await tab.focus();
-      await page.keyboard.press("ArrowRight");
+      await tab.press("ArrowRight");
       const selected = page.getByRole("tab", { name: "npm", exact: true });
       await expect(selected).toBeFocused();
       await expect(selected).toHaveCSS("outline-color", accent);
