@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/ts-76/honoxpress/compare/v0.2.1...v0.3.0) (2026-10-12)
+
+
+### Features
+
+* colocate static component styles with hono/css ([#33](https://github.com/ts-76/honoxpress/issues/33)) ([b2b8455](https://github.com/ts-76/honoxpress/commit/b2b84552e6ba92c1a3bd1baca0e667de18cf7f74))
+
 ## [0.2.1](https://github.com/ts-76/honoxpress/compare/v0.2.0...v0.2.1) (2026-10-11)
 
 
