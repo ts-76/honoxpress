@@ -66,7 +66,7 @@ const fixture = async (t) => {
       workspaceOrSourceLinks: false,
       packageStaleOutputRemoved: true,
     },
-    validation: { buildTests: 5, browserTests: 26, clientSSGWorker: "passed", cfBuild: "passed" },
+    validation: { buildTests: 5, browserTests: 28, clientSSGWorker: "passed", cfBuild: "passed" },
     starter: {
       packageInstalledFromTarball: true,
       cliInitStarter: true,
@@ -87,7 +87,7 @@ const fixture = async (t) => {
   });
   await save("artifacts/package-tests.json", {
     success: true,
-    numPassedTests: 28,
+    numPassedTests: 29,
     numFailedTests: 0,
   });
   return { root, tarball, commit: "fixture-commit", ref: `refs/tags/v${pkg.version}` };
