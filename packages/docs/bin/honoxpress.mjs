@@ -455,6 +455,9 @@ function install({ command, target, cwd, dryRun, starter }) {
   console.log(
     "\nInstalled consumer-owned files. Existing routes and Vite config were left to you.",
   );
+  console.log(
+    "Static components need <Style /> from hono/css once in <head>, before your stylesheets; DocsLayout includes it.",
+  );
   if (starter)
     console.log(
       "The scaffold is ready; install its declared dependencies and follow docs/components.md.",

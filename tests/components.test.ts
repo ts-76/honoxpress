@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { Style } from "hono/css";
 import { jsx } from "hono/jsx/jsx-runtime";
 import { FileTree, File, Folder } from "../packages/docs/templates/file-tree";
 import { TypeTable } from "../packages/docs/templates/type-table";
@@ -8,6 +9,21 @@ import DemoFrame from "../packages/docs/templates/demo-frame";
 import { Figure } from "../packages/docs/templates/figure";
 import { test, expect } from "vite-plus/test";
 import { remarkDocsComponents, remarkDocsCode, highlightDocsCode } from "honoxpress/build";
+import { Callout, Cards, Card } from "../packages/docs/templates/docs-content";
+
+async function renderDocument(component: ReturnType<typeof jsx>, nonce?: string) {
+  const app = new Hono().get("/", (c) =>
+    c.html(
+      jsx("html", {
+        children: [
+          jsx("head", { children: jsx(Style, { nonce }) }),
+          jsx("body", { children: component }),
+        ],
+      }).toString(),
+    ),
+  );
+  return (await app.request("/")).text();
+}
 
 test("syntax tokens preserve code, aliases, line endings, and literal HTML", async () => {
   const code = 'const value = "</script><script>alert(1)</script>"; // note\r\n';
@@ -276,6 +292,7 @@ test("static authoring markup escapes values and preserves image dimensions and 
     c.html(
       jsx("div", {
         children: [
+          jsx(Style, {}),
           FileTree({
             label: "Source files",
             children: Folder({
@@ -399,31 +416,33 @@ test("CodeGroup highlights literal samples and leaves dynamic data, spreads, and
   }
 });
 
-test("structured references escape content and demo sizing preserves defaults with explicit overrides", () => {
-  const html = jsx("div", {
-    children: [
-      DefinitionList({
-        items: [
-          { term: "<unsafe>", description: jsx("a", { href: "/guide", children: "Read more" }) },
-        ],
-      }),
-      APIReference({
-        name: "<API>",
-        importFrom: "pkg",
-        usage: "Use it here",
-        sourceHref: "/source",
-        labels: { usage: "用途", source: "ソース" },
-        children: TypeTable({ properties: [{ name: "src", type: "string" }] }),
-      }),
-      DemoFrame({
-        src: "/embed",
-        href: "/full",
-        aspectRatio: 16 / 9,
-        allowFullscreen: true,
-        openInNewTab: true,
-      }),
-    ],
-  }).toString();
+test("structured references escape content and demo sizing preserves defaults with explicit overrides", async () => {
+  const html = await renderDocument(
+    jsx("div", {
+      children: [
+        DefinitionList({
+          items: [
+            { term: "<unsafe>", description: jsx("a", { href: "/guide", children: "Read more" }) },
+          ],
+        }),
+        APIReference({
+          name: "<API>",
+          importFrom: "pkg",
+          usage: "Use it here",
+          sourceHref: "/source",
+          labels: { usage: "用途", source: "ソース" },
+          children: TypeTable({ properties: [{ name: "src", type: "string" }] }),
+        }),
+        DemoFrame({
+          src: "/embed",
+          href: "/full",
+          aspectRatio: 16 / 9,
+          allowFullscreen: true,
+          openInNewTab: true,
+        }),
+      ],
+    }),
+  );
   expect(html).toContain("<dt>&lt;unsafe&gt;</dt><dd><a");
   expect(html).toContain("&lt;API&gt;");
   expect(html).toContain("用途");
@@ -432,12 +451,12 @@ test("structured references escape content and demo sizing preserves defaults wi
   expect(html).toContain('href="/full" target="_blank" rel="noreferrer"');
   expect(html).toContain("aspect-ratio:");
   expect(html).toContain('allow="fullscreen"');
-  const defaultFrame = jsx(DemoFrame, { src: "/embed" }).toString();
+  const defaultFrame = await renderDocument(jsx(DemoFrame, { src: "/embed" }));
   expect(defaultFrame).toContain('href="/embed"');
   expect(defaultFrame).toContain('loading="lazy"');
   expect(defaultFrame).not.toContain('target="_blank"');
   expect(defaultFrame).not.toContain("style=");
-  const fixed = jsx(DemoFrame, { height: 320, aspectRatio: 16 / 9 }).toString();
+  const fixed = await renderDocument(jsx(DemoFrame, { height: 320, aspectRatio: 16 / 9 }));
   expect(fixed).toContain("height:320px");
   expect(fixed).not.toContain("aspect-ratio:");
   expect(DefinitionList({ items: [] })).toBeNull();
@@ -445,4 +464,37 @@ test("structured references escape content and demo sizing preserves defaults wi
     expect(() => DemoFrame({ height: value })).toThrow(RangeError);
     expect(() => DemoFrame({ aspectRatio: value })).toThrow(RangeError);
   }
+});
+
+test("static CSS is emitted on use, deduplicated, request-isolated and keeps stable selectors", async () => {
+  const html = await renderDocument(
+    jsx("div", {
+      children: [
+        jsx(Callout, { title: "最初の注意", children: "本文" }),
+        jsx(Callout, { type: "warning", title: "Second note", children: "Body" }),
+      ],
+    }),
+    "test-nonce",
+  );
+  const css = html.match(/<style id="hono-css" nonce="test-nonce">(.*?)<\/style>/s)?.[1];
+  expect(css).toBeDefined();
+  expect(css?.match(/\.hx-callout\{/g)).toHaveLength(2); // Base rule and forced-colors rule.
+  expect(css).not.toMatch(/hx-card|hx-file|hx-type-table|hx-figure|demo-frame/);
+  expect(html).toContain('class="hx-callout hx-callout-info"');
+  expect(html).toContain('class="hx-callout hx-callout-warning"');
+  expect(html).not.toContain("<script");
+  expect(html).not.toContain(".css-");
+
+  const cards = await renderDocument(jsx(Cards, { children: jsx(Card, { title: "Guide" }) }));
+  expect(cards).toContain(".hx-card{");
+  expect(cards).not.toContain(".hx-callout");
+  const empty = await renderDocument(jsx("p", { children: "No components" }));
+  expect(empty).toContain('<style id="hono-css"></style>');
+
+  const [noteRequest, tableRequest] = await Promise.all([
+    renderDocument(jsx(Callout, { children: "Concurrent note" })),
+    renderDocument(jsx(TypeTable, { properties: [{ name: "src", type: "string" }] })),
+  ]);
+  expect(noteRequest).not.toContain(".hx-type-table");
+  expect(tableRequest).not.toContain(".hx-callout");
 });

@@ -124,6 +124,13 @@ For the complete component list, props, MDX registry setup, CLI workflow, and st
 
 The layout and styles include responsive navigation and TOC disclosures, visible keyboard focus, a skip link, copy success/failure feedback, and a persistent Light / Dark / System theme selector. Installed components are app-owned; review changes manually and preserve the MIT notice when distributing copied files. See the [component system guide](docs/components.md) for installation, registry setup, props, and customization.
 
+Static components define their styles alongside their JSX using `hono/css`;
+`DocsLayout` emits only the static styles used by each page. Shared tokens, shell,
+Markdown, and interactive styles remain in the public stylesheets. Existing sites
+must [merge the copied sources and layout](docs/migrating-static-component-styles.md)
+to adopt this unreleased change; installing a dependency does not replace their
+customizations.
+
 ## Build model and scope
 
 `honoxpress` provides runtime metadata APIs. `honoxpress/build` provides build-time MDX discovery, heading transformation, syntax highlighting, and SSG filtering. Your HonoX application configures its router and renderer.

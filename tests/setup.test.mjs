@@ -173,6 +173,10 @@ void test("init starter dry-run includes the runnable project scaffold", () => {
       readFileSync(join(directory, "app/components/docs-layout.tsx"), "utf8"),
       /<ThemeScript nonce=/,
     );
+    assert.match(
+      readFileSync(join(directory, "app/components/docs-layout.tsx"), "utf8"),
+      /<Style nonce=\{nonce\} \/>/,
+    );
   });
 });
 
