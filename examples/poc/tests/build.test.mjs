@@ -54,7 +54,19 @@ async function assertArtifacts() {
     assert.match(html, new RegExp(`src="/${manifest["app/client.ts"].file}"`));
     assert.match(html, /src="\/demo\/clock"/);
     assert.match(html, /<h2 id="[^"]+"/);
+    const styles = html.match(/<style id="hono-css">(.*?)<\/style>/s)?.[1];
+    assert.ok(styles?.includes(".demo-frame{"), "DemoFrame CSS is included in SSG HTML");
+    assert.doesNotMatch(styles, /hx-type-table|hx-file-tree|hx-figure/);
   }
+  const sharedCSS = await read("dist/public/components.css");
+  assert.doesNotMatch(
+    sharedCSS,
+    /hx-callout|hx-card|hx-step|hx-accordion|hx-file-tree|hx-type-table|hx-figure|hx-api-reference|hx-definition/,
+  );
+  const componentPage = await read("dist/public/docs/components.html");
+  assert.match(componentPage, /<style id="hono-css">/);
+  assert.match(componentPage, /\.hx-type-table\{/);
+  assert.doesNotMatch(componentPage, /document\.querySelector\('#hono-css'\)\.textContent/);
   const worker = await read("dist/worker/index.js");
   assert.doesNotMatch(
     worker,
@@ -69,6 +81,26 @@ async function assertArtifacts() {
       ).length,
       0,
     );
+    if (target === "client")
+      assert.equal(
+        evidence.loaded.filter((id) =>
+          /\/(?:file-tree|type-table|figure|definition-list|api-reference|demo-frame)\.tsx$/.test(
+            id,
+          ),
+        ).length,
+        0,
+      );
+    if (target === "client") {
+      // CodeGroup imports the shared TabPanel source. Its unused static CSS must
+      // disappear from emitted chunks, even though the module itself is loaded.
+      for (const chunk of evidence.chunks) {
+        const code = await read(`dist/public/${chunk.file}`);
+        assert.doesNotMatch(
+          code,
+          /\.hx-callout\s*\{|\.hx-card\s*\{|\.hx-step\s*\{|\.hx-accordion\s*\{/,
+        );
+      }
+    }
   }
   const report = await json("dist/evidence/ssg.json");
   assert.deepEqual(

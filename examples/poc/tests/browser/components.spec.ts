@@ -1,5 +1,54 @@
 import { test, expect } from "@playwright/test";
 
+test("static styles survive SSR/SSG, locales, narrow screens and app overrides", async ({
+  page,
+}) => {
+  for (const locale of ["en", "ja"]) {
+    for (const width of [1280, 390, 320]) {
+      for (const colorScheme of ["light", "dark"] as const) {
+        await page.setViewportSize({ width, height: 844 });
+        await page.emulateMedia({ colorScheme });
+        await page.goto(`${locale === "ja" ? "/ja" : ""}/docs/components`);
+        const css = await page.locator("head style#hono-css").textContent();
+        expect(css).toContain(".hx-callout{");
+        expect(css).toContain(".hx-file-tree{");
+        expect(css).toContain(".hx-type-table{");
+        expect(css).toContain(".hx-figure{");
+        expect(css).toContain(".hx-definition-list{");
+        expect(css).toContain(".hx-api-reference{");
+        expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
+          false,
+        );
+        expect(
+          await page.evaluate(() => {
+            const style = document.querySelector("head style#hono-css")!;
+            return Boolean(
+              style.compareDocumentPosition(document.querySelector('link[rel="stylesheet"]')!) &
+              Node.DOCUMENT_POSITION_FOLLOWING,
+            );
+          }),
+        ).toBe(true);
+        await page.addStyleTag({
+          content:
+            ":root,:root[data-theme]{--docs-panel-padding:28px;--docs-radius:12px}.hx-card{border-radius:15px}.hx-card-title{font-size:21px}",
+        });
+        await expect(page.locator(".hx-card").first()).toHaveCSS("padding", "28px");
+        await expect(page.locator(".hx-card").first()).toHaveCSS("border-radius", "15px");
+        await expect(page.locator(".hx-card-title").first()).toHaveCSS("font-size", "21px");
+        const folder = page.locator(".hx-folder").first();
+        await folder.locator("summary").first().click();
+        await expect(folder).not.toHaveAttribute("open");
+        await folder.locator("summary").first().click();
+        await expect(folder).toHaveAttribute("open");
+      }
+    }
+  }
+  await page.goto("/docs/getting-started");
+  const css = await page.locator("head style#hono-css").textContent();
+  expect(css).not.toContain(".hx-type-table");
+  expect(css).not.toContain(".hx-file-tree");
+});
+
 test("component styles retain their hierarchy and share the docs theme across sizes", async ({
   page,
 }, testInfo) => {

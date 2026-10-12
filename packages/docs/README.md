@@ -121,6 +121,13 @@ The [component system guide](https://github.com/ts-76/honoxpress/blob/main/docs/
 
 Installed JSX, island, and CSS files belong to the application and can be edited directly. For existing installations, follow the [template upgrade guide](https://github.com/ts-76/honoxpress/blob/main/docs/upgrading-owned-templates.md) to merge responsive fixes without overwriting your customizations. Keep interactive islands under `app/islands` so HonoX discovers and hydrates them. The default public `style.css` imports `components.css`, which imports `tokens.css`. The layout includes a persistent Light / Dark / System selector, and DemoFrame supports aspect ratios, fixed heights, separate embed/open URLs, and fullscreen permission. The shared tokens define reading typography, cool neutral surfaces based on #F9FAFB, and semantic spacing roles; retain both imports to use the standard styles. Nimbus and Fumapress informed the independently implemented layout hierarchy and component patterns; no upstream source or assets were copied. Preserve the MIT notice when distributing copied templates.
 
+Static components carry their defaults in their TSX sources through `hono/css`.
+The copied `DocsLayout` includes `<Style nonce={nonce} />` before the stylesheet;
+add the same element once to a custom layout. Stable classes and shared tokens
+remain available for customization. Public stylesheets still provide shell,
+Markdown, and interactive styles. Updating application-owned templates requires
+a manual merge; see the [static-style migration guide](https://github.com/ts-76/honoxpress/blob/main/docs/migrating-static-component-styles.md).
+
 ## Scope and compatibility
 
 honoxpress is a 0.x library for trusted local MDX. It supplies metadata, build helpers, and editable templates; applications configure routing, rendering, and deployment. It does not include search, drafts, a CMS, hosting, or a React runtime. Navigation uses ordinary document loads, so island state resets between pages.

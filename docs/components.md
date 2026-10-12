@@ -2,7 +2,7 @@
 
 honoxpress can install a set of editable Hono JSX components into an application. The files belong to your app after installation: MDX uses them through one shared registry, and you can change their markup, behavior, props, and styles.
 
-> **Release status:** the component CLI (`init`, `add`, and `list`), component templates, and runnable starter described here are in the unreleased development version. Published npm `honoxpress@0.1.4` does not contain the CLI or these components. Use a built or packed candidate from this repository to try them; wait for a release before following these commands with the current npm package.
+> **Release status:** the CLI and starter are available in 0.2.x. The component-local `hono/css` styling described below is an unreleased change; 0.2.1 still keeps static component styles in shared stylesheets. Use a built or packed candidate to try the new styling.
 
 ## Install into an existing HonoX application
 
@@ -30,6 +30,46 @@ pnpm exec honoxpress list
 Available groups are `callout`, `cards`, `steps`, `accordion`, `tabs`, `code-block`, `demo-frame`, `file-tree`, `type-table`, `code-group`, `figure`, `theme-switch`, `definition-list`, `api-reference`, and `layout`. `init` is shorthand for all groups. `add` adds the group's files and refreshes only the managed registry block in `app/mdx-components.ts`; local code outside that block is preserved. Do not edit the lines between the `honoxpress:components` markers: a later `add` replaces that generated block. Put custom imports and registry additions outside it. `--dry-run` prints the complete proposed changes without writing files. `add code-group` also installs the `tabs` and `code-block` groups when they are missing; previously installed, locally edited islands are preserved. `add layout` also installs `theme-switch`.
 
 Content groups such as `callout` or `tabs` also install `public/components.css` and its shared `public/tokens.css` on first addition. The `layout` group installs `public/style.css`, which imports that component stylesheet. Either run `add layout` as well, or link the component stylesheet from your own layout with `<link rel="stylesheet" href="/components.css" />`. `CodeBlock` also uses the base code-toolbar styles from `docs.css`; if you skip the layout group, copy and load both stylesheets or provide equivalent styles in your own CSS.
+
+### Component-local static styles
+
+Callout, Cards/Card, Steps/Step, Accordion/AccordionItem, FileTree, TypeTable,
+Figure, DefinitionList, APIReference, and DemoFrame define their styles in their
+copied TSX files using `hono/css`. Rendering a component registers its styles;
+importing or registering an unused component does not emit its CSS. Hono deduplicates
+the same styles within a response. Shared tokens, Markdown typography, the shell,
+syntax colors, and interactive component styles remain in the public stylesheets.
+
+`DocsLayout` includes `<Style nonce={nonce} />`. With a custom layout, import `Style`
+from `hono/css` and render it once in `<head>`, before your stylesheets:
+
+```tsx
+import { Style } from "hono/css";
+
+<head>
+  <Style nonce={nonce} />
+  <link rel="stylesheet" href="/style.css" />
+</head>;
+```
+
+Keep the shared token import. Existing `.hx-*` selectors, DemoFrame classes, and
+`--docs-*` tokens stay unchanged. Static styles use `:-hono-global` so generated
+classes do not increase selector specificity. The class attribute uses Hono's
+`html` helper to retain CSS registration callbacks without converting the styles
+to an ordinary string or wrapping the global selectors in another class. Override
+the stable selectors in your own stylesheet, after `<Style />`; do not target
+generated names. These defaults are unlayered CSS, matching the previous templates.
+If your custom shell organizes styles into cascade layers, explicitly review its
+override order: a layered override cannot override an unlayered default.
+
+The component CSS is embedded in HTML and is not extracted to an independently
+cached file. In the non-streaming SSR and SSG paths verified by this starter, it
+needs no extra browser script. Streaming and late Suspense content can use Hono's
+style-append scripts; authorize the nonce for both style and script when applicable.
+The helper is experimental upstream. Tabs, CodeGroup, CodeBlock, and theme controls
+remain on their existing styling path in this first migration. This change does
+not make npm installation or `init` selective; it changes which static CSS a page
+outputs. See [the migration procedure](migrating-static-component-styles.md).
 
 After installation, finish the MDX and Vite setup in the next section. Existing apps need to connect the component registry to their MDX plugin themselves; the CLI deliberately leaves build configuration in the application's hands.
 
@@ -155,7 +195,7 @@ pnpm exec honoxpress add figure
 
 FileTree, TypeTable, and Figure live in separate application-owned files under `app/components`: `file-tree.tsx`, `type-table.tsx`, and `figure.tsx`. `CodeGroup` lives in `app/islands/code-group.tsx` and reuses the app's Tabs and CodeBlock implementations. A single island owns tab navigation and copying to avoid nested island hydration. Adding a group updates the same MDX registry, so no page-level imports are required. Before hydration all code panels remain visible; the selected panel and keyboard navigation become active when Tabs hydrates. Groups do not synchronize their selection across the page. After hydration, the copy icon shares the tab row while the filename stays directly above its code; the button retains its accessible label and announces copy feedback.
 
-**Existing installations:** `add` preserves your owned stylesheets. If your copied `components.css` predates these components, merge the authoring styles from `honoxpress/templates/components.css` and keep its `tokens.css` import before using the new groups. Fresh installations include those styles automatically. This is a manual source upgrade, rather than an automatic overwrite of local styles.
+**Existing installations:** `add` preserves your owned sources and stylesheets. Merge the updated static TSX components and add `<Style />` to your layout before removing their old rules from the shared stylesheets. Preserve your overrides and the `tokens.css` import. Interactive groups still need their shared CSS. Follow the [static-style migration procedure](migrating-static-component-styles.md); the CLI does not automatically overwrite local styles.
 
 ```mdx
 <FileTree label="Project structure">

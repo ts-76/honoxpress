@@ -1,4 +1,5 @@
 import type { Child } from "hono/jsx";
+import { Style } from "hono/css";
 import type { DocsPage, LocaleLink, DocsSiteConfig, DocsLayoutLabels } from "honoxpress";
 export type { DocsSiteConfig, DocsLayoutLabels } from "honoxpress";
 import { ThemeScript, ThemeSwitch } from "./theme-switch";
@@ -54,6 +55,7 @@ export function DocsLayout({
         <title>{current ? `${current.title} · ${config.name}` : config.name}</title>
         {current?.description && <meta name="description" content={current.description} />}
         {config.themeSwitch !== false && <ThemeScript nonce={nonce} />}
+        <Style nonce={nonce} />
         <link rel="stylesheet" href={stylesheetHref} />
         {isDocsPage && clientSrc && <script type="module" src={clientSrc} />}
       </head>

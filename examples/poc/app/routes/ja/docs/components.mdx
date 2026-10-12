@@ -150,6 +150,49 @@ Props: `src` and `title` are required, with optional `linkLabel`. Demo routes re
 
 ## API reference
 
+<FileTree label="ドキュメントのファイル構成">
+  <Folder name="app">
+    <Folder name="ドキュメント用のコンポーネント">
+      <File name="日本語の説明を含む長いファイル名のコンポーネント.tsx" highlighted={true} />
+    </Folder>
+    <Folder name="routes" open={false}>
+      <File name="components.mdx" href="/ja/docs/components" />
+    </Folder>
+  </Folder>
+</FileTree>
+
+<TypeTable
+  caption="画像のプロパティ"
+  properties={[
+    { name: "src", type: "string", required: true, description: "表示する画像のURLです。" },
+    {
+      name: "loading",
+      type: '"lazy" | "eager"',
+      defaultValue: '"lazy"',
+      description: "ページを開いた時点で見える画像では eager を指定します。",
+    },
+  ]}
+/>
+
+<Figure
+  src="/component-flow.svg"
+  alt="MDXの原稿から共通コンポーネントを通してドキュメントを生成する流れ。"
+  width={720}
+  height={240}
+  caption="コンポーネントを一度登録すると、各ページで利用できます。"
+/>
+
+<DefinitionList
+  label="サイトの設定"
+  items={[
+    { term: <code>theme</code>, description: "資料の色や文字のスタイルを設定します。" },
+    {
+      term: "ドキュメントの表示テーマ",
+      description: "ライト、ダーク、システムの設定を読者が選べます。",
+    },
+  ]}
+/>
+
 <APIReference
   name="ThemeSwitch"
   importFrom="./components/theme-switch"
