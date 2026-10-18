@@ -2,7 +2,7 @@
 
 honoxpress can install a set of editable Hono JSX components into an application. The files belong to your app after installation: MDX uses them through one shared registry, and you can change their markup, behavior, props, and styles.
 
-> **Version scope:** this guide describes 0.4.0. The CLI and starter are available since 0.2.0; component-local `hono/css` styling is included since 0.3.0. Version 0.4.0 adds the parser-neutral Markdown renderer and framework integration primitives.
+> **Version scope:** this guide describes 0.5.0. The CLI and starter are available since 0.2.0; component-local `hono/css` styling is included since 0.3.0. Version 0.4.0 adds the parser-neutral Markdown renderer and framework integration primitives.
 
 ## Install into an existing HonoX application
 
@@ -430,7 +430,7 @@ Static `code` and `language` attributes may be strings, string literals in brace
 
 ## Start a new site
 
-Create a new site with `pnpm dlx honoxpress@0.4.0 init --starter --cwd /path/to/new-docs`, then install dependencies in the new directory. To test a local checkout instead, build and pack a candidate and invoke its CLI source:
+Create a new site with `pnpm dlx honoxpress@0.5.0 init --starter --cwd /path/to/new-docs`, then install dependencies in the new directory. To test a local checkout instead, build and pack a candidate and invoke its CLI source:
 
 ```sh
 pnpm build:package
@@ -439,7 +439,7 @@ pnpm --dir packages/docs pack --pack-destination /tmp/honoxpress-candidate
 mkdir /tmp/my-docs
 node packages/docs/bin/honoxpress.mjs init --starter --cwd /tmp/my-docs
 cd /tmp/my-docs
-pnpm add /tmp/honoxpress-candidate/honoxpress-0.4.0.tgz
+pnpm add /tmp/honoxpress-candidate/honoxpress-0.5.0.tgz
 pnpm dev
 ```
 
@@ -452,3 +452,5 @@ Pin the version used by `pnpm dlx` when reproducing a setup. The package install
 Installed files become application source. Change components and layout directly to fit your routes, content, and design system. The default `public/style.css` imports `./components.css`; keep that import if you want the standard component styles, and its import of `tokens.css`, or replace the three stylesheets with your own. To update a previously copied theme manually, copy `tokens.css` alongside the updated stylesheets; `add` preserves existing application-owned CSS. The CLI records the installed groups and file hashes in `.honoxpress.json`; later additions refresh only the registry's marked block and stop on conflicting destination files. They do not overwrite your copied component implementation.
 
 Nimbus and Fumapress informed the layout hierarchy and component patterns. The Hono JSX, CSS, and icons in these templates are independently implemented; no upstream source code or assets were copied. Preserve the repository's MIT license and notice when distributing copied template files.
+
+For Void/Hono Markdown, use `init --framework void --starter` and follow the [Void guide](void.md). HonoX remains the default.

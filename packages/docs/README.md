@@ -6,12 +6,12 @@ Use HonoX's file-based routes to build navigation, tables of contents, and langu
 
 [Component system](https://github.com/ts-76/honoxpress/blob/main/docs/components.md) · [Integration guide](https://github.com/ts-76/honoxpress/blob/main/docs/api.md) · [Example app](https://github.com/ts-76/honoxpress/tree/main/examples/poc) · [Releases](https://github.com/ts-76/honoxpress/releases) · [Issues](https://github.com/ts-76/honoxpress/issues) · [MIT](https://github.com/ts-76/honoxpress/blob/main/LICENSE)
 
-## Void support (next release)
+## Void support (since 0.5.0)
 
 The Void starter adds `honoxpress init --framework void --starter`, editable
 Markdown wrappers, a docs frame, and a metadata bridge at `honoxpress/void`.
-It requires the pending Void adapter PR #122 (planned minimum 0.3.0).
-See the [Void guide](https://github.com/ts-76/honoxpress/blob/main/docs/void.md) for setup and release prerequisites.
+It uses `void-plugin-hono-jsx >=0.3.0 <0.4.0`.
+See the [Void guide](https://github.com/ts-76/honoxpress/blob/main/docs/void.md) for setup and supported behavior.
 
 ## Install
 
@@ -21,7 +21,7 @@ pnpm add honoxpress hono
 
 The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX, Vite Plus, MDX, and SSG adapters are application dependencies. See the [compatibility guide](https://github.com/ts-76/honoxpress/blob/main/docs/compatibility.md) for tested versions.
 
-The `honoxpress@0.4.0` package includes the component installer, runnable starter,
+The `honoxpress@0.5.0` package includes the component installer, runnable starter,
 syntax-highlighting helpers, component-local static CSS, framework integration
 primitives and the parser-neutral Markdown component renderer. See the
 [component guide](https://github.com/ts-76/honoxpress/blob/main/docs/components.md#start-a-new-site)
@@ -71,8 +71,8 @@ name, literal string/boolean attributes and already parsed Hono JSX children;
 the app's registry selects a static wrapper or an explicit host island adapter.
 The subpath imports no parser or client runtime. Complex data stays in local TSX
 wrappers. See [Markdown-first authoring](https://github.com/ts-76/honoxpress/blob/main/docs/markdown.md)
-for the actual `.md` example, customization-preserving adoption and the pending
-Void extension point. Existing HonoX/MDX setup remains supported.
+for the `.md` example and customization-preserving adoption. The
+[Void guide](https://github.com/ts-76/honoxpress/blob/main/docs/void.md) covers the standard starter. Existing HonoX/MDX setup remains supported.
 
 Since 0.4.0, the copied templates also expose a body-only `DocsFrame`, a router-link
 adapter and idempotent theme initialization/synchronization. Existing HonoX APIs

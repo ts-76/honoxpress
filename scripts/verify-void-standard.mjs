@@ -11,11 +11,8 @@ const stack = process.env.HX_VOID_STACK ?? "vite";
 assert.ok(["vite", "vp"].includes(stack), "HX_VOID_STACK must be vite or vp");
 const artifacts = join(root, "artifacts/void-standard", stack);
 await mkdir(artifacts, { recursive: true });
-const plugin = resolve(
-  process.env.HX_VOID_PLUGIN_TARBALL ??
-    join(root, "artifacts/void-standard/void-plugin-hono-jsx-0.3.0.tgz"),
-);
-await lstat(plugin);
+// The release path always installs the public registry version.
+const pluginVersion = "0.3.0";
 const directory = await mkdtemp(join(tmpdir(), "honoxpress-void-standard-"));
 const project = join(directory, "site");
 const bootstrap = join(directory, "bootstrap");
@@ -107,7 +104,7 @@ async function withServer(script, verify) {
   }
 }
 const result = {
-  dependency: "Void plugin PR #122 / 743badf8a4153aadf3fbb8a9ab78e6563d3ef555 (candidate 0.3.0)",
+  dependency: `void-plugin-hono-jsx@${pluginVersion} (public npm registry)`,
   project,
   stack,
   checks: [],
@@ -142,7 +139,7 @@ try {
   const manifestFile = join(project, "package.json");
   const manifest = JSON.parse(await readFile(manifestFile, "utf8"));
   manifest.dependencies.honoxpress = `file:${tarball}`;
-  manifest.dependencies["void-plugin-hono-jsx"] = `file:${plugin}`;
+  manifest.dependencies["void-plugin-hono-jsx"] = pluginVersion;
   manifest.devDependencies.playwright = "1.64.0";
   if (stack === "vp") {
     manifest.devDependencies["vite-plus"] = "1.3.0";
@@ -167,7 +164,19 @@ try {
     ),
     await readFile(join(root, "packages/docs/void/integration/app/void-layout.tsx"), "utf8"),
   );
-  result.checks.push("packed CLI, real tgz dependencies, frozen reinstall, no source links");
+  const installedPlugin = JSON.parse(
+    await readFile(join(project, "node_modules/void-plugin-hono-jsx/package.json"), "utf8"),
+  );
+  assert.equal(installedPlugin.version, pluginVersion);
+  const lock = JSON.parse(await readFile(join(project, "package-lock.json"), "utf8"));
+  const lockedPlugin = lock.packages["node_modules/void-plugin-hono-jsx"];
+  assert.equal(lockedPlugin.version, pluginVersion);
+  assert.equal(
+    lockedPlugin.resolved,
+    `https://registry.npmjs.org/void-plugin-hono-jsx/-/void-plugin-hono-jsx-${pluginVersion}.tgz`,
+  );
+  assert.match(lockedPlugin.integrity, /^sha512-/);
+  result.checks.push("packed CLI, public registry adapter, frozen reinstall, no source links");
   const vitePath = join(project, "vite.config.ts");
   const viteSource = (await readFile(vitePath, "utf8")).replace(
     'from "vite"',

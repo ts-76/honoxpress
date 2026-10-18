@@ -34,6 +34,6 @@ Use Conventional Commit titles for squash merges (`fix:`, `feat:`, and `!` for b
 ## Void starter
 
 The Void consumer uses its own dependency graph with Node 24.21.0. See
-[the Void guide](docs/void.md#verify-a-candidate) for the pinned adapter candidate
+[the Void guide](docs/void.md#verification) for the public adapter version
 and `pnpm test:void`. This check installs packaged CLI output into a fresh
 project; the historical TSX pilot is kept only for baseline diagnostics.
