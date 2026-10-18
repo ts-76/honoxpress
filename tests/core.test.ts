@@ -1,5 +1,70 @@
 import { test, expect } from "vite-plus/test";
-import { createDocsCatalog, defineDocsConfig, resolveDocsLocale } from "honoxpress";
+import {
+  createDocsCatalog,
+  createDocsCatalogFromPages,
+  defineDocsConfig,
+  resolveDocsLocale,
+} from "honoxpress";
+
+test("explicit catalogs accept framework paths, root pages and translated Unicode keys", () => {
+  const heading = { depth: 2, text: "Install", id: "install" };
+  const input = {
+    locale: "en",
+    slug: "日本語",
+    href: "/en/start",
+    title: " Start ",
+    route: "pages/en/index.tsx",
+    headings: [heading],
+  };
+  const docs = createDocsCatalogFromPages({
+    locales: ["en", "ja"],
+    defaultLocale: "en",
+    pages: [
+      input,
+      { locale: "ja", slug: "日本語", href: "/ja/日本語", title: "導入" },
+      { locale: "en", slug: "", href: "/", title: "Home", order: -1 },
+    ],
+  });
+  expect(docs.page("/")?.title).toBe("Home");
+  expect(docs.page("/en/start/")?.title).toBe("Start");
+  expect(docs.page("/ja/日本語")?.href).toBe("/ja/" + encodeURIComponent("日本語"));
+  expect(docs.translations("/en/start")).toEqual([
+    { locale: "en", href: "/en/start" },
+    { locale: "ja", href: "/ja/" + encodeURIComponent("日本語") },
+  ]);
+  expect(docs.translations("/")[1]).toEqual({ locale: "ja" });
+  input.title = "Mutated";
+  heading.text = "Mutated";
+  expect(docs.page("/en/start")?.headings[0].text).toBe("Install");
+  expect(Object.isFrozen(docs.pages)).toBe(true);
+});
+
+test("explicit catalogs reject unsafe URLs, encodings and ambiguous translation identities", () => {
+  const page = { locale: "en", slug: "start", href: "/start", title: "Start" };
+  const make = (pages = [page]) =>
+    createDocsCatalogFromPages({ locales: ["en", "ja"], defaultLocale: "en", pages });
+  for (const href of [
+    "//example.com",
+    "https://example.com",
+    "/../a",
+    "/a/",
+    "/a//b",
+    "/a?x=1",
+    "/a#b",
+    "/%2f",
+    "/%5c",
+    "/%252F",
+    "/%2e%2e",
+    "/%",
+    "/a\\b",
+  ])
+    expect(() => make([{ ...page, href }])).toThrow();
+  expect(() => make([page, { ...page, href: "/another" }])).toThrow("translation identity");
+  expect(() => make([page, { ...page, locale: "ja" }])).toThrow("Duplicate docs URL");
+  expect(() => make([{ ...page, locale: "fr" }])).toThrow("locale");
+  expect(() => make([{ ...page, slug: "../bad" }])).toThrow();
+  expect(() => make([{ ...page, title: " " }])).toThrow("metadata");
+});
 
 const options = {
   locales: ["en", "ja"],

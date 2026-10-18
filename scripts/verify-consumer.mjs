@@ -77,6 +77,8 @@ for (const file of [
   "dist/index.d.ts",
   "dist/build.js",
   "dist/build.d.ts",
+  "dist/markdown.js",
+  "dist/markdown.d.ts",
   "templates/docs.css",
   "templates/tokens.css",
   "templates/copy-code.tsx",
@@ -131,6 +133,7 @@ for (const file of [
   "build",
   "tests",
   "public",
+  "content",
   "vite.config.ts",
   "tsconfig.json",
   "cloudflare.config.ts",
@@ -223,7 +226,7 @@ const cf = await json(path.join(consumer, "dist/evidence/cf-build.json"));
 assert.equal(unit.numPassedTests, 5);
 assert.equal(unit.numFailedTests, 0);
 assert.equal(unit.success, true);
-assert.equal(browser.stats.expected, 28);
+assert.equal(browser.stats.expected, 34);
 assert.equal(browser.stats.unexpected, 0);
 assert.equal(hmr.stats.expected, 2);
 assert.equal(hmr.stats.unexpected, 0);
@@ -232,7 +235,9 @@ const graphs = {};
 for (const target of ["worker", "client"]) {
   const graph = await json(path.join(consumer, `dist/evidence/${target}-modules.json`));
   const leaked = graph.loaded.filter((id) =>
-    /\.mdx|@mdx-js|remark-|\/(?:docs|honoxpress)\/dist\/build\.js/.test(id),
+    /\.mdx?|@mdx-js|remark-|unified|micromark|\/build\/markdown-fixture|markdown-content|\/(?:docs|honoxpress)\/dist\/build\.js/.test(
+      id,
+    ),
   );
   assert.deepEqual(leaked, [], `Consumer ${target} leaks docs/compiler/build entry`);
   graphs[target] = { loadedModules: graph.loaded.length, docsCompilerOrBuildModules: leaked };

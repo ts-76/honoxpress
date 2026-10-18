@@ -38,6 +38,10 @@
       "types": "./dist/build.d.ts",
       "import": "./dist/build.js"
     },
+    "./markdown": {
+      "types": "./dist/markdown.d.ts",
+      "import": "./dist/markdown.js"
+    },
     "./templates/*": "./templates/*"
   },
   "scripts": {

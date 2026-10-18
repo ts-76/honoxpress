@@ -8,7 +8,13 @@ export default defineConfig({
   timeout: 60000,
   expect: { timeout: 15000 },
   reporter: [["list"], ["json", { outputFile: "dist/evidence/hmr-tests.json" }]],
-  use: { baseURL: "http://127.0.0.1:5195", trace: "retain-on-failure" },
+  use: {
+    baseURL: "http://127.0.0.1:5195",
+    trace: "retain-on-failure",
+    launchOptions: process.env.HONOXPRESS_CHROMIUM_EXECUTABLE
+      ? { executablePath: process.env.HONOXPRESS_CHROMIUM_EXECUTABLE }
+      : undefined,
+  },
   webServer: {
     command: "node tests/start-hmr.mjs",
     url: "http://127.0.0.1:5195",

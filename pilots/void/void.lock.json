@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "source": {
+    "name": "honoxpress-void-tsx-pilot"
+  },
+  "resolved": {
+    "name": "honoxpress-void-tsx-pilot",
+    "compatibility_date": "2026-02-24"
+  },
+  "text": "{\n  \"name\": \"honoxpress-void-tsx-pilot\",\n  \"compatibility_date\": \"2026-02-24\"\n}\n"
+}

@@ -2,7 +2,7 @@
 import { useId } from "hono/jsx";
 import type { PropsWithChildren } from "hono/jsx";
 import { css } from "hono/css";
-import { html } from "hono/html";
+import { componentClass as html } from "honoxpress";
 
 // Stable selectors keep application overrides at their existing specificity.
 // Pure initialization lets Island imports of TabPanel drop unrelated CSS definitions.

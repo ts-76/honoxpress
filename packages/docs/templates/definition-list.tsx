@@ -1,7 +1,7 @@
 /** @jsxImportSource hono/jsx */
 import type { Child } from "hono/jsx";
 import { css } from "hono/css";
-import { html } from "hono/html";
+import { componentClass as html } from "honoxpress";
 
 // Stable selectors keep application overrides at their existing specificity.
 const definitionListStyles = css`
