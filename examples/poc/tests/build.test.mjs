@@ -67,6 +67,16 @@ async function assertArtifacts() {
   assert.match(componentPage, /<style id="hono-css">/);
   assert.match(componentPage, /\.hx-type-table\{/);
   assert.doesNotMatch(componentPage, /document\.querySelector\('#hono-css'\)\.textContent/);
+  for (const locale of ["", "ja/"]) {
+    const markdown = await read(`dist/public/${locale}docs/markdown.html`);
+    assert.match(markdown, /\.hx-callout\{/);
+    assert.match(markdown, /\.hx-type-table\{/);
+    assert.match(markdown, /<strong>/);
+    assert.match(markdown, /<code>/);
+    assert.equal((markdown.match(/component-name=/g) ?? []).length, 1);
+    assert.match(markdown, /component-name="\/app\/islands\/code-group.tsx"/);
+    assert.doesNotMatch(markdown, /:::Callout|::CodeSamples|\[object Promise\]/);
+  }
   const worker = await read("dist/worker/index.js");
   assert.doesNotMatch(
     worker,
@@ -77,7 +87,9 @@ async function assertArtifacts() {
     assert.ok(evidence.loaded.length > 0);
     assert.equal(
       evidence.loaded.filter((id) =>
-        /\.mdx|@mdx-js|remark-|shiki|code-highlight|\/routes\/(?:ja\/)?docs\//.test(id),
+        /\.mdx?|@mdx-js|remark-|unified|micromark|\/build\/markdown-fixture|markdown-content|shiki|code-highlight|\/routes\/(?:ja\/)?docs\//.test(
+          id,
+        ),
       ).length,
       0,
     );
@@ -108,14 +120,16 @@ async function assertArtifacts() {
     [
       "/docs/components",
       "/docs/getting-started",
+      "/docs/markdown",
       "/ja/docs/components",
       "/ja/docs/getting-started",
+      "/ja/docs/markdown",
     ],
   );
   assert.ok(report.skipped.includes("/demo/clock"), JSON.stringify(report));
   assert.ok(report.skipped.includes("/demo/status"));
   assert.equal(report.result.success, true);
-  assert.equal(report.result.files.length, 4);
+  assert.equal(report.result.files.length, 6);
   await assert.rejects(access("dist/public/demo/clock.html"));
   await assert.rejects(access("dist/public/.vite/manifest.json"));
 }
@@ -205,14 +219,17 @@ test("positive control: standard eager router includes MDX bodies in a Worker bu
   const { default: remarkMdxFrontmatter } = await import("remark-mdx-frontmatter");
   const { default: worker } = await import("@hono/vite-build/cloudflare-workers");
   const { docsMetadataPlugin, remarkDocsHeadings } = await import("honoxpress/build");
+  const { markdownFixturePlugin } = await import("../build/markdown-fixture.ts");
   const result = await build({
     configFile: false,
     mode: "eager-control",
     logLevel: "error",
     plugins: [
+      markdownFixturePlugin(false),
       docsMetadataPlugin({ locales: ["en", "ja"], defaultLocale: "en", worker: false }),
       honox(),
       mdx({
+        include: /\.mdx$/,
         jsxImportSource: "hono/jsx",
         providerImportSource: "/app/mdx-components",
         remarkPlugins: [

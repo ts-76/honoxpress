@@ -7,7 +7,8 @@ Hono 4.13.13 and Vite 8.3.4. The reproducible consumer is in
 
 **TSX reuse works with the pilot's integration changes. The unmodified published
 templates are not sufficient for Void's full client-rendered Pages mode.**
-MDX support is a separate implementation task; this pilot does not provide it.
+Markdown-first authoring is the agreed next step. Full MDX integration is deferred;
+this TSX pilot provides neither a Markdown adapter extension nor an MDX compiler.
 
 The current source adds the honoxpress-side class, theme, frame and catalog APIs;
 these are unreleased. The separate packed-candidate consumer uses those APIs
@@ -104,7 +105,16 @@ does not preserve HonoX's server-only static-component delivery boundary. Evalua
 Void island pages separately if keeping static content out of browser JavaScript
 is a requirement.
 
-## Changes required for MDX
+## Markdown-first decision and deferred MDX work
+
+On 2026-10-18 the authoring direction changed to reusing `voidHonoMarkdown()`:
+static components produce HTML/CSS, interactive wrappers opt into islands, and
+complex props stay in TSX wrappers. [Markdown-first authoring](markdown.md)
+documents the new `honoxpress/markdown` component boundary and the HonoX `.md`
+fixtures. Those fixtures are not a test of production Void Markdown support.
+Void #117 now tracks the missing public static-component extension point; #116
+remains the independent SSR CSS prerequisite. The MDX-specific rows below record
+the original larger proposal, which is deferred rather than required for this path.
 
 The current optional `voidHonoMarkdown()` plugin discovers and compiles **`.md`**,
 not `.mdx`. Its island syntax accepts literal string/boolean props and no tag
@@ -123,9 +133,11 @@ ported by changing the filename or enabling the Markdown plugin.
 | Authoring and setup            | Add a Void installer/scaffold that centralizes site settings, copies editable components and chooses the correct router, client entry and compiler. Keep optional Markdown/MDX dependencies optional for ordinary TSX consumers.                                                                                                               |
 | Acceptance matrix              | Cover real SSR plus browser context identity, heading/frontmatter/TOC parity, nested components, rich TypeTable/CodeGroup props, route and translation additions/removals, JavaScript-disabled reading, light/dark/system, PC/SP, static output and packed external consumers.                                                                 |
 
-Recommended order: upstream the renderer/CSS/theme primitives first, generalize
-the catalog and shell second, then implement and validate the MDX build adapter.
-This keeps framework integration issues separate from authoring/compiler issues.
+Recommended order: upstream the renderer/CSS/theme primitives and explicit
+catalog/frame, then connect and verify the Markdown component boundary through
+the Void adapter's public extension point. Keep discovery/parsing/routing in Void.
+Revisit a full MDX adapter only if Markdown plus TSX wrappers cannot satisfy an
+identified authoring requirement.
 
 Source references: [Hono CSS helper](https://hono.dev/docs/helpers/css),
 [Void Hono adapter](https://github.com/ts-76/void-plugin-hono-jsx),

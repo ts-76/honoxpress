@@ -16,6 +16,7 @@ import {
 } from "honoxpress/build";
 import { components } from "./app/mdx-components";
 import docsSite from "./app/docs.config";
+import { markdownFixturePlugin } from "./build/markdown-fixture";
 import { docsOnlyPlugin } from "./build/docs-only.ts";
 
 function audit(target: string): Plugin {
@@ -103,6 +104,7 @@ export default defineConfig(({ mode }) => {
       options: { typeAware: true, typeCheck: true },
     },
     plugins: lazyPlugins(async () => [
+      markdownFixturePlugin(mode === "worker"),
       docsMetadataPlugin({
         locales: Object.keys(docsSite.localeLabels),
         defaultLocale: docsSite.defaultLocale,
@@ -113,6 +115,7 @@ export default defineConfig(({ mode }) => {
         ? []
         : [
             mdx({
+              include: /\.mdx$/,
               jsxImportSource: "hono/jsx",
               providerImportSource: "/app/mdx-components",
               remarkPlugins: [

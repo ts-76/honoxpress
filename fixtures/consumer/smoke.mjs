@@ -4,15 +4,21 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { createDocsCatalog, resolveClientScript } from "honoxpress";
 import { docsMetadataPlugin, docsOnlyPlugin } from "honoxpress/build";
+import { createDocsMarkdownRenderer } from "honoxpress/markdown";
 
 const entry = fileURLToPath(import.meta.resolve("honoxpress"));
 const root = path.dirname(path.dirname(entry));
 assert.ok((await realpath(root)).startsWith(await realpath(process.cwd())));
-for (const name of ["index", "catalog", "client"]) {
+for (const name of ["index", "catalog", "client", "markdown"]) {
   const code = await readFile(path.join(root, "dist", `${name}.js`), "utf8");
   assert.doesNotMatch(code, /node:|@mdx-js|remark-|from ["']react/);
   await readFile(path.join(root, "dist", `${name}.d.ts`));
 }
+const markdown = createDocsMarkdownRenderer({
+  components: { Note: { kind: "static", render: ({ attributes }) => attributes.title } },
+});
+assert.equal(markdown("Note", { title: "日本語 & English" }), "日本語 & English");
+assert.throws(() => markdown("Unknown"), /Unknown Markdown component/);
 assert.throws(() => import.meta.resolve("honoxpress/src/catalog.ts"), {
   code: "ERR_PACKAGE_PATH_NOT_EXPORTED",
 });

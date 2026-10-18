@@ -6,6 +6,14 @@ import {
   remarkDocsComponents,
 } from "honoxpress/build";
 import type { Plugin } from "vite-plus";
+import { createDocsMarkdownRenderer } from "honoxpress/markdown";
+
+const markdown = createDocsMarkdownRenderer({
+  components: { Note: { kind: "static", render: ({ attributes }) => String(attributes.title) } },
+});
+void markdown("Note", { title: "Literal text", open: true });
+// @ts-expect-error structured data belongs in the TSX wrapper, not Markdown attributes
+void markdown("Note", { properties: [{ name: "src" }] });
 
 const docs: DocsCatalog = createDocsCatalog({
   locales: ["en", "ja"],

@@ -59,6 +59,15 @@ This example supplies metadata directly. For an MDX application, `docsMetadataPl
 
 The runtime entry contains no Node API or MDX compiler.
 
+The unreleased `honoxpress/markdown` subpath exports `createDocsMarkdownRenderer`
+and its component/attribute/content/options types. Host parsers pass a component
+name, literal string/boolean attributes and already parsed Hono JSX children;
+the app's registry selects a static wrapper or an explicit host island adapter.
+The subpath imports no parser or client runtime. Complex data stays in local TSX
+wrappers. See [Markdown-first authoring](https://github.com/ts-76/honoxpress/blob/main/docs/markdown.md)
+for the actual `.md` example, customization-preserving adoption and the pending
+Void extension point. Existing HonoX/MDX setup remains supported.
+
 The unreleased copied templates also expose a body-only `DocsFrame`, a router-link
 adapter and idempotent theme initialization/synchronization. Existing HonoX APIs
 remain supported. See the [framework integration guide](https://github.com/ts-76/honoxpress/blob/main/docs/framework-integration.md)

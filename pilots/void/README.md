@@ -75,7 +75,7 @@ It is evidence for an upstream renderer change; do not adopt this text transform
 as a stable production integration API. The prototype also uses the exported
 `hono/utils/html` callback resolver, whose internals need compatibility coverage.
 
-Read the [findings and MDX work breakdown](../../docs/void-tsx-pilot.md) before
+Read the [findings and Markdown-first direction](../../docs/void-tsx-pilot.md) before
 extending the experiment.
 
 To test the current unreleased library instead of the published baseline, run

@@ -10,6 +10,8 @@ Use HonoX's file-based routes to build navigation, tables of contents, and langu
 
 ## Features
 
+- **Markdown-first integration (unreleased)** — A parser-neutral component boundary for static TSX wrappers and explicit host islands, with English/Japanese `.md` examples. Existing HonoX/MDX setup remains supported; Void's Markdown adapter extension is tracked separately. See the [authoring guide](docs/markdown.md).
+
 - **Page metadata** — Generate navigation from MDX frontmatter, including titles, descriptions, and display order.
 - **Multilingual documentation** — Derive URLs and locales from file paths and connect translations with matching relative slugs. Unavailable translations have no link.
 - **Tables of contents and anchors** — Generate a TOC from Markdown headings, with support for Unicode text and duplicate headings.
@@ -148,6 +150,7 @@ honoxpress is a 0.x library. Pin your package version and review the [changelog]
 - [Integration guide / API](docs/api.md) — MDX, Vite, renderer, templates, and Worker configuration
 - [Compatibility guide](docs/compatibility.md) — Tested environments and known limitations
 - [Framework integration](docs/framework-integration.md) — Unreleased SSR/DOM classes, theme lifecycle, docs frame and explicit catalog APIs
+- [Markdown-first authoring](docs/markdown.md) — Unreleased parser-neutral component renderer, static wrappers and explicit host islands; runnable `.md` examples
 - [Maintenance and upgrades](docs/maintenance.md) — Compatibility decisions and template migration
 - [Updating existing sites](docs/upgrading-owned-templates.md) — Responsive template fixes and manual merge steps
 - [Example application](examples/poc) — The complete client/SSG/Worker pipeline

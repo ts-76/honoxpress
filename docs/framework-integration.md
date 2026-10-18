@@ -4,6 +4,12 @@ The APIs on this page are **unreleased**. They are available in the current
 source/packed candidate, not the published `honoxpress@0.3.0` package.
 Existing HonoX applications can keep `createDocsCatalog` and `DocsLayout`.
 
+For new Void-facing authoring, prefer the [Markdown-first component boundary](markdown.md).
+`createDocsMarkdownRenderer` from `honoxpress/markdown` dispatches parsed component
+nodes to static wrappers or an explicit host island adapter. It does not parse
+Markdown or require a full MDX compiler. The existing MDX integration remains
+supported.
+
 ## Explicit page metadata
 
 Framework adapters can provide paths without inventing HonoX MDX filenames:
@@ -154,5 +160,6 @@ through the ordinary `pilots/void` verifier.
 The candidate uses DocsFrame, the explicit catalog and the new theme sync API,
 with unchanged class imports and no literal theme patch. Only the Void-owned
 SSR/style-host workaround remains. The [pilot report](void-tsx-pilot.md) records
-observed limits and the separate MDX compiler work; these APIs do not add MDX
-discovery, compilation or static export to Void.
+observed limits and the separate Markdown adapter work; these APIs do not add
+Markdown discovery, parsing, islands or static export to Void. The HonoX example
+contains separate `.md` fixtures for testing the honoxpress-owned boundary.
