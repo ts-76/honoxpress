@@ -1,0 +1,28 @@
+{
+  "name": "honoxpress-void-tsx-pilot",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5195 --strictPort",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4195 --strictPort",
+    "typecheck": "tsc --noEmit",
+    "components:sync": "node scripts/sync-components.mjs",
+    "verify": "node scripts/verify.mjs"
+  },
+  "dependencies": {
+    "hono": "4.13.13",
+    "honoxpress": "0.3.0",
+    "void": "1.1.11",
+    "void-plugin-hono-jsx": "0.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.1",
+    "playwright": "1.64.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.4"
+  },
+  "engines": {
+    "node": ">=24.21.0 <25"
+  }
+}
