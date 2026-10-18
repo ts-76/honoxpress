@@ -1,6 +1,6 @@
 # Markdown-first authoring
 
-The API below is **unreleased**, available in the PR #39 source/packed candidate.
+The API below is included in **honoxpress 0.4.0**, introduced by PR #39.
 Existing HonoX/MDX sites keep their current compiler, registry and routes. This
 change adds a component boundary for Markdown hosts; it does not make the
 published Void adapter support nested static components automatically.
@@ -128,10 +128,10 @@ until an unmet authoring requirement warrants it. The existing TSX pilot verifie
 the framework primitives; the new `.md` pages verify the honoxpress boundary in
 HonoX, not production Void Markdown support.
 
-## Adopting the candidate
+## Adopting 0.4.0
 
-1. Build/pack PR #39 and install that tarball, or wait for a release containing
-   `honoxpress/markdown`. Published `0.3.0` does not contain this API.
+1. Install `honoxpress@0.4.0` or later. For local development, build/pack the
+   checkout and install its tarball. Version `0.3.0` does not contain this API.
 2. Keep existing copied components, CSS overrides and MDX content. Merge the
    [framework template changes](framework-integration.md#upgrade-consumer-owned-files)
    manually; installing a package does not replace owned files.

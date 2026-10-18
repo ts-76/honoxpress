@@ -2,7 +2,7 @@
 
 honoxpress can install a set of editable Hono JSX components into an application. The files belong to your app after installation: MDX uses them through one shared registry, and you can change their markup, behavior, props, and styles.
 
-> **Release status:** the CLI and starter are available in 0.2.x. The component-local `hono/css` styling described below is an unreleased change; 0.2.1 still keeps static component styles in shared stylesheets. Use a built or packed candidate to try the new styling.
+> **Version scope:** this guide describes 0.4.0. The CLI and starter are available since 0.2.0; component-local `hono/css` styling is included since 0.3.0. Version 0.4.0 adds the parser-neutral Markdown renderer and framework integration primitives.
 
 ## Install into an existing HonoX application
 
@@ -430,7 +430,7 @@ Static `code` and `language` attributes may be strings, string literals in brace
 
 ## Start a new site
 
-Published npm `honoxpress@0.1.4` does not have this command. To try the current repository version from a clone, build and pack a candidate, then invoke its CLI source to create a new directory:
+Create a new site with `pnpm dlx honoxpress@0.4.0 init --starter --cwd /path/to/new-docs`, then install dependencies in the new directory. To test a local checkout instead, build and pack a candidate and invoke its CLI source:
 
 ```sh
 pnpm build:package
@@ -439,13 +439,13 @@ pnpm --dir packages/docs pack --pack-destination /tmp/honoxpress-candidate
 mkdir /tmp/my-docs
 node packages/docs/bin/honoxpress.mjs init --starter --cwd /tmp/my-docs
 cd /tmp/my-docs
-pnpm add /tmp/honoxpress-candidate/honoxpress-0.1.4.tgz
+pnpm add /tmp/honoxpress-candidate/honoxpress-0.4.0.tgz
 pnpm dev
 ```
 
 Open `http://127.0.0.1:5173/docs/getting-started`. The starter pins Hono, HonoX, Vite Plus, MDX, and Cloudflare tooling. Its production build runs browser assets, docs-only SSG, then the Worker build; `pnpm preview` runs that output locally through Wrangler. It includes a small dynamic Worker demo and keeps MDX route bodies out of the Worker route graph. `init --starter` creates files but does not install packages, access credentials, or deploy. Installing the local tarball with `pnpm add` installs its declared dependencies.
 
-After a release includes the CLI, a new project can use `pnpm dlx honoxpress@<version> init --starter --cwd /path/to/new-docs`. Replace `<version>` with that release; `0.1.4` is not a valid choice because it predates the CLI.
+Pin the version used by `pnpm dlx` when reproducing a setup. The package installed in the generated app should match the CLI version used to create it.
 
 ## Ownership, updates, and design references
 

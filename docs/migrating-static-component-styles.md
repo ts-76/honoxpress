@@ -1,9 +1,9 @@
 # Migrating static component styles
 
-This unreleased change moves static component defaults into their copied TSX
-sources using `hono/css`. Published 0.2.1 uses the previous shared CSS arrangement.
-Updating the dependency alone does not update application-owned files. Merge this
-change after it is released, or evaluate a packed candidate on a separate branch.
+Since 0.3.0, static component defaults live in their copied TSX sources using
+`hono/css`. Version 0.2.1 uses the previous shared CSS arrangement. Updating the
+dependency alone does not update application-owned files. Merge the relevant
+template changes on a separate application branch and preserve customizations.
 
 ## Merge the sources and layout first
 

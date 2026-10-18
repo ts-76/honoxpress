@@ -371,7 +371,7 @@ try {
   await run(["scripts/sync-components.mjs"]);
   browser = await chromium.launch({ headless: true });
   if (process.env.HX_CANDIDATE === "1") {
-    report.baseline = { mode: "unreleased-candidate", baselineReport: "docs/void-tsx-pilot.md" };
+    report.baseline = { mode: "working-tree-candidate", baselineReport: "docs/void-tsx-pilot.md" };
   } else {
   const baseline = await start("baseline", "dev", 5196, { HX_BASELINE: "1" });
   const raw = await (await fetch(`${baseline}/en`)).text();

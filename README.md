@@ -10,7 +10,7 @@ Use HonoX's file-based routes to build navigation, tables of contents, and langu
 
 ## Features
 
-- **Markdown-first integration (unreleased)** — A parser-neutral component boundary for static TSX wrappers and explicit host islands, with English/Japanese `.md` examples. Existing HonoX/MDX setup remains supported; Void's Markdown adapter extension is tracked separately. See the [authoring guide](docs/markdown.md).
+- **Markdown-first integration (0.4.0)** — A parser-neutral component boundary for static TSX wrappers and explicit host islands, with English/Japanese `.md` examples. Existing HonoX/MDX setup remains supported; Void's Markdown adapter extension is tracked separately. See the [authoring guide](docs/markdown.md).
 
 - **Page metadata** — Generate navigation from MDX frontmatter, including titles, descriptions, and display order.
 - **Multilingual documentation** — Derive URLs and locales from file paths and connect translations with matching relative slugs. Unavailable translations have no link.
@@ -29,7 +29,7 @@ pnpm add honoxpress hono
 
 The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX and MDX build dependencies belong to your application.
 
-The component CLI and runnable starter are being prepared for an upcoming release. The currently published npm version, `honoxpress@0.1.4`, contains the metadata API and file templates but does not include `honoxpress init`, `honoxpress add`, or `init --starter`. The [component guide](docs/components.md#start-a-new-site) shows how to build and run the current repository candidate.
+The package includes `honoxpress init`, `honoxpress add`, and a runnable starter. To create a new site with this release, run `pnpm dlx honoxpress@0.4.0 init --starter --cwd /path/to/new-docs`, then install dependencies in the generated directory. The [component guide](docs/components.md#start-a-new-site) also covers local tarball development.
 
 `createDocsCatalog` turns page metadata into URLs, navigation, and translation links:
 
@@ -122,7 +122,7 @@ Templates are exported as files through `honoxpress/templates/*`:
 | `docs.css`            | Your public stylesheet                      |
 | `tokens.css`          | Shared theme, typography, and spacing roles |
 
-For the complete component list, props, MDX registry setup, CLI workflow, and starter, see the [component system guide](docs/components.md). The upcoming CLI installs Hono JSX components and islands into your app, then validates MDX tags using the same registry supplied to `providerImportSource`.
+For the complete component list, props, MDX registry setup, CLI workflow, and starter, see the [component system guide](docs/components.md). The CLI installs Hono JSX components and islands into your app, then validates MDX tags using the same registry supplied to `providerImportSource`.
 
 The layout and styles include responsive navigation and TOC disclosures, visible keyboard focus, a skip link, copy success/failure feedback, and a persistent Light / Dark / System theme selector. Installed components are app-owned; review changes manually and preserve the MIT notice when distributing copied files. See the [component system guide](docs/components.md) for installation, registry setup, props, and customization.
 
@@ -130,7 +130,7 @@ Static components define their styles alongside their JSX using `hono/css`;
 `DocsLayout` emits only the static styles used by each page. Shared tokens, shell,
 Markdown, and interactive styles remain in the public stylesheets. Existing sites
 must [merge the copied sources and layout](docs/migrating-static-component-styles.md)
-to adopt this unreleased change; installing a dependency does not replace their
+to adopt component-local styling; installing a dependency does not replace their
 customizations.
 
 ## Build model and scope
@@ -149,8 +149,8 @@ honoxpress is a 0.x library. Pin your package version and review the [changelog]
 - [Component system](docs/components.md) — MDX registry, standard component props, CLI, layout config, and starter
 - [Integration guide / API](docs/api.md) — MDX, Vite, renderer, templates, and Worker configuration
 - [Compatibility guide](docs/compatibility.md) — Tested environments and known limitations
-- [Framework integration](docs/framework-integration.md) — Unreleased SSR/DOM classes, theme lifecycle, docs frame and explicit catalog APIs
-- [Markdown-first authoring](docs/markdown.md) — Unreleased parser-neutral component renderer, static wrappers and explicit host islands; runnable `.md` examples
+- [Framework integration](docs/framework-integration.md) — SSR/DOM classes, theme lifecycle, docs frame and explicit catalog APIs
+- [Markdown-first authoring](docs/markdown.md) — Parser-neutral component renderer, static wrappers and explicit host islands; runnable `.md` examples
 - [Maintenance and upgrades](docs/maintenance.md) — Compatibility decisions and template migration
 - [Updating existing sites](docs/upgrading-owned-templates.md) — Responsive template fixes and manual merge steps
 - [Example application](examples/poc) — The complete client/SSG/Worker pipeline

@@ -10,10 +10,11 @@ They do not change component props, routes, content, or theme persistence.
 
 ## Choose the template source
 
-These fixes are unreleased until a package containing this change is published.
-Do not assume `honoxpress@0.2.0` contains them. Before publication, review the files
-from the Git commit containing this change. After publication, install an explicit
-version containing the fixes and use that package's exported templates.
+These fixes are included since 0.2.1; version 0.2.0 does not contain them.
+Install an explicit version containing the fixes and use that package's exported
+templates. Version 0.3.0 also moves static styles into component sources; consult
+the [static-style migration guide](migrating-static-component-styles.md) when
+upgrading across that boundary.
 
 Create a branch in your application and commit your current customizations before
 comparing files. The default installed destinations are:

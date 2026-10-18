@@ -78,7 +78,7 @@ as a stable production integration API. The prototype also uses the exported
 Read the [findings and Markdown-first direction](../../docs/void-tsx-pilot.md) before
 extending the experiment.
 
-To test the current unreleased library instead of the published baseline, run
+To test the current working-tree library instead of the published baseline, run
 `node scripts/verify-void-current.mjs` from the repository root after
 `pnpm build:package`. It packs the library into an independent temporary consumer,
 uses `candidate/layout.tsx` with the public frame/catalog/theme APIs, and leaves

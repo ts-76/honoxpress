@@ -16,7 +16,8 @@ const names = [
 const candidate = process.env.HX_CANDIDATE === "1";
 const hashes = {};
 const manifest = JSON.parse(await readFile("node_modules/honoxpress/package.json", "utf8"));
-if (manifest.version !== "0.3.0")
+const expectedVersion = candidate ? process.env.HX_CANDIDATE_VERSION : "0.3.0";
+if (!expectedVersion || manifest.version !== expectedVersion)
   throw new Error("Review the pilot against the new honoxpress version before syncing.");
 for (const mode of ["baseline", "adapted", "shared"])
   await mkdir(`.generated/${mode}`, { recursive: true });
@@ -52,5 +53,5 @@ for (const name of [...names, "docs.css", "components.css", "tokens.css"]) {
 }
 await writeFile(".generated/template-hashes.json", JSON.stringify(hashes, null, 2) + "\n");
 console.log(candidate
-  ? "Synced unreleased candidate templates without class or theme patches."
+  ? `Synced honoxpress ${expectedVersion} candidate templates without class or theme patches.`
   : "Synced honoxpress 0.3.0 templates; baseline unchanged, adapted class tag only.");
