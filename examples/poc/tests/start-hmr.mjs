@@ -7,7 +7,7 @@ import { randomUUID } from "node:crypto";
 // Tests edit only this disposable app. The installed registry package stays intact.
 const id = randomUUID();
 const root = await mkdtemp(join(tmpdir(), "honoxpress-hmr-"));
-for (const name of ["app", "build", "public", "vite.config.ts", "tsconfig.json"])
+for (const name of ["app", "build", "content", "public", "vite.config.ts", "tsconfig.json"])
   await cp(name, join(root, name), { recursive: true });
 // The packed consumer has its own config; the repository example inherits one.
 const workspace = await readFile("pnpm-workspace.yaml", "utf8").catch(() =>
