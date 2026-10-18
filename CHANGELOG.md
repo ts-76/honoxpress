@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/ts-76/honoxpress/compare/v0.3.0...v0.4.0) (2026-10-18)
+
+
+### Features
+
+* add Markdown-first component rendering and framework primitives ([#39](https://github.com/ts-76/honoxpress/issues/39)) ([02b8d20](https://github.com/ts-76/honoxpress/commit/02b8d20fd2a52e61f74fcec8a2cf42d51b9577ab))
+
 ## [0.3.0](https://github.com/ts-76/honoxpress/compare/v0.2.1...v0.3.0) (2026-10-12)
 
 
