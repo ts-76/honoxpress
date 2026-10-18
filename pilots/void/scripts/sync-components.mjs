@@ -10,7 +10,10 @@ const names = [
   "tabs.tsx",
   "code-group.tsx",
   "copy-code.tsx",
+  "docs-layout.tsx",
+  "docs-ui.tsx",
 ];
+const candidate = process.env.HX_CANDIDATE === "1";
 const hashes = {};
 const manifest = JSON.parse(await readFile("node_modules/honoxpress/package.json", "utf8"));
 if (manifest.version !== "0.3.0")
@@ -27,13 +30,13 @@ for (const name of [...names, "docs.css", "components.css", "tokens.css"]) {
   await writeFile(`.generated/baseline/${name}`, source);
   // The only component edit: use a renderer-aware class tag, keeping the CSS
   // template, stable selectors, props and markup byte-for-byte otherwise.
-  const adapted = source.replace(
+  const adapted = candidate ? source : source.replace(
     'import { html } from "hono/html";',
     'import { componentClass as html } from "../../integration/component-class";',
   );
   if (
     ["docs-content.tsx", "file-tree.tsx", "type-table.tsx"].includes(name) &&
-    adapted === source
+    !candidate && adapted === source
   ) {
     throw new Error(`Published class composition changed in ${name}; review the adapter.`);
   }
@@ -48,4 +51,6 @@ for (const name of [...names, "docs.css", "components.css", "tokens.css"]) {
   }
 }
 await writeFile(".generated/template-hashes.json", JSON.stringify(hashes, null, 2) + "\n");
-console.log("Synced honoxpress 0.3.0 templates; baseline unchanged, adapted class tag only.");
+console.log(candidate
+  ? "Synced unreleased candidate templates without class or theme patches."
+  : "Synced honoxpress 0.3.0 templates; baseline unchanged, adapted class tag only.");

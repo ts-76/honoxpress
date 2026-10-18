@@ -9,6 +9,17 @@ Hono 4.13.13 and Vite 8.3.4. The reproducible consumer is in
 templates are not sufficient for Void's full client-rendered Pages mode.**
 MDX support is a separate implementation task; this pilot does not provide it.
 
+The current source adds the honoxpress-side class, theme, frame and catalog APIs;
+these are unreleased. The separate packed-candidate consumer uses those APIs
+without the pilot's class/theming patches and retains only the Void SSR/style-host
+workaround. See [framework integration](framework-integration.md). Tracking:
+[honoxpress #35](https://github.com/ts-76/honoxpress/issues/35),
+[#36](https://github.com/ts-76/honoxpress/issues/36),
+[#37](https://github.com/ts-76/honoxpress/issues/37),
+[#38](https://github.com/ts-76/honoxpress/issues/38);
+[Void #116](https://github.com/ts-76/void-plugin-hono-jsx/issues/116),
+[#117](https://github.com/ts-76/void-plugin-hono-jsx/issues/117).
+
 ## What the pilot exercises
 
 The component page uses Callout, Cards/Card, Steps/Step, Accordion/AccordionItem,

@@ -147,6 +147,7 @@ honoxpress is a 0.x library. Pin your package version and review the [changelog]
 - [Component system](docs/components.md) — MDX registry, standard component props, CLI, layout config, and starter
 - [Integration guide / API](docs/api.md) — MDX, Vite, renderer, templates, and Worker configuration
 - [Compatibility guide](docs/compatibility.md) — Tested environments and known limitations
+- [Framework integration](docs/framework-integration.md) — Unreleased SSR/DOM classes, theme lifecycle, docs frame and explicit catalog APIs
 - [Maintenance and upgrades](docs/maintenance.md) — Compatibility decisions and template migration
 - [Updating existing sites](docs/upgrading-owned-templates.md) — Responsive template fixes and manual merge steps
 - [Example application](examples/poc) — The complete client/SSG/Worker pipeline

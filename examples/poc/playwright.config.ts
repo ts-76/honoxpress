@@ -5,7 +5,13 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   reporter: [["list"], ["json", { outputFile: "dist/evidence/browser-tests.json" }]],
-  use: { browserName: "chromium", trace: "retain-on-failure" },
+  use: {
+    browserName: "chromium",
+    trace: "retain-on-failure",
+    launchOptions: process.env.HONOXPRESS_CHROMIUM_EXECUTABLE
+      ? { executablePath: process.env.HONOXPRESS_CHROMIUM_EXECUTABLE }
+      : undefined,
+  },
   projects: [
     { name: "development", use: { baseURL: "http://127.0.0.1:5173" } },
     { name: "production-local", use: { baseURL: "http://127.0.0.1:8787" } },

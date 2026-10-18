@@ -77,3 +77,10 @@ as a stable production integration API. The prototype also uses the exported
 
 Read the [findings and MDX work breakdown](../../docs/void-tsx-pilot.md) before
 extending the experiment.
+
+To test the current unreleased library instead of the published baseline, run
+`node scripts/verify-void-current.mjs` from the repository root after
+`pnpm build:package`. It packs the library into an independent temporary consumer,
+uses `candidate/layout.tsx` with the public frame/catalog/theme APIs, and leaves
+only the Void SSR workaround in place. See the
+[framework integration guide](../../docs/framework-integration.md#reproduce-the-integration-checks).

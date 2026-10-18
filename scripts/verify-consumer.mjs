@@ -223,7 +223,7 @@ const cf = await json(path.join(consumer, "dist/evidence/cf-build.json"));
 assert.equal(unit.numPassedTests, 5);
 assert.equal(unit.numFailedTests, 0);
 assert.equal(unit.success, true);
-assert.equal(browser.stats.expected, 28);
+assert.equal(browser.stats.expected, 30);
 assert.equal(browser.stats.unexpected, 0);
 assert.equal(hmr.stats.expected, 2);
 assert.equal(hmr.stats.unexpected, 0);

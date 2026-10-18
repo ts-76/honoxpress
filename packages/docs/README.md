@@ -14,7 +14,13 @@ pnpm add honoxpress hono
 
 The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX, Vite Plus, MDX, and SSG adapters are application dependencies. See the [compatibility guide](https://github.com/ts-76/honoxpress/blob/main/docs/compatibility.md) for tested versions.
 
-The component installer, runnable starter, and syntax-highlighting helpers are under active development. The currently published npm `honoxpress@0.1.4` provides the metadata API and exported templates, but does not include the `honoxpress` CLI. The `init`, `add`, `list`, and `init --starter` commands documented in the repository require a built or packed candidate from the development branch and will be included only after a later release. The [component guide](https://github.com/ts-76/honoxpress/blob/main/docs/components.md#start-a-new-site) gives the exact candidate workflow.
+The `honoxpress@0.3.0` package includes the component installer, runnable starter,
+syntax-highlighting helpers and component-local static CSS. The framework
+integration APIs explicitly marked **unreleased** below require a current
+source/packed candidate until a later version is published. See the
+[component guide](https://github.com/ts-76/honoxpress/blob/main/docs/components.md#start-a-new-site)
+for setup and the [framework guide](https://github.com/ts-76/honoxpress/blob/main/docs/framework-integration.md)
+for the new integration boundaries.
 
 ## Runtime API
 
@@ -42,6 +48,8 @@ This example supplies metadata directly. For an MDX application, `docsMetadataPl
 | Export                                                | Purpose                                                                                          |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | `createDocsCatalog(options)`                          | Validate metadata and build an immutable page catalog                                            |
+| `createDocsCatalogFromPages(options)` (unreleased)    | Build a catalog from explicit locale/slug/href metadata, without HonoX file paths                |
+| `componentClass` (unreleased)                         | Compose stable classes while preserving Hono SSR callbacks and DOM CSS registration              |
 | `defineDocsConfig(config)`                            | Validate the app-owned site's default language and language labels                               |
 | `resolveDocsLocale(pathname, config)`                 | Resolve a full locale path segment, falling back to the configured default                       |
 | `DocsSiteConfig`, `DocsLayoutLabels`                  | Shared types for site identity, links, languages, layout labels, and theme controls              |
@@ -50,6 +58,11 @@ This example supplies metadata directly. For an MDX application, `docsMetadataPl
 | `Heading`, `LocaleLink`, `ClientManifest`             | Types for headings, optional translation links, and client manifests                             |
 
 The runtime entry contains no Node API or MDX compiler.
+
+The unreleased copied templates also expose a body-only `DocsFrame`, a router-link
+adapter and idempotent theme initialization/synchronization. Existing HonoX APIs
+remain supported. See the [framework integration guide](https://github.com/ts-76/honoxpress/blob/main/docs/framework-integration.md)
+for API boundaries, host-renderer requirements and manual template upgrade steps.
 
 The generated starter reads site settings from `app/docs.config.ts` for Vite, docs SSG, rendering, home links, and 404 pages. Use `defineDocsConfig({ name, defaultLocale, localeLabels, ... })` there; `localeLabels` keys are the supported languages. The default language has unprefixed `/docs/*` URLs, while other languages use `/<locale>/docs/*`. `docsHref` selects the default-language entry page. Changing the default requires placing authored content in the corresponding directories, but no separate build/renderer language constants need editing. See the [configuration guide](https://github.com/ts-76/honoxpress/blob/main/docs/components.md#layout-and-site-configuration).
 

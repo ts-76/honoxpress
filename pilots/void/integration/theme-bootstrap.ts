@@ -6,7 +6,7 @@ const marker = 'document.addEventListener("DOMContentLoaded", apply, { once: tru
 if (!themeInitializer.includes(marker))
   throw new Error("Published theme lifecycle changed; review the pilot adapter.");
 export const themeBootstrap =
-  process.env.HX_BASELINE === "1"
+  process.env.HX_BASELINE === "1" || process.env.HX_CANDIDATE === "1"
     ? themeInitializer
     : themeInitializer.replace(
         marker,

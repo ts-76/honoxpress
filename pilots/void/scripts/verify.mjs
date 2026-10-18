@@ -370,6 +370,9 @@ async function matrix(base, phase, widths) {
 try {
   await run(["scripts/sync-components.mjs"]);
   browser = await chromium.launch({ headless: true });
+  if (process.env.HX_CANDIDATE === "1") {
+    report.baseline = { mode: "unreleased-candidate", baselineReport: "docs/void-tsx-pilot.md" };
+  } else {
   const baseline = await start("baseline", "dev", 5196, { HX_BASELINE: "1" });
   const raw = await (await fetch(`${baseline}/en`)).text();
   const p = await browser.newPage();
@@ -385,13 +388,14 @@ try {
   await p.close();
   await stop();
   console.log("Baseline reproduced: missing SSR CSS, Promise classes, disabled theme.");
-  const dev = await start("dev", "dev", 5195);
+  }
+  const dev = await start("dev", "dev", Number(process.env.HX_DEV_PORT ?? 5195));
   await noJs(dev, "dev");
   await matrix(dev, "dev", [1280, 390]);
   await run(["node_modules/typescript/bin/tsc", "--noEmit"]);
   await stop();
   await run(["node_modules/vite/bin/vite.js", "build"]);
-  const preview = await start("preview", "preview", 4195);
+  const preview = await start("preview", "preview", Number(process.env.HX_PREVIEW_PORT ?? 4195));
   await noJs(preview, "preview");
   await matrix(preview, "preview", [1280, 390, 320]);
   const [pkg, hashes] = await Promise.all([

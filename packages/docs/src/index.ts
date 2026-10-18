@@ -1,4 +1,5 @@
-export { createDocsCatalog } from "./catalog.js";
+export { createDocsCatalog, createDocsCatalogFromPages } from "./catalog.js";
+export { componentClass } from "./component-class.js";
 export type {
   DocsEntry,
   DocsPage,
@@ -6,6 +7,8 @@ export type {
   DocsCatalog,
   Heading,
   LocaleLink,
+  DocsPageInput,
+  ExplicitDocsOptions,
 } from "./catalog.js";
 
 export { resolveClientScript } from "./client.js";

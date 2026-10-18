@@ -1,4 +1,38 @@
 import { test, expect } from "@playwright/test";
+import { themeInitializer } from "../../app/components/theme-switch";
+
+test("repeated theme bootstrap resynchronizes replaced controls without duplicate listeners", async ({
+  page,
+}) => {
+  await page.goto("/docs/components");
+  const select = page.locator(".theme-desktop select");
+  await expect(select).toBeEnabled();
+  await select.selectOption("dark");
+  await page.evaluate(() => {
+    const previous = document.querySelector(
+      ".theme-desktop select",
+    ) as unknown as HTMLSelectElement;
+    const replacement = previous.cloneNode(true) as HTMLSelectElement;
+    replacement.disabled = true;
+    replacement.value = "light";
+    previous.replaceWith(replacement);
+    const original = localStorage.setItem.bind(localStorage);
+    (window as unknown as { themeWrites: number }).themeWrites = 0;
+    Storage.prototype.setItem = function (key, value) {
+      if (key === "honoxpress-theme") (window as unknown as { themeWrites: number }).themeWrites++;
+      return original(key, value);
+    };
+  });
+  await page.addScriptTag({ content: themeInitializer });
+  await page.addScriptTag({ content: themeInitializer });
+  await expect(select).toBeEnabled();
+  await expect(select).toHaveValue("dark");
+  await select.selectOption("light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  expect(
+    await page.evaluate(() => (window as unknown as { themeWrites: number }).themeWrites),
+  ).toBe(1);
+});
 
 test("static styles survive SSR/SSG, locales, narrow screens and app overrides", async ({
   page,
