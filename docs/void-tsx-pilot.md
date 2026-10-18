@@ -10,8 +10,8 @@ templates are not sufficient for Void's full client-rendered Pages mode.**
 Markdown-first authoring is the agreed next step. Full MDX integration is deferred;
 this TSX pilot provides neither a Markdown adapter extension nor an MDX compiler.
 
-The current source adds the honoxpress-side class, theme, frame and catalog APIs;
-these are unreleased. The separate packed-candidate consumer uses those APIs
+honoxpress 0.4.0 adds the honoxpress-side class, theme, frame and catalog APIs.
+The baseline above remains pinned to 0.3.0 for historical comparison. The separate packed-candidate consumer uses those APIs
 without the pilot's class/theming patches and retains only the Void SSR/style-host
 workaround. See [framework integration](framework-integration.md). Tracking:
 [honoxpress #35](https://github.com/ts-76/honoxpress/issues/35),

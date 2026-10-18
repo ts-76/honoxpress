@@ -1,7 +1,7 @@
 # Integrating another Hono JSX framework
 
-The APIs on this page are **unreleased**. They are available in the current
-source/packed candidate, not the published `honoxpress@0.3.0` package.
+The APIs on this page are included in **honoxpress 0.4.0**. Version 0.3.0
+does not contain these integration primitives.
 Existing HonoX applications can keep `createDocsCatalog` and `DocsLayout`.
 
 For new Void-facing authoring, prefer the [Markdown-first component boundary](markdown.md).
@@ -123,7 +123,7 @@ storage-event behavior and ThemeScript's nonce prop remain compatible.
 
 ## Upgrade consumer-owned files
 
-After a version containing these APIs is published:
+When upgrading to 0.4.0 or later:
 
 1. Update the package first, retaining the site's supported Hono version.
 2. Merge the class import change into all static templates that composed CSS via
@@ -138,7 +138,7 @@ After a version containing these APIs is published:
    files, and rerunning the CLI does not overwrite owned customizations.
 
 For a local candidate, build and pack the repository and install that tarball;
-do not assume the currently published package has these exports.
+versions before 0.4.0 do not have these exports.
 
 ## Reproduce the integration checks
 

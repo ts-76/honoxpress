@@ -14,10 +14,9 @@ pnpm add honoxpress hono
 
 The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX, Vite Plus, MDX, and SSG adapters are application dependencies. See the [compatibility guide](https://github.com/ts-76/honoxpress/blob/main/docs/compatibility.md) for tested versions.
 
-The `honoxpress@0.3.0` package includes the component installer, runnable starter,
-syntax-highlighting helpers and component-local static CSS. The framework
-integration APIs explicitly marked **unreleased** below require a current
-source/packed candidate until a later version is published. See the
+The `honoxpress@0.4.0` package includes the component installer, runnable starter,
+syntax-highlighting helpers, component-local static CSS, framework integration
+primitives and the parser-neutral Markdown component renderer. See the
 [component guide](https://github.com/ts-76/honoxpress/blob/main/docs/components.md#start-a-new-site)
 for setup and the [framework guide](https://github.com/ts-76/honoxpress/blob/main/docs/framework-integration.md)
 for the new integration boundaries.
@@ -48,8 +47,8 @@ This example supplies metadata directly. For an MDX application, `docsMetadataPl
 | Export                                                | Purpose                                                                                          |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | `createDocsCatalog(options)`                          | Validate metadata and build an immutable page catalog                                            |
-| `createDocsCatalogFromPages(options)` (unreleased)    | Build a catalog from explicit locale/slug/href metadata, without HonoX file paths                |
-| `componentClass` (unreleased)                         | Compose stable classes while preserving Hono SSR callbacks and DOM CSS registration              |
+| `createDocsCatalogFromPages(options)` (since 0.4.0)   | Build a catalog from explicit locale/slug/href metadata, without HonoX file paths                |
+| `componentClass` (since 0.4.0)                        | Compose stable classes while preserving Hono SSR callbacks and DOM CSS registration              |
 | `defineDocsConfig(config)`                            | Validate the app-owned site's default language and language labels                               |
 | `resolveDocsLocale(pathname, config)`                 | Resolve a full locale path segment, falling back to the configured default                       |
 | `DocsSiteConfig`, `DocsLayoutLabels`                  | Shared types for site identity, links, languages, layout labels, and theme controls              |
@@ -59,7 +58,7 @@ This example supplies metadata directly. For an MDX application, `docsMetadataPl
 
 The runtime entry contains no Node API or MDX compiler.
 
-The unreleased `honoxpress/markdown` subpath exports `createDocsMarkdownRenderer`
+The `honoxpress/markdown` subpath (since 0.4.0) exports `createDocsMarkdownRenderer`
 and its component/attribute/content/options types. Host parsers pass a component
 name, literal string/boolean attributes and already parsed Hono JSX children;
 the app's registry selects a static wrapper or an explicit host island adapter.
@@ -68,7 +67,7 @@ wrappers. See [Markdown-first authoring](https://github.com/ts-76/honoxpress/blo
 for the actual `.md` example, customization-preserving adoption and the pending
 Void extension point. Existing HonoX/MDX setup remains supported.
 
-The unreleased copied templates also expose a body-only `DocsFrame`, a router-link
+Since 0.4.0, the copied templates also expose a body-only `DocsFrame`, a router-link
 adapter and idempotent theme initialization/synchronization. Existing HonoX APIs
 remain supported. See the [framework integration guide](https://github.com/ts-76/honoxpress/blob/main/docs/framework-integration.md)
 for API boundaries, host-renderer requirements and manual template upgrade steps.

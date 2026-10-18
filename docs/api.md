@@ -12,7 +12,7 @@ Keep HonoX, Vite Plus, `@mdx-js/rollup`, `remark-frontmatter`, `remark-mdx-front
 
 For local package development, `pnpm pack:docs` in this repository creates a tarball under `artifacts/package`. Install that tarball in a separate app to test the actual distribution without workspace links.
 
-The component CLI and runnable starter require the unreleased development version. Published npm `honoxpress@0.1.4` has no `honoxpress` executable; `init`, `add`, and `list` require a built or packed candidate until a later release.
+The package includes the component CLI and runnable starter. Use an explicit version, such as `pnpm dlx honoxpress@0.4.0 init --starter --cwd /path/to/new-docs`, for reproducible setup.
 
 ## Add MDX routes
 
@@ -123,7 +123,7 @@ pnpm exec honoxpress add tabs
 
 Use `honoxpress list` to print component groups. `init` installs all groups; `add` accepts one group such as `callout`, `cards`, `steps`, `accordion`, `tabs`, `code-block`, `demo-frame`, or `layout`. The CLI does not install dependencies, edit existing routes or Vite configuration, access credentials, or deploy. It never overwrites existing files; a differing destination stops the plan before files are written.
 
-To try the unreleased CLI against the current checkout, build and pack the package, then create the new app from that local candidate:
+To test the CLI from a local checkout, build and pack the package, then create the new app from that local candidate:
 
 ```sh
 pnpm build:package
@@ -132,13 +132,11 @@ pnpm --dir packages/docs pack --pack-destination /tmp/honoxpress-candidate
 mkdir /tmp/my-docs
 node packages/docs/bin/honoxpress.mjs init --starter --cwd /tmp/my-docs
 cd /tmp/my-docs
-pnpm add /tmp/honoxpress-candidate/honoxpress-0.1.4.tgz
+pnpm add /tmp/honoxpress-candidate/honoxpress-0.4.0.tgz
 pnpm dev
 ```
 
-The starter sets up the HonoX routes, shared MDX registry, and client → docs SSG → Worker build stages. The standard `public/style.css` imports `components.css`; retain the import when keeping the supplied component styles. After a release includes the CLI, use `pnpm dlx honoxpress@<version> init --starter --cwd /path/to/new-docs`; replace `<version>` with that release. Published `honoxpress@0.1.4` predates these commands.
-
-These commands require a built or packed candidate from the development branch until a later release. They are not included in published npm `honoxpress@0.1.4`.
+The starter sets up the HonoX routes, shared MDX registry, and client → docs SSG → Worker build stages. The standard `public/style.css` imports `components.css`; retain the import when keeping the supplied component styles. For a registry installation, use `pnpm dlx honoxpress@0.4.0 init --starter --cwd /path/to/new-docs` and install dependencies in the generated directory.
 
 ## Build client, static docs, and Worker separately
 
