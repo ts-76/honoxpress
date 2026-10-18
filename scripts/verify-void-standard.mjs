@@ -62,9 +62,10 @@ async function port() {
   await new Promise((done) => server.close(done));
   return value;
 }
-async function until(test) {
+async function until(test, fail = () => {}) {
   const end = Date.now() + 60000;
   while (Date.now() < end) {
+    fail();
     try {
       if (await test()) return;
     } catch {}
@@ -88,7 +89,13 @@ async function withServer(script, verify) {
     log += data;
   });
   try {
-    await until(async () => (await fetch(origin + "/docs/en/guide")).status === 200);
+    await until(
+      async () => (await fetch(origin + "/docs/en/guide")).status === 200,
+      () => {
+        if (child.exitCode !== null)
+          throw new Error(`${script} exited with ${child.exitCode}: ${log}`);
+      },
+    );
     await verify(origin);
   } finally {
     if (child.exitCode === null && child.pid !== undefined) {
@@ -142,7 +149,10 @@ try {
     manifest.devDependencies.vite = "npm:@voidzero-dev/vite-plus-core@1.3.0";
     manifest.overrides = { vite: "$vite" };
     for (const name of ["dev", "build", "preview"])
-      manifest.scripts[name] = manifest.scripts[name].replace(/^vite/, "vp");
+      manifest.scripts[name] = manifest.scripts[name].replace(
+        /^vite/,
+        name === "dev" ? "vp dev" : "vp",
+      );
   }
 
   await writeFile(manifestFile, JSON.stringify(manifest, null, 2) + "\n");
