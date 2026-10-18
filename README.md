@@ -1,6 +1,6 @@
 # honoxpress
 
-Documentation metadata, build helpers, and an editable Hono JSX component system for HonoX and MDX.
+Documentation metadata, build helpers, and an editable Hono JSX component system for HonoX/MDX and Void/Hono Markdown.
 
 Use HonoX's file-based routes to build navigation, tables of contents, and language links. Your application owns its routes, renderer, islands, and CSS, so you can adapt the documentation to your existing app.
 
@@ -20,6 +20,13 @@ Use HonoX's file-based routes to build navigation, tables of contents, and langu
 - **Editable layout and starter** — Install consumer-owned navigation, TOC, language links, page layout, components, and styles. A runnable HonoX starter configures the client, docs SSG, and Worker build stages.
 
 honoxpress fits existing HonoX applications and projects that keep their layouts in their own code. It does not include search, a CMS, or hosting.
+
+## Void support (next release)
+
+The Void starter adds `honoxpress init --framework void --starter`, editable
+Markdown wrappers, a docs frame, and a metadata bridge at `honoxpress/void`.
+It requires the pending Void adapter PR #122 (planned minimum 0.3.0).
+See the [Void guide](docs/void.md) for setup and release prerequisites.
 
 ## Install and try the API
 

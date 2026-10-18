@@ -23,7 +23,8 @@
     "LICENSE",
     "bin",
     "starter",
-    "scaffold"
+    "scaffold",
+    "void"
   ],
   "type": "module",
   "sideEffects": [
@@ -42,7 +43,11 @@
       "types": "./dist/markdown.d.ts",
       "import": "./dist/markdown.js"
     },
-    "./templates/*": "./templates/*"
+    "./templates/*": "./templates/*",
+    "./void": {
+      "types": "./dist/void.d.ts",
+      "import": "./dist/void.js"
+    }
   },
   "scripts": {
     "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json"

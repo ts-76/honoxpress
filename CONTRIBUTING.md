@@ -30,3 +30,10 @@ PR verification runs on the exact proposed commit with read-only repository acce
 ## Release PRs
 
 Use Conventional Commit titles for squash merges (`fix:`, `feat:`, and `!` for breaking changes). With a merge commit, ensure a Conventional Commit appears in the merged history. main push runs release-please to maintain a version/changelog PR. Review and pass its exact-head CI before merging; that merge creates a tag/GitHub Release and prepares accepted artifacts. npm stage/2FA is a separate step described in [the release guide](docs/npm-release.md). Only the package in packages/docs is published; the root remains private. Existing v0.1.0 is the immutable bootstrap baseline.
+
+## Void starter
+
+The Void consumer uses its own dependency graph with Node 24.21.0. See
+[the Void guide](docs/void.md#verify-a-candidate) for the pinned adapter candidate
+and `pnpm test:void`. This check installs packaged CLI output into a fresh
+project; the historical TSX pilot is kept only for baseline diagnostics.

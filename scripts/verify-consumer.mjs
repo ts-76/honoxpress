@@ -70,7 +70,7 @@ const files = (await run("tar", ["-tzf", tarball])).trim().split("\n").sort();
 for (const file of files)
   assert.match(
     file,
-    /^package\/(?:package\.json|README\.md|LICENSE|dist\/[a-z-]+\.(?:js|d\.ts)|templates\/(?:docs-ui\.tsx|docs-content\.tsx|file-tree\.tsx|type-table\.tsx|code-group\.tsx|figure\.tsx|theme-switch\.tsx|definition-list\.tsx|api-reference\.tsx|docs-layout\.tsx|tabs\.tsx|site-config\.ts|copy-code\.tsx|demo-frame\.tsx|docs\.css|components\.css|tokens\.css)|bin\/honoxpress\.mjs|starter\/(?:client\.ts|docs-virtual\.d\.ts|mdx-components\.ts)|scaffold\/[\w./-]+)$/,
+    /^package\/(?:package\.json|README\.md|LICENSE|dist\/[a-z-]+\.(?:js|d\.ts)|templates\/(?:docs-ui\.tsx|docs-content\.tsx|file-tree\.tsx|type-table\.tsx|code-group\.tsx|figure\.tsx|theme-switch\.tsx|definition-list\.tsx|api-reference\.tsx|docs-layout\.tsx|tabs\.tsx|site-config\.ts|copy-code\.tsx|demo-frame\.tsx|docs\.css|components\.css|tokens\.css)|bin\/honoxpress\.mjs|starter\/(?:client\.ts|docs-virtual\.d\.ts|mdx-components\.ts)|(?:scaffold|void)\/[\w./-]+)$/,
   );
 for (const file of [
   "dist/index.js",

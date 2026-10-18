@@ -229,3 +229,54 @@ test("catalog rejects HonoX excluded MDX routes while allowing underscore direct
     }).pages,
   ).toHaveLength(1);
 });
+
+// The optional Void bridge consumes public metadata without importing a framework.
+import { createVoidDocsCatalog } from "../packages/docs/src/void";
+const voidConfig = { defaultLocale: "en", localeLabels: { en: "English", ja: "日本語" } };
+const voidPage = { locale: "en", slug: "guide", href: "/docs/en/guide", title: "Guide" };
+test("maps Void headings and preserves explicit source, URLs, and translation identity", () => {
+  const catalog = createVoidDocsCatalog(
+    {
+      "./guide.md": {
+        frontmatter: voidPage,
+        headings: [{ depth: 2, text: "Start", slug: "start" }],
+      },
+      "./ja.md": {
+        frontmatter: { ...voidPage, locale: "ja", href: "/docs/ja/guide", title: "ガイド" },
+        headings: [],
+      },
+    },
+    voidConfig,
+  );
+  expect(catalog.page("/docs/en/guide")?.headings).toEqual([
+    { depth: 2, text: "Start", id: "start" },
+  ]);
+  expect(catalog.pages[0]?.route).toBe("./guide.md");
+  expect(catalog.translations("/docs/en/guide")[1]?.href).toBe("/docs/ja/guide");
+});
+test("rejects ambiguous Void identity and unsupported locales", () => {
+  const page = { frontmatter: voidPage, headings: [] };
+  expect(() => createVoidDocsCatalog({ a: page, b: page }, voidConfig)).toThrow(/Duplicate/);
+  expect(() =>
+    createVoidDocsCatalog(
+      { a: { ...page, frontmatter: { ...voidPage, locale: "fr" } } },
+      voidConfig,
+    ),
+  ).toThrow(/Unsupported/);
+});
+test("validates Void heading IDs through the shared catalog boundary", () => {
+  expect(() =>
+    createVoidDocsCatalog(
+      {
+        a: {
+          frontmatter: voidPage,
+          headings: [
+            { depth: 2, text: "One", slug: "same" },
+            { depth: 2, text: "Two", slug: "same" },
+          ],
+        },
+      },
+      voidConfig,
+    ),
+  ).toThrow(/duplicate heading/);
+});

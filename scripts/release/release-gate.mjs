@@ -106,7 +106,7 @@ export async function inspectArtifact({ root = process.cwd(), artifactRoot = roo
     assert.deepEqual(evidence.graphs[target].docsCompilerOrBuildModules, []);
   const unit = await json(path.join(artifactRoot, "artifacts/package-tests.json"));
   assert.equal(unit.success, true);
-  assert.equal(unit.numPassedTests, 35);
+  assert.equal(unit.numPassedTests, 38);
   assert.equal(unit.numFailedTests, 0);
   return {
     pkg,

@@ -110,23 +110,20 @@ both code samples and the native disclosure remain readable. Markdown parsing
 and static wrapper sources are checked against the browser and Worker graphs;
 SSG generates the six Markdown/MDX documentation pages.
 
-## Void integration and remaining work
+## Void integration
 
-Use the existing `voidHonoMarkdown()` path. Void owns file discovery, its parser
-and emitter, metadata/loader contexts, routes, SSR, islands and static export.
-honoxpress owns the component boundary, templates, tokens, theme lifecycle,
-frame/catalog and authoring guidance. Do not duplicate Void's compiler here,
-import private hashed chunks or register a fake framework.
+The next release adds a [standard Void starter](void.md), based on the Hono
+adapter's static imports, Markdown containers, explicit islands, and public CSS
+host. It requires the pending [adapter PR #122](https://github.com/ts-76/void-plugin-hono-jsx/pull/122)
+(planned minimum 0.3.0). The published honoxpress 0.4.0 contains the generic
+component boundary, not this starter.
 
-[Void #117](https://github.com/ts-76/void-plugin-hono-jsx/issues/117) must provide a
-public extension point that can call this boundary for static content and route
-interactive wrappers through its island emitter. Its current string/boolean
-island syntax does not imply support for nested children or static wrappers.
-[Void #116](https://github.com/ts-76/void-plugin-hono-jsx/issues/116) remains the
-independent SSR CSS/style-host prerequisite. Full MDX integration is deferred
-until an unmet authoring requirement warrants it. The existing TSX pilot verifies
-the framework primitives; the new `.md` pages verify the honoxpress boundary in
-HonoX, not production Void Markdown support.
+Void and its Hono adapter own compilation, routes, contexts, SSR, islands, and
+static export. honoxpress owns editable wrappers, tokens, layout, themes, and the
+catalog bridge. The bridge selects metadata exports without retaining page render
+functions. No private compiler import, renderer patch, or fake framework is used.
+Complex data remains in TSX; explicit islands still accept literal props rather
+than nested Markdown children. Full MDX support is a separate feature.
 
 ## Adopting 0.4.0
 
