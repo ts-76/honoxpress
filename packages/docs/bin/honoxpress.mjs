@@ -18,6 +18,7 @@ const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const packageVersion = JSON.parse(readFileSync(join(packageRoot, "package.json"), "utf8")).version;
 const starterRoot = join(packageRoot, "starter");
 const templateRoot = join(packageRoot, "templates");
+const voidRoot = join(packageRoot, "void");
 const scaffoldRoot = join(packageRoot, "scaffold");
 const manifestName = ".honoxpress.json";
 const begin = "// honoxpress:components:start";
@@ -58,7 +59,13 @@ const allGroups = Object.keys(groups);
 function parseArgs(args) {
   const command = args[0];
   let target;
-  const options = { cwd: process.cwd(), dryRun: false, starter: false, help: false };
+  const options = {
+    cwd: process.cwd(),
+    dryRun: false,
+    starter: false,
+    help: false,
+    framework: undefined,
+  };
   let i = 1;
   if (command === "add") target = args[i++];
   for (; i < args.length; i += 1) {
@@ -66,6 +73,10 @@ function parseArgs(args) {
     if (arg === "--cwd") {
       if (!args[i + 1]) throw new Error("--cwd requires a directory");
       options.cwd = resolve(args[++i]);
+    } else if (arg === "--framework") {
+      options.framework = args[++i];
+      if (!["honox", "void"].includes(options.framework))
+        throw new Error("--framework must be honox or void");
     } else if (arg === "--dry-run") options.dryRun = true;
     else if (arg === "--starter" && command === "init") options.starter = true;
     else if (arg === "--help" || arg === "-h") options.help = true;
@@ -83,13 +94,15 @@ function help() {
   console.log(`honoxpress — consumer-owned Hono JSX documentation components
 
 Usage:
-  honoxpress init [--cwd directory] [--dry-run]
-  honoxpress init --starter [--cwd directory] [--dry-run]
+  honoxpress init [--framework honox|void] [--cwd directory] [--dry-run]
+  honoxpress init --starter [--framework honox|void] [--cwd directory] [--dry-run]
   honoxpress add <${allGroups.join("|")}|all> [--cwd directory] [--dry-run]
   honoxpress list
 
-init installs the complete component set, MDX registry, layout, and CSS.
-init --starter also installs a runnable HonoX starter project scaffold.
+init installs the complete component set, framework integration, layout, and CSS.
+init --starter also installs a runnable project scaffold (HonoX by default).
+--framework void installs Void Markdown wrappers and a content-only layout.
+Later add commands inherit the framework from .honoxpress.json.
 add installs a component group and registers its MDX tags. User-owned files are
 never overwritten; differing files stop the plan. honoxpress only updates its
 marked registry block and its own installation manifest.
@@ -224,6 +237,7 @@ function readManifest(root) {
   const value = JSON.parse(readFileSync(file, "utf8"));
   if (
     value.version !== 1 ||
+    (value.framework !== undefined && !["honox", "void"].includes(value.framework)) ||
     !Array.isArray(value.groups) ||
     value.groups.some((name) => !groups[name]) ||
     (value.files !== undefined &&
@@ -234,7 +248,7 @@ function readManifest(root) {
   return { ...value, original: readFileSync(file, "utf8") };
 }
 
-function install({ command, target, cwd, dryRun, starter }) {
+function install({ command, target, cwd, dryRun, starter, framework: selectedFramework }) {
   const root = safeRoot(cwd);
   let requested = command === "init" ? allGroups : target === "all" ? allGroups : [target];
   for (const group of requested)
@@ -246,6 +260,13 @@ function install({ command, target, cwd, dryRun, starter }) {
   ];
   requested = [...new Set(requested.flatMap(includeDependencies))];
   const previous = readManifest(root);
+  const framework = selectedFramework ?? previous.framework ?? "honox";
+  if (previous.original && framework !== (previous.framework ?? "honox"))
+    throw new Error(
+      "existing honoxpress installation uses a different framework; choose a separate directory",
+    );
+  const isVoid = framework === "void";
+  const projectScaffold = isVoid ? join(voidRoot, "scaffold") : scaffoldRoot;
   const added = requested.filter((name) => !previous.groups.includes(name));
   const installedGroups = [...new Set([...previous.groups, ...requested])].sort((a, b) =>
     a.localeCompare(b),
@@ -267,9 +288,14 @@ function install({ command, target, cwd, dryRun, starter }) {
           .replace('from "./docs-content"', 'from "../components/docs-content"'),
       );
     }
-    if (source.startsWith(`${scaffoldRoot}${sep}`) && source.endsWith(`${sep}package.json`)) {
+    if (source.startsWith(`${projectScaffold}${sep}`) && source.endsWith(`${sep}package.json`)) {
       content = Buffer.from(
         content.toString("utf8").replaceAll("__HONOXPRESS_VERSION__", packageVersion),
+      );
+    }
+    if (isVoid && source === join(templateRoot, "site-config.ts")) {
+      content = Buffer.from(
+        content.toString("utf8").replace('"/docs/getting-started"', '"/docs/en/guide"'),
       );
     }
     files.set(destination, { source: null, content });
@@ -297,6 +323,7 @@ function install({ command, target, cwd, dryRun, starter }) {
   const visualsAlreadyInstalled = previous.groups.some((name) => visualGroups.includes(name));
   for (const name of added) {
     for (const rel of groups[name].files) {
+      if (isVoid && ["client.ts", "docs-virtual.d.ts"].includes(rel)) continue;
       // The content primitives share one consumer-owned source file. Copy it once;
       // later groups only extend the registry so local edits remain untouched.
       if (rel === "components/docs-content.tsx" && contentInstalled) continue;
@@ -341,8 +368,44 @@ function install({ command, target, cwd, dryRun, starter }) {
   if (added.includes("layout")) {
     addSource(join(templateRoot, "docs.css"), "public/style.css");
   }
+  if (isVoid) {
+    const wrappers = {
+      DemoFrame: "demo-frame",
+      Callout: "docs-content",
+      Cards: "docs-content",
+      Card: "docs-content",
+      Steps: "docs-content",
+      Step: "docs-content",
+      Accordion: "docs-content",
+      AccordionItem: "docs-content",
+      TabPanel: "docs-content",
+      FileTree: "file-tree",
+      File: "file-tree",
+      Folder: "file-tree",
+      TypeTable: "type-table",
+      Figure: "figure",
+      ThemeSwitch: "theme-switch",
+      DefinitionList: "definition-list",
+      APIReference: "api-reference",
+    };
+    for (const name of added.flatMap((group) => groups[group].names)) {
+      const source = wrappers[name];
+      const path = source
+        ? `../components/${source}`
+        : `../islands/${{ Tabs: "tabs", CodeBlock: "copy-code", CodeGroup: "code-group" }[name]}`;
+      files.set(`app/markdown/${name}.tsx`, {
+        source: null,
+        content: Buffer.from(
+          `export { ${source && name !== "DemoFrame" ? name : "default"} as default } from "${path}";\n`,
+        ),
+      });
+    }
+    if (added.includes("layout"))
+      for (const rel of listFiles(join(voidRoot, "integration")))
+        addSource(join(voidRoot, "integration", rel), rel);
+  }
   if (starter) {
-    if (!existsSync(scaffoldRoot))
+    if (!existsSync(projectScaffold))
       throw new Error("starter scaffold is missing from this honoxpress package");
     const generatedByInit = new Set([
       "app/client.ts",
@@ -366,31 +429,37 @@ function install({ command, target, cwd, dryRun, starter }) {
       "public/components.css",
       "public/tokens.css",
     ]);
-    for (const rel of listFiles(scaffoldRoot)) {
+    for (const rel of listFiles(projectScaffold)) {
       if (generatedByInit.has(rel)) continue;
-      addSource(join(scaffoldRoot, rel), rel === "gitignore" ? ".gitignore" : rel);
+      addSource(join(projectScaffold, rel), rel === "gitignore" ? ".gitignore" : rel);
     }
   }
 
   const registryRel = "app/mdx-components.ts";
-  const registryAbs = inspectPath(root, registryRel);
-  if (existsSync(registryAbs)) {
-    if (!previous.original) {
-      throw new Error(
-        `${registryRel} exists but ${manifestName} is missing; restore the installation record before updating its managed registry`,
-      );
-    }
-    const current = readFileSync(registryAbs, "utf8");
-    originalRegistry = current;
-    files.set(registryRel, { source: null, content: Buffer.from(updateRegistry(current, names)) });
-  } else
-    files.set(registryRel, {
-      source: null,
-      content: Buffer.from(makeRegistry(names)),
-    });
+  if (!isVoid) {
+    const registryAbs = inspectPath(root, registryRel);
+    if (existsSync(registryAbs)) {
+      if (!previous.original) {
+        throw new Error(
+          `${registryRel} exists but ${manifestName} is missing; restore the installation record before updating its managed registry`,
+        );
+      }
+      const current = readFileSync(registryAbs, "utf8");
+      originalRegistry = current;
+      files.set(registryRel, {
+        source: null,
+        content: Buffer.from(updateRegistry(current, names)),
+      });
+    } else
+      files.set(registryRel, {
+        source: null,
+        content: Buffer.from(makeRegistry(names)),
+      });
+  }
 
   const manifest = {
     version: 1,
+    ...(isVoid ? { framework } : {}),
     groups: installedGroups,
     files: Object.assign({}, previous.files),
   };
@@ -456,11 +525,15 @@ function install({ command, target, cwd, dryRun, starter }) {
     "\nInstalled consumer-owned files. Existing routes and Vite config were left to you.",
   );
   console.log(
-    "Static components need <Style /> from hono/css once in <head>, before your stylesheets; DocsLayout includes it.",
+    isVoid
+      ? "Use app/void-layout.tsx with Void Markdown; see docs/void.md."
+      : "Static components need <Style /> from hono/css once in <head>, before your stylesheets; DocsLayout includes it.",
   );
   if (starter)
     console.log(
-      "The scaffold is ready; install its declared dependencies and follow docs/components.md.",
+      isVoid
+        ? "The scaffold is ready; install its declared dependencies and follow docs/void.md."
+        : "The scaffold is ready; install its declared dependencies and follow docs/components.md.",
     );
 }
 

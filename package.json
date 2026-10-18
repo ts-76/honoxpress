@@ -30,7 +30,8 @@
     "release:plan": "node scripts/release/release-plan.mjs",
     "release:dry-run": "node scripts/release/release-dry-run.mjs",
     "test:setup": "node --test tests/setup.test.mjs",
-    "check:theme": "node scripts/check-theme.mjs"
+    "check:theme": "node scripts/check-theme.mjs",
+    "test:void": "node scripts/verify-void-standard.mjs"
   },
   "dependencies": {
     "honoxpress": "workspace:*"

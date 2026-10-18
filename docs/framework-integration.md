@@ -96,10 +96,9 @@ The host renderer must finish Hono HTML callbacks, emit a single style host befo
 application styles, and keep its CSSOM node outside any replaced client root.
 Head metadata synchronization must preserve that node. These are framework
 responsibilities; the class helper alone does not supply SSR CSS collection.
-HonoX's existing `DocsLayout` already supplies its Style element. The Void pilot
-still needs a version-pinned SSR workaround until
-[void-plugin-hono-jsx#116](https://github.com/ts-76/void-plugin-hono-jsx/issues/116)
-is implemented. It is not a supported production adapter yet.
+HonoX's existing `DocsLayout` already supplies its Style element. The standard [Void integration](void.md) uses the public `HonoStyles` host from
+the Hono adapter. The older TSX pilot retains its version-pinned workaround only
+to reproduce the historical baseline.
 
 ## Theme lifecycle
 
@@ -140,7 +139,7 @@ When upgrading to 0.4.0 or later:
 For a local candidate, build and pack the repository and install that tarball;
 versions before 0.4.0 do not have these exports.
 
-## Reproduce the integration checks
+## Historical pilot checks
 
 With Node 24.21.0 and the locked dependencies installed in `pilots/void`:
 
@@ -163,3 +162,5 @@ SSR/style-host workaround remains. The [pilot report](void-tsx-pilot.md) records
 observed limits and the separate Markdown adapter work; these APIs do not add
 Markdown discovery, parsing, islands or static export to Void. The HonoX example
 contains separate `.md` fixtures for testing the honoxpress-owned boundary.
+
+For current Void support, use the fresh packed-starter verifier in the [Void guide](void.md).

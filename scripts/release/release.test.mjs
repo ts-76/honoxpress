@@ -87,7 +87,7 @@ const fixture = async (t) => {
   });
   await save("artifacts/package-tests.json", {
     success: true,
-    numPassedTests: 35,
+    numPassedTests: 38,
     numFailedTests: 0,
   });
   return { root, tarball, commit: "fixture-commit", ref: `refs/tags/v${pkg.version}` };

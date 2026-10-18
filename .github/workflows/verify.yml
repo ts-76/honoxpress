@@ -15,10 +15,16 @@ concurrency:
   group: verify-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
-  void-tsx-pilot:
-    name: Experimental Void TSX primitives
+  void-standard:
+    name: Void standard starter (${{ matrix.stack }})
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        stack: [vite, vp]
+    env:
+      HX_VOID_STACK: ${{ matrix.stack }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -34,19 +40,28 @@ jobs:
           run_install: false
           cache: true
       - run: pnpm install --frozen-lockfile
-      - run: npm ci --prefix pilots/void
-      - name: Chromium for the independently locked pilot
-        working-directory: pilots/void
-        run: npx playwright install --with-deps chromium
       - run: pnpm build:package
-      - name: Packed candidate using public honoxpress APIs
-        run: node scripts/verify-void-current.mjs
-      - name: Keep experimental diagnostics
+      # PR #122 is not published yet. Verify an immutable candidate, not a fake registry release.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ts-76/void-plugin-hono-jsx
+          ref: 743badf8a4153aadf3fbb8a9ab78e6563d3ef555
+          path: .ci-void-plugin
+          persist-credentials: false
+      - run: npm ci --ignore-scripts
+        working-directory: .ci-void-plugin
+      - run: npm run build:package
+        working-directory: .ci-void-plugin
+      - run: node scripts/prepare-void-dependency.mjs .ci-void-plugin
+      - name: Chromium
+        run: npm exec --yes --package=playwright@1.64.0 -- playwright install --with-deps chromium
+      - run: node scripts/verify-void-standard.mjs
+      - name: Keep packed starter diagnostics
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: void-tsx-${{ github.event.pull_request.head.sha || github.sha }}-attempt-${{ github.run_attempt }}
-          path: artifacts/void-current/
+          name: void-standard-${{ matrix.stack }}-${{ github.event.pull_request.head.sha || github.sha }}-attempt-${{ github.run_attempt }}
+          path: artifacts/void-standard/
           retention-days: 7
           if-no-files-found: warn
   acceptance:

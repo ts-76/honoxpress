@@ -245,3 +245,65 @@ void test("code-group installs its dependencies and styles in an empty app", () 
       assert.ok(existsSync(join(directory, path)), path);
   });
 });
+
+void test("Void starter uses the same conflict-safe installer and preserves its framework", () => {
+  withProject((directory) => {
+    const dry = invoke(directory, "init", "--framework", "void", "--starter", "--dry-run");
+    assert.equal(dry.status, 0, dry.stderr);
+    assert.match(dry.stdout, /pages\/docs\/en\/guide.md/);
+    assert.deepEqual(readdirSync(directory), []);
+    const installed = invoke(directory, "init", "--framework", "void", "--starter");
+    assert.equal(installed.status, 0, installed.stderr);
+    assert.equal(existsSync(join(directory, "app/mdx-components.ts")), false);
+    assert.equal(existsSync(join(directory, "app/client.ts")), false);
+    assert.match(readFileSync(join(directory, "vite.config.ts"), "utf8"), /voidHonoMarkdown/);
+    assert.match(readFileSync(join(directory, "app/void-layout.tsx"), "utf8"), /HonoStyles/);
+    assert.equal(
+      JSON.parse(readFileSync(join(directory, "package.json"))).dependencies[
+        "void-plugin-hono-jsx"
+      ],
+      "^0.3.0",
+    );
+    const component = join(directory, "app/markdown/Callout.tsx");
+    const custom = readFileSync(component, "utf8") + "// Local customization\n";
+    writeFileSync(component, custom);
+    assert.equal(invoke(directory, "add", "callout").status, 0);
+    assert.equal(readFileSync(component, "utf8"), custom);
+    const before = readFileSync(join(directory, ".honoxpress.json"), "utf8");
+    const mixed = invoke(directory, "init", "--framework", "honox");
+    assert.equal(mixed.status, 1);
+    assert.match(mixed.stderr, /different framework/);
+    assert.equal(readFileSync(join(directory, ".honoxpress.json"), "utf8"), before);
+  });
+});
+
+void test("Void additions preserve edited dependencies and reject conflicts and symlinks", () => {
+  withProject((directory) => {
+    assert.equal(invoke(directory, "add", "callout", "--framework", "void").status, 0);
+    const content = join(directory, "app/components/docs-content.tsx");
+    const custom = readFileSync(content, "utf8") + "// Custom\n";
+    writeFileSync(content, custom);
+    assert.equal(invoke(directory, "add", "cards").status, 0);
+    assert.equal(readFileSync(content, "utf8"), custom);
+    assert.match(readFileSync(join(directory, "app/markdown/Card.tsx"), "utf8"), /Card as default/);
+    const conflicting = join(directory, "vite.config.ts");
+    writeFileSync(conflicting, "// Application config\n");
+    assert.equal(invoke(directory, "init", "--framework", "void", "--starter").status, 1);
+    assert.equal(existsSync(join(directory, "pages")), false);
+    assert.equal(readFileSync(conflicting, "utf8"), "// Application config\n");
+  });
+  withProject((directory) => {
+    mkdirSync(join(directory, "app"));
+    const outside = mkdtempSync(join(tmpdir(), "honoxpress-void-outside-"));
+    try {
+      symlinkSync(outside, join(directory, "app/markdown"), "dir");
+      const result = invoke(directory, "add", "callout", "--framework", "void");
+      assert.equal(result.status, 1);
+      assert.match(result.stderr, /unsafe parent/);
+      assert.deepEqual(readdirSync(outside), []);
+      assert.equal(existsSync(join(directory, ".honoxpress.json")), false);
+    } finally {
+      rmSync(outside, { recursive: true, force: true });
+    }
+  });
+});
