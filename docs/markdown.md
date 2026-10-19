@@ -1,9 +1,9 @@
 # Markdown-first authoring
 
-The API below is included in **honoxpress 0.4.0**, introduced by PR #39.
-Existing HonoX/MDX sites keep their current compiler, registry and routes. This
-change adds a component boundary for Markdown hosts; it does not make the
-published Void adapter support nested static components automatically.
+The parser-neutral API below is available since **honoxpress 0.4.0**.
+Existing HonoX/MDX sites keep their compiler, registry, and routes. For Void,
+use the [standard starter](void.md) added in 0.5.0 with the Hono Markdown adapter
+0.3.0 or later in the 0.3.x series.
 
 Prefer ordinary Markdown for prose, links, headings and code fences. Use static
 components for callouts, cards, steps and native disclosures. Use an explicit
@@ -112,11 +112,10 @@ SSG generates the six Markdown/MDX documentation pages.
 
 ## Void integration
 
-The next release adds a [standard Void starter](void.md), based on the Hono
+honoxpress 0.5.0 adds a [standard Void starter](void.md), based on the Hono
 adapter's static imports, Markdown containers, explicit islands, and public CSS
-host. It requires the pending [adapter PR #122](https://github.com/ts-76/void-plugin-hono-jsx/pull/122)
-(planned minimum 0.3.0). The published honoxpress 0.4.0 contains the generic
-component boundary, not this starter.
+host. It requires `void-plugin-hono-jsx >=0.3.0 <0.4.0`. Existing honoxpress 0.4.0
+users can upgrade the package before adopting this starter.
 
 Void and its Hono adapter own compilation, routes, contexts, SSR, islands, and
 static export. honoxpress owns editable wrappers, tokens, layout, themes, and the

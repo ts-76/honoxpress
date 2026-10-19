@@ -41,18 +41,6 @@ jobs:
           cache: true
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:package
-      # PR #122 is not published yet. Verify an immutable candidate, not a fake registry release.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ts-76/void-plugin-hono-jsx
-          ref: 743badf8a4153aadf3fbb8a9ab78e6563d3ef555
-          path: .ci-void-plugin
-          persist-credentials: false
-      - run: npm ci --ignore-scripts
-        working-directory: .ci-void-plugin
-      - run: npm run build:package
-        working-directory: .ci-void-plugin
-      - run: node scripts/prepare-void-dependency.mjs .ci-void-plugin
       - name: Chromium
         run: npm exec --yes --package=playwright@1.64.0 -- playwright install --with-deps chromium
       - run: node scripts/verify-void-standard.mjs

@@ -15,7 +15,7 @@ Run `npm run typecheck` to check the TSX and configuration files.
 - Edit `/public/style.css`, `components.css`, and `tokens.css` for honoxpress styles. Optional `void-plugin-hono-jsx/theme-content.css` styles use `.void-md` and separate `--vmd-*` tokens.
 - Links use native document navigation. No custom router, renderer source patch, or second Markdown compiler is installed.
 
-This starter requires the unreleased Void plugin changes from PR #122 (planned minimum 0.3.0). Publish that dependency before releasing this honoxpress feature. No deployment is performed by setup or verification.
+This starter requires `void-plugin-hono-jsx >=0.3.0 <0.4.0`. Setup and verification do not deploy the application.
 
 For an existing app, `init --framework void` copies components and integration
 files without editing Vite config, routes, or dependencies. Add `voidHonoJsx()`

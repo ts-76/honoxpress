@@ -10,7 +10,7 @@ Use HonoX's file-based routes to build navigation, tables of contents, and langu
 
 ## Features
 
-- **Markdown-first integration (0.4.0)** — A parser-neutral component boundary for static TSX wrappers and explicit host islands, with English/Japanese `.md` examples. Existing HonoX/MDX setup remains supported; Void's Markdown adapter extension is tracked separately. See the [authoring guide](docs/markdown.md).
+- **Markdown-first integration (0.4.0)** — A parser-neutral component boundary for static TSX wrappers and explicit host islands, with English/Japanese `.md` examples. Existing HonoX/MDX setup remains supported; Void integration uses its Hono Markdown adapter and the standard starter. See the [authoring guide](docs/markdown.md).
 
 - **Page metadata** — Generate navigation from MDX frontmatter, including titles, descriptions, and display order.
 - **Multilingual documentation** — Derive URLs and locales from file paths and connect translations with matching relative slugs. Unavailable translations have no link.
@@ -21,12 +21,12 @@ Use HonoX's file-based routes to build navigation, tables of contents, and langu
 
 honoxpress fits existing HonoX applications and projects that keep their layouts in their own code. It does not include search, a CMS, or hosting.
 
-## Void support (next release)
+## Void support (since 0.5.0)
 
 The Void starter adds `honoxpress init --framework void --starter`, editable
 Markdown wrappers, a docs frame, and a metadata bridge at `honoxpress/void`.
-It requires the pending Void adapter PR #122 (planned minimum 0.3.0).
-See the [Void guide](docs/void.md) for setup and release prerequisites.
+It uses `void-plugin-hono-jsx >=0.3.0 <0.4.0`.
+See the [Void guide](docs/void.md) for setup and supported behavior.
 
 ## Install and try the API
 
@@ -36,7 +36,7 @@ pnpm add honoxpress hono
 
 The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX and MDX build dependencies belong to your application.
 
-The package includes `honoxpress init`, `honoxpress add`, and a runnable starter. To create a new site with this release, run `pnpm dlx honoxpress@0.4.0 init --starter --cwd /path/to/new-docs`, then install dependencies in the generated directory. The [component guide](docs/components.md#start-a-new-site) also covers local tarball development.
+The package includes `honoxpress init`, `honoxpress add`, and a runnable starter. To create a new site with this release, run `pnpm dlx honoxpress@0.5.0 init --starter --cwd /path/to/new-docs`, then install dependencies in the generated directory. The [component guide](docs/components.md#start-a-new-site) also covers local tarball development.
 
 `createDocsCatalog` turns page metadata into URLs, navigation, and translation links:
 
