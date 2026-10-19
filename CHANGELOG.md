@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/ts-76/honoxpress/compare/v0.4.0...v0.5.0) (2026-10-19)
+
+
+### Features
+
+* **void:** Markdownスターターと標準連携を追加 ([#44](https://github.com/ts-76/honoxpress/issues/44)) ([1d0bb41](https://github.com/ts-76/honoxpress/commit/1d0bb41a74444adae37e86cf380033b3d8f5db46))
+
+
+### Bug Fixes
+
+* **void:** verify the published adapter before release ([#46](https://github.com/ts-76/honoxpress/issues/46)) ([88f8492](https://github.com/ts-76/honoxpress/commit/88f84928685e118b809c35342f45bb7cbcd31703))
+
 ## [0.4.0](https://github.com/ts-76/honoxpress/compare/v0.3.0...v0.4.0) (2026-10-18)
 
 
