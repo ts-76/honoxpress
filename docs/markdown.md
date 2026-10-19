@@ -1,9 +1,9 @@
 # Markdown-first authoring
 
-The API below is included in **honoxpress 0.4.0**, introduced by PR #39.
-Existing HonoX/MDX sites keep their current compiler, registry and routes. This
-change adds a component boundary for Markdown hosts; it does not make the
-published Void adapter support nested static components automatically.
+The parser-neutral API below is available since **honoxpress 0.4.0**.
+Existing HonoX/MDX sites keep their compiler, registry, and routes. For Void,
+use the [standard starter](void.md) added in 0.5.0 with the Hono Markdown adapter
+0.3.0 or later in the 0.3.x series.
 
 Prefer ordinary Markdown for prose, links, headings and code fences. Use static
 components for callouts, cards, steps and native disclosures. Use an explicit

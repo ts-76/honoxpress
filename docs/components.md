@@ -2,7 +2,7 @@
 
 honoxpress can install a set of editable Hono JSX components into an application. The files belong to your app after installation: MDX uses them through one shared registry, and you can change their markup, behavior, props, and styles.
 
-> **Version scope:** this guide describes 0.5.0. The CLI and starter are available since 0.2.0; component-local `hono/css` styling is included since 0.3.0. Version 0.4.0 adds the parser-neutral Markdown renderer and framework integration primitives.
+> **Version scope:** this guide describes 0.5.0. The CLI and starter are available since 0.2.0; component-local `hono/css` styling is included since 0.3.0. Version 0.4.0 adds the parser-neutral Markdown renderer and framework integration primitives; 0.5.0 adds the Void starter.
 
 ## Install into an existing HonoX application
 
