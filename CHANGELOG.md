@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.0](https://github.com/ts-76/honoxpress/compare/v0.5.0...v0.6.0) (2026-10-20)
+
+
+### Features
+
+* expose host-neutral Markdown catalog adapters ([93ade40](https://github.com/ts-76/honoxpress/commit/93ade4075976e20a9afae95166aa16236ade7910))
+* expose host-neutral Markdown catalog adapters ([41b7f68](https://github.com/ts-76/honoxpress/commit/41b7f68558d2250fa5cff464ee4b16de01aa3b3d))
+
+
+### Bug Fixes
+
+* preserve catalog imports for existing installations ([5b1c9c8](https://github.com/ts-76/honoxpress/commit/5b1c9c8145bbb49624c8d0503da55e5adaac6767))
+
 ## [0.5.0](https://github.com/ts-76/honoxpress/compare/v0.4.0...v0.5.0) (2026-10-19)
 
 
