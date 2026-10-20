@@ -24,7 +24,8 @@ in your docs route layout and link `/style.css` from Void head config. Install
 `void-plugin-hono-jsx`, `markdown-exit`, `markdown-it-container`, `yaml`,
 `shiki`, and `@shikijs/transformers` with the versions in the starter's package.json.
 
-The catalog uses `honoxpress/adapters/void`; existing `honoxpress/void` imports
-remain compatible. The neutral mapper is `honoxpress/adapters/hono-markdown`.
+The generated catalog keeps `honoxpress/void` so an existing installation does
+not require a package upgrade just to copy the integration.
+`honoxpress/adapters/void` exposes the same adapter in newer packages. The neutral mapper is `honoxpress/adapters/hono-markdown`.
 The same Void app may also mount hono-decks at `/slides`; keep the docs layout
 scoped to `/docs` and let each integration own its document routes.

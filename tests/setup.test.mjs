@@ -307,3 +307,12 @@ void test("Void additions preserve edited dependencies and reject conflicts and 
     }
   });
 });
+
+test("Void catalog template retains the existing package entry", () => {
+  const content = readFileSync(
+    new URL("../packages/docs/void/integration/app/docs-catalog.ts", import.meta.url),
+    "utf8",
+  );
+  assert.match(content, /from "honoxpress\/void"/);
+  assert.doesNotMatch(content, /honoxpress\/adapters/);
+});
