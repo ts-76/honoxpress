@@ -47,6 +47,14 @@
     "./void": {
       "types": "./dist/void.d.ts",
       "import": "./dist/void.js"
+    },
+    "./adapters/void": {
+      "types": "./dist/adapters/void.d.ts",
+      "import": "./dist/adapters/void.js"
+    },
+    "./adapters/hono-markdown": {
+      "types": "./dist/adapters/hono-markdown.d.ts",
+      "import": "./dist/adapters/hono-markdown.js"
     }
   },
   "scripts": {

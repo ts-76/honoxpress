@@ -97,3 +97,12 @@ test("Markdown rejects unknown names, expressions, reserved props and ambiguous 
     createDocsMarkdownRenderer({ components: { Invalid: { kind: "unknown" } as never } }),
   ).toThrow("Invalid Markdown component registration");
 });
+
+// Both entry points intentionally preserve the same function identity.
+import { createVoidDocsCatalog as adapterCatalog } from "../packages/docs/src/adapters/void";
+import { createHonoMarkdownDocsCatalog } from "../packages/docs/src/adapters/hono-markdown";
+import { createVoidDocsCatalog as compatibilityCatalog } from "../packages/docs/src/void";
+test("keeps the Void adapter and compatibility API on the neutral metadata mapper", () => {
+  expect(adapterCatalog).toBe(createHonoMarkdownDocsCatalog);
+  expect(compatibilityCatalog).toBe(adapterCatalog);
+});

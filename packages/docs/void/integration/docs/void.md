@@ -15,11 +15,16 @@ Run `npm run typecheck` to check the TSX and configuration files.
 - Edit `/public/style.css`, `components.css`, and `tokens.css` for honoxpress styles. Optional `void-plugin-hono-jsx/theme-content.css` styles use `.void-md` and separate `--vmd-*` tokens.
 - Links use native document navigation. No custom router, renderer source patch, or second Markdown compiler is installed.
 
-This starter requires `void-plugin-hono-jsx >=0.3.0 <0.4.0`. Setup and verification do not deploy the application.
+This starter requires `void-plugin-hono-jsx >=0.3.0 <0.6.0`. Setup and verification do not deploy the application.
 
 For an existing app, `init --framework void` copies components and integration
 files without editing Vite config, routes, or dependencies. Add `voidHonoJsx()`
 and `voidHonoMarkdown()` after `voidPlugin()` in Vite; mount `app/void-layout.tsx`
 in your docs route layout and link `/style.css` from Void head config. Install
-`void-plugin-hono-jsx@^0.3.0`, `markdown-exit`, `markdown-it-container`, `yaml`,
+`void-plugin-hono-jsx`, `markdown-exit`, `markdown-it-container`, `yaml`,
 `shiki`, and `@shikijs/transformers` with the versions in the starter's package.json.
+
+The catalog uses `honoxpress/adapters/void`; existing `honoxpress/void` imports
+remain compatible. The neutral mapper is `honoxpress/adapters/hono-markdown`.
+The same Void app may also mount hono-decks at `/slides`; keep the docs layout
+scoped to `/docs` and let each integration own its document routes.

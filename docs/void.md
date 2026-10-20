@@ -1,7 +1,7 @@
 # Void integration
 
 honoxpress 0.5.0 adds a Void/Hono Markdown starter. Use Node 24.21.0 and
-`void-plugin-hono-jsx >=0.3.0 <0.4.0`.
+`void-plugin-hono-jsx >=0.3.0 <0.6.0`.
 
 ## Start a site
 
@@ -58,3 +58,22 @@ Diagnostics are under `artifacts/void-standard`. The verifier closes its servers
 and removes successful temporary consumers. The old [TSX pilot](void-tsx-pilot.md)
 is a historical diagnostic. Cloudflare deployment, other browsers, and physical
 mobile devices are outside this local verification.
+
+## Adapter boundaries
+
+`honoxpress/adapters/hono-markdown` exports `createHonoMarkdownDocsCatalog` and
+`HonoMarkdownDocsModule`. It maps public `frontmatter` and `headings` exports to
+the existing catalog without importing a compiler, Void, Vite, or Node APIs.
+`honoxpress/adapters/void` supplies the Void names; `honoxpress/void` remains a
+compatible entry and shares the same function. HonoX/MDX APIs and copied UI remain
+unchanged. The CLI selects host integration files from framework presets.
+
+The same Void app can mount honoxpress under `/docs` and hono-decks under
+`/slides`. Void owns document routes and head; the deck middleware handles only
+its mount path. Both use the Markdown provider supplied by the adapter. No extra
+compile command or application script change is needed.
+
+Local candidate coexistence can be verified with `scripts/verify-void-coexist.mjs`.
+Set `HONO_MARKDOWN_PACKAGE`, `VOID_HONO_PACKAGE`, and `HONO_DECKS_PACKAGE` to built
+tarballs, then run the script with Node 24.21 or later in the 24.x line. This is a
+local artifact check, separate from the public registry release check above.

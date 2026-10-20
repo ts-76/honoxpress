@@ -1,4 +1,4 @@
-import { createVoidDocsCatalog, type VoidDocsModule } from "honoxpress/void";
+import { createVoidDocsCatalog, type VoidDocsModule } from "honoxpress/adapters/void";
 import docsConfig from "./docs.config";
 
 // Select metadata exports so the catalog does not retain page render functions.
