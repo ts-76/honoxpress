@@ -10,7 +10,7 @@ Use HonoX's file-based routes to build navigation, tables of contents, and langu
 
 The Void starter adds `honoxpress init --framework void --starter`, editable
 Markdown wrappers, a docs frame, and a metadata bridge at `honoxpress/void`.
-It uses `void-plugin-hono-jsx >=0.3.0 <0.4.0`.
+It uses `void-plugin-hono-jsx >=0.3.0 <0.6.0`.
 See the [Void guide](https://github.com/ts-76/honoxpress/blob/main/docs/void.md) for setup and supported behavior.
 
 ## Install
@@ -169,3 +169,10 @@ Report bugs with package/toolchain versions, reproduction steps, the affected UR
 MIT © 2026 ts-76. The distribution includes `LICENSE`.
 
 Thank you to [Cloudflare Nimbus](https://github.com/cloudflare/nimbus) for its reading width, typography, spacing, and navigation hierarchy, and [Fumapress](https://github.com/fuma-nama/fumapress) for its current-page accent, code actions, and mobile TOC. The templates' JSX, CSS, and icons were independently written; no upstream code or assets were copied.
+
+## Host adapters
+
+The parser-neutral catalog mapper is available as `honoxpress/adapters/hono-markdown`.
+`honoxpress/adapters/void` and the existing `honoxpress/void` entry share the same
+implementation. Framework presets select the CLI integration files; existing
+HonoX/MDX APIs and application-owned components remain supported.

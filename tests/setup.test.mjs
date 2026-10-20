@@ -1,3 +1,4 @@
+import { isBuildOnlyModule } from "../scripts/runtime-compiler-guard.mjs";
 import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 import {
@@ -262,7 +263,7 @@ void test("Void starter uses the same conflict-safe installer and preserves its 
       JSON.parse(readFileSync(join(directory, "package.json"))).dependencies[
         "void-plugin-hono-jsx"
       ],
-      "^0.3.0",
+      "^0.3.0 || ^0.4.0 || ^0.5.0",
     );
     const component = join(directory, "app/markdown/Callout.tsx");
     const custom = readFileSync(component, "utf8") + "// Local customization\n";
@@ -306,4 +307,28 @@ void test("Void additions preserve edited dependencies and reject conflicts and 
       rmSync(outside, { recursive: true, force: true });
     }
   });
+});
+
+await test("Void catalog template retains the existing package entry", () => {
+  const content = readFileSync(
+    new URL("../packages/docs/void/integration/app/docs-catalog.ts", import.meta.url),
+    "utf8",
+  );
+  assert.match(content, /from "honoxpress\/void"/);
+  assert.doesNotMatch(content, /honoxpress\/adapters/);
+});
+
+await test("runtime graph guard distinguishes metadata adapters from compilers", () => {
+  for (const path of [
+    "node_modules/void-plugin-hono-jsx/dist/plugins/hono-markdown.js",
+    "node_modules/@ts-76/hono-markdown/dist/compiler/static-markdown.js",
+    "node_modules/@babel/parser/lib/index.js",
+    "node_modules/honoxpress/dist/build.js",
+  ])
+    assert.equal(isBuildOnlyModule(path), true, path);
+  for (const path of [
+    "node_modules/honoxpress/dist/adapters/hono-markdown.js",
+    "node_modules/@ts-76/hono-markdown/dist/runtime/markdown.js",
+  ])
+    assert.equal(isBuildOnlyModule(path), false, path);
 });

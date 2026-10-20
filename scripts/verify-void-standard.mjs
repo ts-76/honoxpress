@@ -1,3 +1,4 @@
+import { isBuildOnlyModule } from "./runtime-compiler-guard.mjs";
 import assert from "node:assert/strict";
 import { spawn, execFileSync } from "node:child_process";
 import { mkdtemp, mkdir, readFile, writeFile, readdir, lstat, rm } from "node:fs/promises";
@@ -377,15 +378,7 @@ try {
   for (const graph of (await readdir(directory)).filter((file) => /^graph-.*\.json$/.test(file))) {
     const ids = JSON.parse(await readFile(join(directory, graph), "utf8"));
     assert.ok(ids.length > 0);
-    assert.deepEqual(
-      ids.filter((id) =>
-        /(?:markdown-exit|markdown-it-container|honoxpress\/dist\/build\.js|hono-markdown\.js|\/shiki\/)/.test(
-          id,
-        ),
-      ),
-      [],
-      graph,
-    );
+    assert.deepEqual(ids.filter(isBuildOnlyModule), [], graph);
   }
   assert.ok((await readdir(directory)).some((file) => file === "graph-client.json"));
   assert.ok((await readdir(directory)).some((file) => file === "graph-void_worker.json"));

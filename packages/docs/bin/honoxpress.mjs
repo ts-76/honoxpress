@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { frameworkPresets } from "./framework-presets.mjs";
 import { createHash } from "node:crypto";
 import {
   copyFileSync,
@@ -18,8 +19,6 @@ const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const packageVersion = JSON.parse(readFileSync(join(packageRoot, "package.json"), "utf8")).version;
 const starterRoot = join(packageRoot, "starter");
 const templateRoot = join(packageRoot, "templates");
-const voidRoot = join(packageRoot, "void");
-const scaffoldRoot = join(packageRoot, "scaffold");
 const manifestName = ".honoxpress.json";
 const begin = "// honoxpress:components:start";
 const end = "// honoxpress:components:end";
@@ -266,7 +265,8 @@ function install({ command, target, cwd, dryRun, starter, framework: selectedFra
       "existing honoxpress installation uses a different framework; choose a separate directory",
     );
   const isVoid = framework === "void";
-  const projectScaffold = isVoid ? join(voidRoot, "scaffold") : scaffoldRoot;
+  const preset = frameworkPresets[framework];
+  const projectScaffold = join(packageRoot, preset.scaffold);
   const added = requested.filter((name) => !previous.groups.includes(name));
   const installedGroups = [...new Set([...previous.groups, ...requested])].sort((a, b) =>
     a.localeCompare(b),
@@ -401,8 +401,8 @@ function install({ command, target, cwd, dryRun, starter, framework: selectedFra
       });
     }
     if (added.includes("layout"))
-      for (const rel of listFiles(join(voidRoot, "integration")))
-        addSource(join(voidRoot, "integration", rel), rel);
+      for (const rel of listFiles(join(packageRoot, preset.integration)))
+        addSource(join(packageRoot, preset.integration, rel), rel);
   }
   if (starter) {
     if (!existsSync(projectScaffold))
