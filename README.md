@@ -25,7 +25,7 @@ honoxpress fits existing HonoX applications and projects that keep their layouts
 
 The Void starter adds `honoxpress init --framework void --starter`, editable
 Markdown wrappers, a docs frame, and a metadata bridge at `honoxpress/void`.
-It uses `void-plugin-hono-jsx >=0.3.0 <0.6.0`.
+It supports `void-plugin-hono-jsx >=0.3.0 <0.7.0`; new Void starters use `^0.6.0`.
 See the [Void guide](docs/void.md) for setup and supported behavior.
 
 ## Install and try the API
@@ -36,7 +36,7 @@ pnpm add honoxpress hono
 
 The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX and MDX build dependencies belong to your application.
 
-The package includes `honoxpress init`, `honoxpress add`, and a runnable starter. To create a new site with this release, run `pnpm dlx honoxpress@0.5.0 init --starter --cwd /path/to/new-docs`, then install dependencies in the generated directory. The [component guide](docs/components.md#start-a-new-site) also covers local tarball development.
+The package includes `honoxpress init`, `honoxpress add`, and a runnable starter. To create a new site with this release, run `pnpm dlx honoxpress@0.6.0 init --starter --cwd /path/to/new-docs`, then install dependencies in the generated directory. The [component guide](docs/components.md#start-a-new-site) also covers local tarball development.
 
 `createDocsCatalog` turns page metadata into URLs, navigation, and translation links:
 

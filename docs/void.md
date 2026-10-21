@@ -1,14 +1,14 @@
 # Void integration
 
 honoxpress 0.5.0 adds a Void/Hono Markdown starter. Use Node 24.21.0 and
-`void-plugin-hono-jsx >=0.3.0 <0.6.0`.
+`void-plugin-hono-jsx >=0.3.0 <0.7.0`. New Void starters use `^0.6.0`.
 
 ## Start a site
 
 Create an empty directory, then run:
 
 ```sh
-pnpm dlx honoxpress@0.5.0 init --framework void --starter --cwd /path/to/new-docs
+pnpm dlx honoxpress@0.6.0 init --framework void --starter --cwd /path/to/new-docs
 cd /path/to/new-docs
 npm install
 npm run dev
@@ -48,7 +48,7 @@ pnpm test:void
 HX_VOID_STACK=vp pnpm test:void
 ```
 
-The verifier installs the honoxpress tgz and public `void-plugin-hono-jsx@0.3.0`
+The verifier installs the honoxpress tgz and public `void-plugin-hono-jsx@0.6.0`
 in a fresh project. It checks the packaged CLI, frozen reinstall, types,
 dev/production rendering, static output, CSS, metadata updates, EN/JA, themes, and
 islands in Chromium. CI checks Vite 8.3.4 and Vite Plus 1.3.0 separately.
