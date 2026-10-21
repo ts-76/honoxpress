@@ -1,4 +1,6 @@
-# Release state and maintenance decisions
+# Release verification record and maintenance decisions
+
+This page retains the 2026-10-04 release record. Check [npm](https://www.npmjs.com/package/honoxpress) and [GitHub Releases](https://github.com/ts-76/honoxpress/releases) for the current published version; use the [Void guide](void.md) or [HonoX setup guide](components.md#start-a-new-site) for new projects.
 
 The published baseline verified on 2026-10-04 is [honoxpress@0.1.3](https://www.npmjs.com/package/honoxpress), from commit `616d1ab97cf5a63f589d2b41e2faf1f85d7c1b76` at [v0.1.3](https://github.com/ts-76/honoxpress/releases/tag/v0.1.3). Subsequent documentation commits on main are not part of that immutable npm artifact.
 

@@ -124,10 +124,11 @@ functions. No private compiler import, renderer patch, or fake framework is used
 Complex data remains in TSX; explicit islands still accept literal props rather
 than nested Markdown children. Full MDX support is a separate feature.
 
-## Adopting 0.4.0
+## Adopting the parser-neutral API
 
-1. Install `honoxpress@0.4.0` or later. For local development, build/pack the
-   checkout and install its tarball. Version `0.3.0` does not contain this API.
+1. Install `honoxpress@latest` for a new integration. This API is available in
+   `0.4.0` and later; version `0.3.0` does not contain it. For local development,
+   build/pack the checkout and install its tarball.
 2. Keep existing copied components, CSS overrides and MDX content. Merge the
    [framework template changes](framework-integration.md#upgrade-consumer-owned-files)
    manually; installing a package does not replace owned files.

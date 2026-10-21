@@ -8,7 +8,7 @@ honoxpress 0.5.0 adds a Void/Hono Markdown starter. Use Node 24.21.0 and
 Create an empty directory, then run:
 
 ```sh
-pnpm dlx honoxpress@0.6.0 init --framework void --starter --cwd /path/to/new-docs
+pnpm dlx honoxpress@latest init --framework void --starter --cwd /path/to/new-docs
 cd /path/to/new-docs
 npm install
 npm run dev
