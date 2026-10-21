@@ -28,8 +28,8 @@ importers:
         specifier: 4.13.12
         version: 4.13.12
       npm:
-        specifier: 11.21.0
-        version: 11.21.0
+        specifier: 11.21.1
+        version: 11.21.1
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -2082,8 +2082,8 @@ packages:
     resolution: {integrity: sha512-71kFFjYaSshDTA8/a2HiTYPLdASWjLJxUyJxGE+ffxU+KhxSBtM9kiLUX+R2yooFdSFKMFpi4n3PFtDy6qXv8A==}
     engines: {node: '>=18'}
 
-  npm@11.21.0:
-    resolution: {integrity: sha512-Zov8KhamNneiLdELtj5YALtNmJW4L4fCLTzjfpzXG2w6MSHcf0UxgdlK5uloCuksWT+7mGUU7wi79cO6RqivPg==}
+  npm@11.21.1:
+    resolution: {integrity: sha512-YTzL6QBEJXyHcTu0JiUc7RKMp+mzlJtl7rGLmERaXUQeFHIMc9atdr6G9M9C8vDWbv40epoTQAzNL2/PtZVDhQ==}
     engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
     bundledDependencies:
@@ -4371,7 +4371,7 @@ snapshots:
     dependencies:
       '@babel/parser': 7.29.8
 
-  npm@11.21.0: {}
+  npm@11.21.1: {}
 
   obug@2.2.1: {}
 
