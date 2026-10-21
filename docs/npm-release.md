@@ -2,7 +2,7 @@
 
 Only `packages/docs` is published as honoxpress. The root workspace stays private. Published npm versions and Git tags are immutable.
 
-## Verified published baseline: 0.1.3
+## Historical publication verification: 0.1.3 (2026-10-04)
 
 [honoxpress@0.1.3](https://www.npmjs.com/package/honoxpress) was published on 2026-10-04 from `616d1ab97cf5a63f589d2b41e2faf1f85d7c1b76` at [v0.1.3](https://github.com/ts-76/honoxpress/releases/tag/v0.1.3).
 

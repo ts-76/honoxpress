@@ -12,7 +12,7 @@ Keep HonoX, Vite Plus, `@mdx-js/rollup`, `remark-frontmatter`, `remark-mdx-front
 
 For local package development, `pnpm pack:docs` in this repository creates a tarball under `artifacts/package`. Install that tarball in a separate app to test the actual distribution without workspace links.
 
-The package includes the component CLI and runnable starter. Use an explicit version, such as `pnpm dlx honoxpress@0.4.0 init --starter --cwd /path/to/new-docs`, for reproducible setup.
+The package includes the component CLI and runnable starter. For a new site, create an empty target directory and run `pnpm dlx honoxpress@latest init --starter --cwd /path/to/new-docs`. To reproduce a setup, replace `@latest` with the exact published version you have verified.
 
 ## Add MDX routes
 
@@ -129,14 +129,15 @@ To test the CLI from a local checkout, build and pack the package, then create t
 pnpm build:package
 mkdir -p /tmp/honoxpress-candidate
 pnpm --dir packages/docs pack --pack-destination /tmp/honoxpress-candidate
+HONOXPRESS_VERSION=$(node -p 'require("./packages/docs/package.json").version')
 mkdir /tmp/my-docs
 node packages/docs/bin/honoxpress.mjs init --starter --cwd /tmp/my-docs
 cd /tmp/my-docs
-pnpm add /tmp/honoxpress-candidate/honoxpress-0.4.0.tgz
+pnpm add "/tmp/honoxpress-candidate/honoxpress-${HONOXPRESS_VERSION}.tgz"
 pnpm dev
 ```
 
-The starter sets up the HonoX routes, shared MDX registry, and client → docs SSG → Worker build stages. The standard `public/style.css` imports `components.css`; retain the import when keeping the supplied component styles. For a registry installation, use `pnpm dlx honoxpress@0.4.0 init --starter --cwd /path/to/new-docs` and install dependencies in the generated directory.
+The starter sets up the HonoX routes, shared MDX registry, and client → docs SSG → Worker build stages. The standard `public/style.css` imports `components.css`; retain the import when keeping the supplied component styles. For a registry installation, use `pnpm dlx honoxpress@latest init --starter --cwd /path/to/new-docs` and install dependencies in the generated directory.
 
 ## Build client, static docs, and Worker separately
 

@@ -430,16 +430,17 @@ Static `code` and `language` attributes may be strings, string literals in brace
 
 ## Start a new site
 
-Create a new site with `pnpm dlx honoxpress@0.5.0 init --starter --cwd /path/to/new-docs`, then install dependencies in the new directory. To test a local checkout instead, build and pack a candidate and invoke its CLI source:
+Create an empty target directory, then run `pnpm dlx honoxpress@latest init --starter --cwd /path/to/new-docs`, then install dependencies in the new directory. To test a local checkout instead, build and pack a candidate and invoke its CLI source:
 
 ```sh
 pnpm build:package
 mkdir -p /tmp/honoxpress-candidate
 pnpm --dir packages/docs pack --pack-destination /tmp/honoxpress-candidate
+HONOXPRESS_VERSION=$(node -p 'require("./packages/docs/package.json").version')
 mkdir /tmp/my-docs
 node packages/docs/bin/honoxpress.mjs init --starter --cwd /tmp/my-docs
 cd /tmp/my-docs
-pnpm add /tmp/honoxpress-candidate/honoxpress-0.5.0.tgz
+pnpm add "/tmp/honoxpress-candidate/honoxpress-${HONOXPRESS_VERSION}.tgz"
 pnpm dev
 ```
 

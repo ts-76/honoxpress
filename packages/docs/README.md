@@ -11,6 +11,8 @@ Use HonoX's file-based routes to build navigation, tables of contents, and langu
 The Void starter adds `honoxpress init --framework void --starter`, editable
 Markdown wrappers, a docs frame, and a metadata bridge at `honoxpress/void`.
 It supports `void-plugin-hono-jsx >=0.3.0 <0.7.0`; new Void starters use `^0.6.0`.
+
+Create an empty target directory and initialize it with `pnpm dlx honoxpress@latest init --framework void --starter --cwd /path/to/new-docs`. Install dependencies in the generated directory.
 See the [Void guide](https://github.com/ts-76/honoxpress/blob/main/docs/void.md) for setup and supported behavior.
 
 ## Install
@@ -21,7 +23,7 @@ pnpm add honoxpress hono
 
 The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX, Vite Plus, MDX, and SSG adapters are application dependencies. See the [compatibility guide](https://github.com/ts-76/honoxpress/blob/main/docs/compatibility.md) for tested versions.
 
-The `honoxpress@0.5.0` package includes the component installer, runnable starter,
+The package includes the component installer, runnable starter,
 syntax-highlighting helpers, component-local static CSS, framework integration
 primitives and the parser-neutral Markdown component renderer. See the
 [component guide](https://github.com/ts-76/honoxpress/blob/main/docs/components.md#start-a-new-site)
