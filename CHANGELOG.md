@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.1](https://github.com/ts-76/honoxpress/compare/v0.6.0...v0.6.1) (2026-10-21)
+
+
+### Bug Fixes
+
+* **ci:** use audited npm 11.21.1 for release staging ([#51](https://github.com/ts-76/honoxpress/issues/51)) ([4d51d67](https://github.com/ts-76/honoxpress/commit/4d51d67fbd1275f5337dc3c934678cc26d049362))
+* **init:** default Void adapter installs to 0.6.0 ([#49](https://github.com/ts-76/honoxpress/issues/49)) ([8febc4a](https://github.com/ts-76/honoxpress/commit/8febc4a7fe207878062dade8d6ab64cc2fd7b824))
+
 ## [0.6.0](https://github.com/ts-76/honoxpress/compare/v0.5.0...v0.6.0) (2026-10-20)
 
 
