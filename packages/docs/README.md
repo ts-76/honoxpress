@@ -10,7 +10,7 @@ Use HonoX's file-based routes to build navigation, tables of contents, and langu
 
 The Void starter adds `honoxpress init --framework void --starter`, editable
 Markdown wrappers, a docs frame, and a metadata bridge at `honoxpress/void`.
-It uses `void-plugin-hono-jsx >=0.3.0 <0.6.0`.
+It supports `void-plugin-hono-jsx >=0.3.0 <0.7.0`; new Void starters use `^0.6.0`.
 See the [Void guide](https://github.com/ts-76/honoxpress/blob/main/docs/void.md) for setup and supported behavior.
 
 ## Install

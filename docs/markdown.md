@@ -114,7 +114,7 @@ SSG generates the six Markdown/MDX documentation pages.
 
 honoxpress 0.5.0 adds a [standard Void starter](void.md), based on the Hono
 adapter's static imports, Markdown containers, explicit islands, and public CSS
-host. It requires `void-plugin-hono-jsx >=0.3.0 <0.4.0`. Existing honoxpress 0.4.0
+host. The Void starter uses `void-plugin-hono-jsx@^0.6.0`. Existing honoxpress 0.4.0
 users can upgrade the package before adopting this starter.
 
 Void and its Hono adapter own compilation, routes, contexts, SSR, islands, and
