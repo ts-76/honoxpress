@@ -6,7 +6,7 @@ import path from "node:path";
 
 export const registry = "https://registry.npmjs.org/";
 export const repository = "https://github.com/ts-76/honoxpress.git";
-export const npmVersion = "11.21.0";
+export const npmVersion = "11.21.1";
 const semver =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 export const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");

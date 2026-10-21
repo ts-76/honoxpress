@@ -38,7 +38,7 @@ The manifest tracks the latest released version. Its bootstrap SHA refers to the
 
 ## Local owner review and 2FA
 
-Use the reviewed npm 11.21.0 with the established Node environment. Replace `REVIEW_REPO_PATH` and `STAGE_ID` before running these read commands:
+Use the reviewed npm 11.21.1 with the established Node environment. Replace `REVIEW_REPO_PATH` and `STAGE_ID` before running these read commands:
 
 ```sh
 rtk proxy pnpm --dir REVIEW_REPO_PATH exec npm stage view STAGE_ID --registry=https://registry.npmjs.org/
