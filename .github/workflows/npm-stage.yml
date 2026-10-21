@@ -63,7 +63,7 @@ jobs:
           name: acceptance-node-24.12.0-${{ github.sha }}-attempt-${{ github.run_attempt }}
           path: accepted
       - name: Isolated pinned npm CLI only
-        run: npm install --prefix "$RUNNER_TEMP/release-cli" --ignore-scripts --no-audit --no-fund npm@11.21.0 --registry=https://registry.npmjs.org/
+        run: npm install --prefix "$RUNNER_TEMP/release-cli" --ignore-scripts --no-audit --no-fund npm@11.21.1 --registry=https://registry.npmjs.org/
       - name: Submit exact verified bytes; never approve or directly publish
         env:
           GH_TOKEN: ${{ github.token }}
