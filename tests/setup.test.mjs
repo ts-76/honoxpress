@@ -263,7 +263,15 @@ void test("Void starter uses the same conflict-safe installer and preserves its 
       JSON.parse(readFileSync(join(directory, "package.json"))).dependencies[
         "void-plugin-hono-jsx"
       ],
-      "^0.6.0",
+      "^0.7.0",
+    );
+    assert.equal(
+      JSON.parse(readFileSync(join(directory, "package.json"))).dependencies.void,
+      "1.2.1",
+    );
+    assert.equal(
+      JSON.parse(readFileSync(join(directory, "package.json"))).engines.node,
+      ">=24.22.1 <25",
     );
     const component = join(directory, "app/markdown/Callout.tsx");
     const custom = readFileSync(component, "utf8") + "// Local customization\n";

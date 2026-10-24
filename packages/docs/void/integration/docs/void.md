@@ -1,6 +1,6 @@
 # Void documentation
 
-Use Node 24.21.0. Install dependencies, then run `npm run dev`.
+Use Node 24.22.1 or newer within Node 24. Install dependencies, then run `npm run dev`.
 `npm run build` creates the production app; `npm run preview` serves it locally.
 Run `npm run typecheck` to check the TSX and configuration files.
 
@@ -15,7 +15,7 @@ Run `npm run typecheck` to check the TSX and configuration files.
 - Edit `/public/style.css`, `components.css`, and `tokens.css` for honoxpress styles. Optional `void-plugin-hono-jsx/theme-content.css` styles use `.void-md` and separate `--vmd-*` tokens.
 - Links use native document navigation. No custom router, renderer source patch, or second Markdown compiler is installed.
 
-This starter requires `void-plugin-hono-jsx >=0.3.0 <0.7.0`. Setup and verification do not deploy the application.
+This starter requires `void-plugin-hono-jsx >=0.3.0 <0.8.0`. Setup and verification do not deploy the application.
 
 For an existing app, `init --framework void` copies components and integration
 files without editing Vite config, routes, or dependencies. Add `voidHonoJsx()`
@@ -29,3 +29,5 @@ not require a package upgrade just to copy the integration.
 `honoxpress/adapters/void` exposes the same adapter in newer packages. The neutral mapper is `honoxpress/adapters/hono-markdown`.
 The same Void app may also mount hono-decks at `/slides`; keep the docs layout
 scoped to `/docs` and let each integration own its document routes.
+
+New Void starters use Void 1.2.1 and adapter 0.7 on Node >=24.22.1 <25. Existing compatible app configuration and scripts remain unchanged. Adapter 0.7 retains the documented [Void/Cloudflare dependency risks](https://github.com/ts-76/void-plugin-hono-jsx/blob/v0.7.0/docs/dependency-security.md); this is not an audit-zero stack.
