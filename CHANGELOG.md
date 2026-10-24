@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.3](https://github.com/ts-76/honoxpress/compare/v0.6.2...v0.6.3) (2026-10-24)
+
+
+### Bug Fixes
+
+* **void:** select Void 1.2.1 and adapter 0.7 for new starters ([#54](https://github.com/ts-76/honoxpress/issues/54)) ([0ff2884](https://github.com/ts-76/honoxpress/commit/0ff288467086a3e70a9b6c1ddd3f01f11fa615da))
+
 ## [0.6.2](https://github.com/ts-76/honoxpress/compare/v0.6.1...v0.6.2) (2026-10-21)
 
 
