@@ -2,14 +2,13 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
+import { verifyPublisher, auditPublisher, submitWithPublisher } from "./publisher.mjs";
 import {
   createPlan,
   inspectArtifact,
   registryPreflight,
   requireEnvironmentReview,
-  stageArguments,
   npmVersion,
-  stageReceipt,
 } from "./release-gate.mjs";
 
 assert.equal(process.env.GITHUB_ACTIONS, "true", "Staging is restricted to the reviewed workflow");
@@ -66,17 +65,24 @@ assert.equal(
   execFileSync(process.execPath, [npmCli, "--version"], { encoding: "utf8" }).trim(),
   npmVersion,
 );
-const result = stageReceipt(
-  execFileSync(process.execPath, [npmCli, ...stageArguments(plan, artifact.tarball)], {
-    encoding: "utf8",
-    timeout: 120000,
-  }),
+verifyPublisher(npmCli);
+const publisherAudit = await auditPublisher();
+const result = await submitWithPublisher({
+  binary: npmCli,
   plan,
-);
+  policy: { distTag: plan.distTag },
+  tarball: artifact.tarball,
+});
 await writeFile(
   path.resolve("stage-receipt.json"),
   JSON.stringify(
-    { ...plan, stage: "submitted; awaiting npm maintainer 2FA", stageId: result.stageId },
+    {
+      ...plan,
+      stage: "submitted; awaiting npm maintainer 2FA",
+      stageId: result.stageId,
+      publisherAudit,
+      publisherReachability: result.reachability,
+    },
     null,
     2,
   ) + "\n",

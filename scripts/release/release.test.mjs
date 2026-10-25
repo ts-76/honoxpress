@@ -268,22 +268,32 @@ await test("pinned npm stage dry-run uses exact tarball and makes no registry wr
 });
 
 await test("stage receipt must identify the approved package and exact verified bytes", () => {
-  const plan = { package: { name: "honoxpress" }, tarball: { integrity: "sha512-test" } };
+  const plan = {
+    package: { name: "honoxpress", version: "0.6.4" },
+    tarball: { integrity: "sha512-test" },
+  };
   assert.equal(
     stageReceipt(
-      JSON.stringify({ honoxpress: { integrity: "sha512-test", stageId: "test-stage-id" } }),
+      JSON.stringify({
+        honoxpress: { ...plan.package, integrity: "sha512-test", stageId: "test-stage-id" },
+      }),
       plan,
     ).stageId,
     "test-stage-id",
   );
   assert.throws(() =>
     stageReceipt(
-      JSON.stringify({ honoxpress: { integrity: "sha512-other", stageId: "test-stage-id" } }),
+      JSON.stringify({
+        honoxpress: { ...plan.package, integrity: "sha512-other", stageId: "test-stage-id" },
+      }),
       plan,
     ),
   );
   assert.throws(() =>
-    stageReceipt(JSON.stringify({ honoxpress: { integrity: "sha512-test" } }), plan),
+    stageReceipt(
+      JSON.stringify({ honoxpress: { ...plan.package, integrity: "sha512-test" } }),
+      plan,
+    ),
   );
   assert.throws(() =>
     stageReceipt(

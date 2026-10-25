@@ -2,6 +2,7 @@ import { defineConfig } from "vite-plus";
 export default defineConfig({
   fmt: {
     ignorePatterns: [
+      "scripts/release/npm-publisher-lock.json",
       "pilots/**", // Independent consumers have their own checks and dependency locks.
       "**/dist/**",
       "**/evidence/**",

@@ -53,6 +53,14 @@ await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 console.log(`Coexist app: ${app}`);
 run("npm", ["install", "--ignore-scripts", "--no-audit", "--no-fund"]);
 const before = await readFile(pkgPath, "utf8");
+for (const name of ["markdown-exit", "markdown-it-container"]) {
+  const manifest = JSON.parse(before);
+  assert.equal(
+    manifest.dependencies?.[name] ?? manifest.devDependencies?.[name],
+    undefined,
+    "init must not add parser dependencies",
+  );
+}
 const originalVite = await readFile(join(app, "vite.config.ts"), "utf8");
 run(process.execPath, [
   join(app, "node_modules/hono-decks/dist/bin.js"),

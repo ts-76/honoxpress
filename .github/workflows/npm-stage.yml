@@ -56,20 +56,20 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: "24.12.0"
+          node-version: "24.22.1"
           package-manager-cache: false
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: acceptance-node-24.12.0-${{ github.sha }}-attempt-${{ github.run_attempt }}
           path: accepted
-      - name: Isolated pinned npm CLI only
-        run: npm install --prefix "$RUNNER_TEMP/release-cli" --ignore-scripts --no-audit --no-fund npm@11.21.1 --registry=https://registry.npmjs.org/
+      - name: Verify the locked fixed-dependency npm publisher
+        run: node scripts/release/install-publisher.mjs
       - name: Submit exact verified bytes; never approve or directly publish
         env:
           GH_TOKEN: ${{ github.token }}
           NPM_STAGE_AUTHORIZATION: protected-environment
         run: |
-          export NPM_RELEASE_CLI="$RUNNER_TEMP/release-cli/node_modules/npm/bin/npm-cli.js"
+          export NPM_RELEASE_CLI="$RELEASE_CLI"
           export RELEASE_ARTIFACT_ROOT="$GITHUB_WORKSPACE/accepted"
           node scripts/release/stage-release.mjs
       - name: Retain stage receipt for manual npm review and 2FA
