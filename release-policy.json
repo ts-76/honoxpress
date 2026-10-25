@@ -4,5 +4,6 @@
   "version": "0.6.3",
   "license": "MIT",
   "distTag": "latest",
-  "provenance": true
+  "provenance": true,
+  "publisherVersion": "11.21.1"
 }

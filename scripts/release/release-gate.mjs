@@ -204,6 +204,7 @@ export function stageArguments(plan, tarball) {
     "publish",
     path.resolve(tarball),
     "--ignore-scripts",
+    "--workspaces=false",
     "--json",
     "--registry",
     registry,
@@ -219,6 +220,8 @@ export function stageReceipt(stdout, plan) {
   const parsed = JSON.parse(stdout);
   assert.deepEqual(Object.keys(parsed), [plan.package.name], "Unexpected npm receipt package");
   const result = parsed[plan.package.name];
+  assert.equal(result.name, plan.package.name, "Stage receipt package changed");
+  assert.equal(result.version, plan.package.version, "Stage receipt version changed");
   assert.equal(result.integrity, plan.tarball.integrity, "Stage receipt integrity changed");
   assert.equal(
     typeof result.stageId,
