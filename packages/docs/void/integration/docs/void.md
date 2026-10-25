@@ -30,6 +30,6 @@ not require a package upgrade just to copy the integration.
 The same Void app may also mount hono-decks at `/slides`; keep the docs layout
 scoped to `/docs` and let each integration own its document routes.
 
-New Void starters use Void 1.2.1 and adapter 0.9.1 on Node >=24.22.1 <25. Existing compatible app configuration and scripts remain unchanged. Adapter 0.9 retains the documented [Void/Cloudflare dependency risks](https://github.com/ts-76/void-plugin-hono-jsx/blob/v0.9.0/docs/dependency-security.md); this is not an audit-zero stack.
+New Void starters use Void 1.2.1 and adapter 0.9.1 on Node >=24.22.1 <25. Existing compatible app configuration and scripts remain unchanged. Adapter 0.9.1 retains the documented [Void/Cloudflare dependency risks](https://github.com/ts-76/void-plugin-hono-jsx/blob/v0.9.1/docs/dependency-security.md); this is not an audit-zero stack.
 
 Markdown parsing dependencies (`markdown-exit` and `markdown-it-container`) are installed transitively by `@ts-76/hono-markdown` 0.2.1 or newer; do not add them to the app for new starters. Existing app-owned dependency declarations are preserved.
