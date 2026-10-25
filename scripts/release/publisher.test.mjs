@@ -53,7 +53,7 @@ function auditFixture() {
   return { policy, results, advisories, request };
 }
 
-test("publisher audit accepts only reviewed versions/content and fails closed on new, changed or incomplete findings", async () => {
+await test("publisher audit accepts only reviewed versions/content and fails closed on new, changed or incomplete findings", async () => {
   const f = auditFixture();
   const report = await auditPublisher(f);
   assert.equal(report.auditedPackages, JSON.parse(readFileSync(inventoryPath)).length);
@@ -102,7 +102,7 @@ test("publisher audit accepts only reviewed versions/content and fails closed on
   );
 });
 
-test("current publisher policy requires zero findings with the fixed locked dependencies", async () => {
+await test("current publisher policy requires zero findings with the fixed locked dependencies", async () => {
   const policy = loadPublisherPolicy();
   assert.deepEqual(policy.acceptedFindings, []);
   const inventory = JSON.parse(readFileSync(inventoryPath));
@@ -123,7 +123,7 @@ test("current publisher policy requires zero findings with the fixed locked depe
   );
 });
 
-test("publisher subprocess strips existing credentials, proxy, runtime injection and provenance overrides", () => {
+await test("publisher subprocess strips existing credentials, proxy, runtime injection and provenance overrides", () => {
   const env = publisherEnvironment(
     {
       HOME: "preserved",
@@ -214,7 +214,7 @@ function stageFixture() {
   };
 }
 
-test("OIDC HTTP transport accepts npm 201 Created and rejects failed exchanges", async (t) => {
+await test("OIDC HTTP transport accepts npm 201 Created and rejects failed exchanges", async (t) => {
   const original = globalThis.fetch;
   t.after(() => {
     globalThis.fetch = original;
@@ -245,7 +245,7 @@ test("OIDC HTTP transport accepts npm 201 Created and rejects failed exchanges",
   await assert.rejects(exchangeOidc(env), /preflight\/service failed/);
 });
 
-test("staging preserves bytes, uses only fresh scoped auth and provenance, and removes auth on success", async () => {
+await test("staging preserves bytes, uses only fresh scoped auth and provenance, and removes auth on success", async () => {
   const f = stageFixture();
   let isolated;
   try {
@@ -286,7 +286,7 @@ test("staging preserves bytes, uses only fresh scoped auth and provenance, and r
   }
 });
 
-test("OIDC missing token, wrong authority and changed accepted bytes stop before any CLI invocation", async () => {
+await test("OIDC missing token, wrong authority and changed accepted bytes stop before any CLI invocation", async () => {
   const f = stageFixture();
   let calls = 0;
   const run = () => {
@@ -329,7 +329,7 @@ test("OIDC missing token, wrong authority and changed accepted bytes stop before
   }
 });
 
-test("failed CLI and invalid receipt remove temporary credentials and never retry staging", async () => {
+await test("failed CLI and invalid receipt remove temporary credentials and never retry staging", async () => {
   const f = stageFixture();
   let calls = 0;
   try {
@@ -376,7 +376,7 @@ test("failed CLI and invalid receipt remove temporary credentials and never retr
   }
 });
 
-test("missing execution coverage after stage submission stops completion without retry and removes credentials", async () => {
+await test("missing execution coverage after stage submission stops completion without retry and removes credentials", async () => {
   const f = stageFixture();
   let calls = 0;
   try {

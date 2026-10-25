@@ -341,7 +341,7 @@ await test("runtime graph guard distinguishes metadata adapters from compilers",
     assert.equal(isBuildOnlyModule(path), false, path);
 });
 
-test("Void starter owns no direct Markdown parser dependencies", () => {
+void test("Void starter owns no direct Markdown parser dependencies", () => {
   const manifest = JSON.parse(
     readFileSync(new URL("../packages/docs/void/scaffold/package.json", import.meta.url), "utf8"),
   );
