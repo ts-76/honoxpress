@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.4](https://github.com/ts-76/honoxpress/compare/v0.6.3...v0.6.4) (2026-10-25)
+
+
+### Bug Fixes
+
+* **init:** simplify parser setup and verify npm publication ([#56](https://github.com/ts-76/honoxpress/issues/56)) ([02929ea](https://github.com/ts-76/honoxpress/commit/02929eaa5f73622adaecea6ea01e2e089128a383))
+
 ## [0.6.3](https://github.com/ts-76/honoxpress/compare/v0.6.2...v0.6.3) (2026-10-24)
 
 
