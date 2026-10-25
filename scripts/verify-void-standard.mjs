@@ -13,7 +13,7 @@ assert.ok(["vite", "vp"].includes(stack), "HX_VOID_STACK must be vite or vp");
 const artifacts = join(root, "artifacts/void-standard", stack);
 await mkdir(artifacts, { recursive: true });
 // The release path always installs the public registry version.
-const pluginVersion = "0.7.0";
+const pluginVersion = "0.9.1";
 const directory = await mkdtemp(join(tmpdir(), "honoxpress-void-standard-"));
 const project = join(directory, "site");
 const bootstrap = join(directory, "bootstrap");
@@ -140,7 +140,7 @@ try {
   const manifestFile = join(project, "package.json");
   const manifest = JSON.parse(await readFile(manifestFile, "utf8"));
   manifest.dependencies.honoxpress = `file:${tarball}`;
-  assert.equal(manifest.dependencies["void-plugin-hono-jsx"], "^0.7.0");
+  assert.equal(manifest.dependencies["void-plugin-hono-jsx"], "^0.9.1");
   manifest.devDependencies.playwright = "1.64.0";
   if (stack === "vp") {
     manifest.devDependencies["vite-plus"] = "1.3.0";

@@ -263,7 +263,7 @@ void test("Void starter uses the same conflict-safe installer and preserves its 
       JSON.parse(readFileSync(join(directory, "package.json"))).dependencies[
         "void-plugin-hono-jsx"
       ],
-      "^0.7.0",
+      "^0.9.1",
     );
     assert.equal(
       JSON.parse(readFileSync(join(directory, "package.json"))).dependencies.void,
@@ -339,4 +339,14 @@ await test("runtime graph guard distinguishes metadata adapters from compilers",
     "node_modules/@ts-76/hono-markdown/dist/runtime/markdown.js",
   ])
     assert.equal(isBuildOnlyModule(path), false, path);
+});
+
+test("Void starter owns no direct Markdown parser dependencies", () => {
+  const manifest = JSON.parse(
+    readFileSync(new URL("../packages/docs/void/scaffold/package.json", import.meta.url), "utf8"),
+  );
+  for (const name of ["markdown-exit", "markdown-it-container"]) {
+    assert.equal(manifest.dependencies?.[name], undefined);
+    assert.equal(manifest.devDependencies?.[name], undefined);
+  }
 });

@@ -15,13 +15,13 @@ Run `npm run typecheck` to check the TSX and configuration files.
 - Edit `/public/style.css`, `components.css`, and `tokens.css` for honoxpress styles. Optional `void-plugin-hono-jsx/theme-content.css` styles use `.void-md` and separate `--vmd-*` tokens.
 - Links use native document navigation. No custom router, renderer source patch, or second Markdown compiler is installed.
 
-This starter requires `void-plugin-hono-jsx >=0.3.0 <0.8.0`. Setup and verification do not deploy the application.
+This starter requires `void-plugin-hono-jsx >=0.3.0 <0.10.0`. Setup and verification do not deploy the application.
 
 For an existing app, `init --framework void` copies components and integration
 files without editing Vite config, routes, or dependencies. Add `voidHonoJsx()`
 and `voidHonoMarkdown()` after `voidPlugin()` in Vite; mount `app/void-layout.tsx`
 in your docs route layout and link `/style.css` from Void head config. Install
-`void-plugin-hono-jsx`, `markdown-exit`, `markdown-it-container`, `yaml`,
+`void-plugin-hono-jsx`, `yaml`,
 `shiki`, and `@shikijs/transformers` with the versions in the starter's package.json.
 
 The generated catalog keeps `honoxpress/void` so an existing installation does
@@ -30,4 +30,6 @@ not require a package upgrade just to copy the integration.
 The same Void app may also mount hono-decks at `/slides`; keep the docs layout
 scoped to `/docs` and let each integration own its document routes.
 
-New Void starters use Void 1.2.1 and adapter 0.7 on Node >=24.22.1 <25. Existing compatible app configuration and scripts remain unchanged. Adapter 0.7 retains the documented [Void/Cloudflare dependency risks](https://github.com/ts-76/void-plugin-hono-jsx/blob/v0.7.0/docs/dependency-security.md); this is not an audit-zero stack.
+New Void starters use Void 1.2.1 and adapter 0.9.1 on Node >=24.22.1 <25. Existing compatible app configuration and scripts remain unchanged. Adapter 0.9 retains the documented [Void/Cloudflare dependency risks](https://github.com/ts-76/void-plugin-hono-jsx/blob/v0.9.0/docs/dependency-security.md); this is not an audit-zero stack.
+
+Markdown parsing dependencies (`markdown-exit` and `markdown-it-container`) are installed transitively by `@ts-76/hono-markdown` 0.2.1 or newer; do not add them to the app for new starters. Existing app-owned dependency declarations are preserved.

@@ -25,7 +25,7 @@ honoxpress fits existing HonoX applications and projects that keep their layouts
 
 The Void starter adds `honoxpress init --framework void --starter`, editable
 Markdown wrappers, a docs frame, and a metadata bridge at `honoxpress/void`.
-It supports `void-plugin-hono-jsx >=0.3.0 <0.8.0`; new Void starters use `^0.7.0`.
+It supports `void-plugin-hono-jsx >=0.3.0 <0.10.0`; new Void starters use `^0.9.1`.
 
 Create an empty target directory and initialize it with `pnpm dlx honoxpress@latest init --framework void --starter --cwd /path/to/new-docs`. Install dependencies in the generated directory.
 See the [Void guide](docs/void.md) for setup and supported behavior.
@@ -181,4 +181,6 @@ The parser-neutral catalog mapper is available as `honoxpress/adapters/hono-mark
 implementation. Framework presets select the CLI integration files; existing
 HonoX/MDX APIs and application-owned components remain supported.
 
-New Void starters use Void 1.2.1 and adapter 0.7 on Node >=24.22.1 <25. Existing compatible app configuration and scripts remain unchanged. Adapter 0.7 retains the documented [Void/Cloudflare dependency risks](https://github.com/ts-76/void-plugin-hono-jsx/blob/v0.7.0/docs/dependency-security.md); this is not an audit-zero stack.
+New Void starters use Void 1.2.1 and adapter 0.9.1 on Node >=24.22.1 <25. Existing compatible app configuration and scripts remain unchanged. Adapter 0.9 retains the documented [Void/Cloudflare dependency risks](https://github.com/ts-76/void-plugin-hono-jsx/blob/v0.9.0/docs/dependency-security.md); this is not an audit-zero stack.
+
+Markdown parsing dependencies (`markdown-exit` and `markdown-it-container`) are installed transitively by `@ts-76/hono-markdown` 0.2.1 or newer; do not add them to the app for new starters. Existing app-owned dependency declarations are preserved.
