@@ -10,14 +10,18 @@ minimumReleaseAgeExclude:
   - "@cloudflare/workerd-linux-64@1.20260930.2"
   - "@cloudflare/workerd-linux-arm64@1.20260930.2"
   - "@cloudflare/workerd-windows-64@1.20260930.2"
-  - hono@4.13.12
+  - hono@4.13.14
   - miniflare@5.20260930.0-alpha
   - workerd@1.20260930.2
   - wrangler@4.145.0
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@1.0.0
-  vite-plus: 1.0.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vite-plus: 1.4.0
 overrides:
+  hono: 4.13.14
+  # PostCSS permits this patched release; prevent the vulnerable locked copy.
+  "source-map-js@<1.2.2": 1.2.2
+  vite-plus: "catalog:"
   vite@*: "catalog:"
 peerDependencyRules:
   allowAny:

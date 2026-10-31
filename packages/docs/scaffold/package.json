@@ -18,12 +18,12 @@
     "build:cf": "cf build"
   },
   "dependencies": {
-    "hono": "4.13.12",
+    "hono": "4.13.14",
     "honox": "0.1.61",
     "honoxpress": "__HONOXPRESS_VERSION__"
   },
   "devDependencies": {
-    "@cloudflare/config": "0.20.0",
+    "@cloudflare/config": "0.29.0",
     "@hono/vite-build": "1.11.1",
     "@hono/vite-ssg": "0.3.3",
     "@mdx-js/rollup": "3.1.1",
@@ -31,8 +31,8 @@
     "remark-frontmatter": "5.0.0",
     "remark-mdx-frontmatter": "6.0.0",
     "typescript": "5.9.3",
-    "vite-plus": "1.0.0",
-    "wrangler": "4.145.0"
+    "vite-plus": "1.4.0",
+    "wrangler": "4.156.0"
   },
   "engines": {
     "node": "^22.20.0 || ^24.12.0 || >=26.0.0"
