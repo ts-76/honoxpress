@@ -26,7 +26,7 @@
     "evidence": "pnpm --filter honoxpress-example evidence",
     "test:consumer": "node scripts/verify-consumer.mjs",
     "pack:docs": "pnpm build:package && pnpm --dir packages/docs pack --pack-destination ../../artifacts/package",
-    "test:release": "node --test scripts/release/release.test.mjs scripts/release/dispatch-release.test.mjs scripts/release/publisher.test.mjs",
+    "test:release": "node --test scripts/release/release.test.mjs scripts/release/dispatch-release.test.mjs scripts/release/publisher.test.mjs scripts/release/publisher-bundles.test.mjs",
     "release:plan": "node scripts/release/release-plan.mjs",
     "release:dry-run": "node scripts/release/release-dry-run.mjs",
     "test:setup": "node --test tests/setup.test.mjs",
@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@types/node": "22.20.4",
-    "hono": "4.13.12",
+    "hono": "4.13.16",
     "npm": "11.21.1",
     "typescript": "^5.9.3",
     "vite-plus": "catalog:"

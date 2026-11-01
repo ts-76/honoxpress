@@ -80,7 +80,7 @@ Point the provider and validator at the same registry. The provider makes regist
 
 `worker` must be an explicit boolean. Development and SSG read the MDX route exports. Worker mode creates an empty catalog without discovering or importing MDX. `routeRoot` defaults to `app/routes` relative to the Vite root.
 
-For HonoX 0.1.61 / Vite Plus 1.0.0, use the [watch adapter](../examples/poc/build/honox-watch.ts) in place of the direct `honox/vite` import. It registers an absolute `app` directory so route additions/removals trigger HonoX's restart behavior. See the [full Vite config](../examples/poc/vite.config.ts) for mode selection and plugin ordering.
+For HonoX 0.1.61 / Vite Plus 1.4.0, use the [watch adapter](../examples/poc/build/honox-watch.ts) in place of the direct `honox/vite` import. It registers an absolute `app` directory, leaving MDX route restarts to `docsMetadataPlugin` and restarting for other additions/removals. See the [full Vite config](../examples/poc/vite.config.ts) for mode selection and plugin ordering.
 
 ## Use the generated catalog in your renderer
 
