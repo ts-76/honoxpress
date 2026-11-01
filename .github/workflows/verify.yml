@@ -30,6 +30,7 @@ jobs:
           package-manager-cache: false
       - run: node scripts/release/install-publisher.mjs
       - run: node scripts/release/check-publisher.mjs
+      - run: node scripts/release/publisher-runtime-test.mjs
   void-standard:
     name: Void standard starter (${{ matrix.stack }})
     runs-on: ubuntu-latest
