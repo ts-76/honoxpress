@@ -526,14 +526,14 @@ function install({ command, target, cwd, dryRun, starter, framework: selectedFra
   );
   console.log(
     isVoid
-      ? "Use app/void-layout.tsx with Void Markdown; see docs/void.md."
+      ? "Use app/void-layout.tsx with Void Markdown; see https://github.com/ts-76/honoxpress/tree/main/packages/docs#void-support-since-050."
       : "Static components need <Style /> from hono/css once in <head>, before your stylesheets; DocsLayout includes it.",
   );
   if (starter)
     console.log(
       isVoid
-        ? "The scaffold is ready; install its declared dependencies and follow docs/void.md."
-        : "The scaffold is ready; install its declared dependencies and follow docs/components.md.",
+        ? "The scaffold is ready; install its declared dependencies and follow https://github.com/ts-76/honoxpress/tree/main/packages/docs#void-support-since-050."
+        : "The scaffold is ready; install its declared dependencies and follow https://github.com/ts-76/honoxpress/tree/main/packages/docs#components-and-starter.",
     );
 }
 

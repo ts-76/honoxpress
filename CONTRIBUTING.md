@@ -1,8 +1,8 @@
 # Contributing to honoxpress
 
-Report bugs and proposals in [GitHub Issues](https://github.com/ts-76/honoxpress/issues). Include package/toolchain versions, reproduction steps, the affected URL, and the failing dev/SSG/Worker stage. Keep credentials and private content out of logs. See the [maintenance and upgrade policy](docs/maintenance.md) for compatibility, consumer-owned templates, and change acceptance. Broader adoption in hono-decks remains tracked in [Issue #6](https://github.com/ts-76/honoxpress/issues/6).
+Report bugs and proposals in [GitHub Issues](https://github.com/ts-76/honoxpress/issues). Include package/toolchain versions, reproduction steps, the affected URL, and the failing dev/SSG/Worker stage. Keep credentials and private content out of logs. See the [compatibility and template ownership](packages/docs/README.md#scope-and-compatibility) for compatibility, consumer-owned templates, and change acceptance. Broader adoption in hono-decks remains tracked in [Issue #6](https://github.com/ts-76/honoxpress/issues/6).
 
-Use your existing Node environment manager to select a tested runtime. The reference development setup uses Node.js 24.12.0, pnpm 11.22.0, and `cf@1.0.0-beta.6`. See [compatibility](docs/compatibility.md) for the CI matrix and other dependency versions.
+Use your existing Node environment manager to select a tested runtime. The reference development setup uses Node.js 24.12.0, pnpm 11.22.0, and `cf@1.0.0-beta.6`. See [compatibility](packages/docs/README.md#scope-and-compatibility) for the CI matrix and other dependency versions.
 
 ## Development setup
 
@@ -29,11 +29,11 @@ PR verification runs on the exact proposed commit with read-only repository acce
 
 ## Release PRs
 
-Use Conventional Commit titles for squash merges (`fix:`, `feat:`, and `!` for breaking changes). With a merge commit, ensure a Conventional Commit appears in the merged history. main push runs release-please to maintain a version/changelog PR. Review and pass its exact-head CI before merging; that merge creates a tag/GitHub Release and prepares accepted artifacts. npm stage/2FA is a separate step described in [the release guide](docs/npm-release.md). Only the package in packages/docs is published; the root remains private. Existing v0.1.0 is the immutable bootstrap baseline.
+Use Conventional Commit titles for squash merges (`fix:`, `feat:`, and `!` for breaking changes). With a merge commit, ensure a Conventional Commit appears in the merged history. main push runs release-please to maintain a version/changelog PR. Review and pass its exact-head CI before merging; that merge creates a tag/GitHub Release and prepares accepted artifacts. npm staging submits only the accepted CI tarball with provenance through the protected `npm-stage` environment. The owner reviews the exact stage and completes npm 2FA; a tag, successful stage, or dry-run does not establish publication. Verify registry bytes and provenance after approval. Release/publisher configuration and checks are maintained under `scripts/release` and `.github/workflows`. Only the package in packages/docs is published; the root remains private. Existing v0.1.0 is the immutable bootstrap baseline.
 
 ## Void starter
 
-The Void consumer uses its own dependency graph with Node 24.21.0. See
-[the Void guide](docs/void.md#verification) for the public adapter version
+The Void consumer uses its own dependency graph with Node >=24.22.1 <25. See
+[the Void guide](packages/docs/README.md#void-support-since-050) for the public adapter version
 and `pnpm test:void`. This check installs packaged CLI output into a fresh
 project; the historical TSX pilot is kept only for baseline diagnostics.
