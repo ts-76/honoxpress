@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.5](https://github.com/ts-76/honoxpress/compare/v0.6.4...v0.6.5) (2026-11-01)
+
+
+### Bug Fixes
+
+* secure pinned npm publisher dependencies ([967eea7](https://github.com/ts-76/honoxpress/commit/967eea768211c0df7b8397e340fb3e1b059f3aa9))
+* update Hono security fixes ([5a219bc](https://github.com/ts-76/honoxpress/commit/5a219bcf6e42585f54335dd15d38eb4038ecd60b))
+* update vulnerable development dependencies ([cca9310](https://github.com/ts-76/honoxpress/commit/cca9310eb97a24f1bf55fe56a2a6dcdd6f1c2339))
+* update vulnerable development dependencies ([56db32b](https://github.com/ts-76/honoxpress/commit/56db32bbf37f3062d1a9ff6eb3f7edb00d7800ef))
+
 ## [0.6.4](https://github.com/ts-76/honoxpress/compare/v0.6.3...v0.6.4) (2026-10-25)
 
 
