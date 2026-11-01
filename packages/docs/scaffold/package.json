@@ -18,7 +18,7 @@
     "build:cf": "cf build"
   },
   "dependencies": {
-    "hono": "4.13.14",
+    "hono": "4.13.16",
     "honox": "0.1.61",
     "honoxpress": "__HONOXPRESS_VERSION__"
   },

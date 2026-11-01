@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  hono: 4.13.14
+  hono: 4.13.16
   source-map-js@<1.2.2: 1.2.2
   vite-plus: 1.4.0
   vite@*: npm:@voidzero-dev/vite-plus-core@1.4.0
@@ -22,8 +22,8 @@ importers:
         specifier: 22.20.4
         version: 22.20.4
       hono:
-        specifier: 4.13.14
-        version: 4.13.14
+        specifier: 4.13.16
+        version: 4.13.16
       npm:
         specifier: 11.21.1
         version: 11.21.1
@@ -37,11 +37,11 @@ importers:
   examples/poc:
     dependencies:
       hono:
-        specifier: 4.13.14
-        version: 4.13.14
+        specifier: 4.13.16
+        version: 4.13.16
       honox:
         specifier: ^0.1.61
-        version: 0.1.61(hono@4.13.14)(supports-color@10.2.2)(wrangler@4.156.0(@types/node@22.20.4))
+        version: 0.1.61(hono@4.13.16)(supports-color@10.2.2)(wrangler@4.156.0(@types/node@22.20.4))
       honoxpress:
         specifier: workspace:*
         version: link:../../packages/docs
@@ -51,10 +51,10 @@ importers:
         version: 0.29.0
       '@hono/vite-build':
         specifier: ^1.11.1
-        version: 1.11.1(hono@4.13.14)
+        version: 1.11.1(hono@4.13.16)
       '@hono/vite-ssg':
         specifier: ^0.3.3
-        version: 0.3.3(hono@4.13.14)
+        version: 0.3.3(hono@4.13.16)
       '@mdx-js/rollup':
         specifier: ^3.1.1
         version: 3.1.1(rollup@4.63.5)(supports-color@10.2.2)
@@ -95,8 +95,8 @@ importers:
   packages/docs:
     dependencies:
       hono:
-        specifier: 4.13.14
-        version: 4.13.14
+        specifier: 4.13.16
+        version: 4.13.16
       shiki:
         specifier: 4.5.0
         version: 4.5.0
@@ -376,19 +376,19 @@ packages:
     resolution: {integrity: sha512-dSneS5qhiauZWGDCeK4o695Xd9nUNjviSZCMQrj10eetr8Uln1ucn6bbphOM6UynAMMtNIzZNSpL9vnASJwrPQ==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
-      hono: 4.13.14
+      hono: 4.13.16
 
   '@hono/vite-build@1.11.1':
     resolution: {integrity: sha512-EQJmFL7G+71MXZQ/mmywNl4qW6DSyjTdC30cq7mlDS451a1/jE86old0M2DCWzNGCO50sv7CzQDYkz4L5dq5VQ==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
-      hono: 4.13.14
+      hono: 4.13.16
 
   '@hono/vite-dev-server@0.25.3':
     resolution: {integrity: sha512-w3uQ0KQF0i/SDcJ6+d5njEFTr6pbolajrt/GxV0pliYL+4ywiBqiOFRWSpwW3mTuZ80boww7+ZxJTGTBIzyBQg==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
-      hono: 4.13.14
+      hono: 4.13.16
       miniflare: '*'
       wrangler: '*'
     peerDependenciesMeta:
@@ -401,7 +401,7 @@ packages:
     resolution: {integrity: sha512-i8mIZhgW1S/xpNLcLHDFvAiwRkLQolJlQWTwNMWZcGnSkc8/Mq+TCWv4NDRWmDayNGWlOqbjIUwk8w5wp/eHTg==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
-      hono: 4.13.14
+      hono: 4.13.16
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -1694,15 +1694,15 @@ packages:
   hast-util-whitespace@3.0.0:
     resolution: {integrity: sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw==}
 
-  hono@4.13.14:
-    resolution: {integrity: sha512-yhRLQ21U6qa9Hsu2N7Qcbh8tE+WKEcoErjIo56LeSGiGXGp9sA7UpE86Ui9uexb61KakiGwuHMn2QdV7w6i6kQ==}
+  hono@4.13.16:
+    resolution: {integrity: sha512-AOLOEhvrV+iH92xXCnFr/5+3KjPKcI3xP63XJtX5spAnkznPdHijlIsUTpi7/9EhWqrTCekw5c5zh1K+YsVw7A==}
     engines: {node: '>=16.9.0'}
 
   honox@0.1.61:
     resolution: {integrity: sha512-HMvVTyAIJYIWjHUvdowQvnMVA3I1HKeKD71TVCAKiTdUI+xU7cYRryMK+ASmnRb7lFV6Yak4/d1VqXjJnEYSvg==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
-      hono: 4.13.14
+      hono: 4.13.16
 
   html-void-elements@3.0.0:
     resolution: {integrity: sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==}
@@ -2679,25 +2679,25 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@hono/node-server@1.19.17(hono@4.13.14)':
+  '@hono/node-server@1.19.17(hono@4.13.16)':
     dependencies:
-      hono: 4.13.14
+      hono: 4.13.16
 
-  '@hono/vite-build@1.11.1(hono@4.13.14)':
+  '@hono/vite-build@1.11.1(hono@4.13.16)':
     dependencies:
-      hono: 4.13.14
+      hono: 4.13.16
 
-  '@hono/vite-dev-server@0.25.3(hono@4.13.14)(wrangler@4.156.0(@types/node@22.20.4))':
+  '@hono/vite-dev-server@0.25.3(hono@4.13.16)(wrangler@4.156.0(@types/node@22.20.4))':
     dependencies:
-      '@hono/node-server': 1.19.17(hono@4.13.14)
-      hono: 4.13.14
+      '@hono/node-server': 1.19.17(hono@4.13.16)
+      hono: 4.13.16
       minimatch: 9.0.9
     optionalDependencies:
       wrangler: 4.156.0(@types/node@22.20.4)
 
-  '@hono/vite-ssg@0.3.3(hono@4.13.14)':
+  '@hono/vite-ssg@0.3.3(hono@4.13.16)':
     dependencies:
-      hono: 4.13.14
+      hono: 4.13.16
 
   '@img/colour@1.1.0': {}
 
@@ -3756,16 +3756,16 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.5
 
-  hono@4.13.14: {}
+  hono@4.13.16: {}
 
-  honox@0.1.61(hono@4.13.14)(supports-color@10.2.2)(wrangler@4.156.0(@types/node@22.20.4)):
+  honox@0.1.61(hono@4.13.16)(supports-color@10.2.2)(wrangler@4.156.0(@types/node@22.20.4)):
     dependencies:
       '@babel/generator': 7.29.1
       '@babel/parser': 7.29.3
       '@babel/traverse': 7.29.0(supports-color@10.2.2)
       '@babel/types': 7.29.0
-      '@hono/vite-dev-server': 0.25.3(hono@4.13.14)(wrangler@4.156.0(@types/node@22.20.4))
-      hono: 4.13.14
+      '@hono/vite-dev-server': 0.25.3(hono@4.13.16)(wrangler@4.156.0(@types/node@22.20.4))
+      hono: 4.13.16
       jsonc-parser: 3.3.1
       precinct: 12.2.0(supports-color@10.2.2)
     optionalDependencies:

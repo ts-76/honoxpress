@@ -7,7 +7,8 @@ minimumReleaseAgeExclude:
   - "@cloudflare/workerd-linux-64@1.20260930.2"
   - "@cloudflare/workerd-linux-arm64@1.20260930.2"
   - "@cloudflare/workerd-windows-64@1.20260930.2"
-  - hono@4.13.14
+  # Emergency security fix published 2026-11-01; re-evaluate once release age passes.
+  - hono@4.13.16
   - miniflare@5.20260930.0-alpha
   - workerd@1.20260930.2
   - wrangler@4.145.0

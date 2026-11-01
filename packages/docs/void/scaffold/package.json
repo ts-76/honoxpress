@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "hono": "4.13.14",
+    "hono": "4.13.16",
     "honoxpress": "__HONOXPRESS_VERSION__",
     "void": "1.2.1",
     "void-plugin-hono-jsx": "^0.9.1"
