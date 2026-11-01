@@ -36,7 +36,7 @@ See the [Void guide](packages/docs/README.md#void-support-since-050) for setup a
 pnpm add honoxpress hono
 ```
 
-The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.16`. HonoX and MDX build dependencies belong to your application.
+The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX and MDX build dependencies belong to your application.
 
 The package includes `honoxpress init`, `honoxpress add`, and a runnable starter. To create a new site, create an empty target directory and run `pnpm dlx honoxpress@latest init --starter --cwd /path/to/new-docs`. Then install dependencies in the generated directory. See the [starter commands](packages/docs/README.md#components-and-starter).
 

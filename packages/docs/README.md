@@ -24,7 +24,7 @@ Write Markdown in `pages/docs`, configure `app/docs.config.ts`, and collect navi
 pnpm add honoxpress hono
 ```
 
-The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.16`. HonoX, Vite Plus, MDX, and SSG adapters are application dependencies. See the [compatibility guide](#scope-and-compatibility) for tested versions.
+The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX, Vite Plus, MDX, and SSG adapters are application dependencies. See the [compatibility guide](#scope-and-compatibility) for tested versions.
 
 The package includes the component installer, runnable starter,
 syntax-highlighting helpers, component-local static CSS, framework integration
