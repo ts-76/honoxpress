@@ -25,8 +25,8 @@
     "test:hmr": "playwright test --config playwright.hmr.config.ts"
   },
   "dependencies": {
-    "hono": "^4.13.16",
-    "honox": "^0.1.61",
+    "hono": "4.13.16",
+    "honox": "0.1.62",
     "honoxpress": "workspace:*"
   },
   "devDependencies": {
@@ -41,10 +41,10 @@
     "remark-mdx-frontmatter": "^6.0.0",
     "remark-parse": "11.0.0",
     "remark-rehype": "11.1.2",
-    "typescript": "^5.9.3",
+    "typescript": "7.0.2",
     "unified": "11.0.5",
-    "vite-plus": "catalog:",
-    "wrangler": "^4.156.0"
+    "vite-plus": "1.4.0",
+    "wrangler": "4.156.2"
   },
   "engines": {
     "node": "^22.20.0 || ^24.12.0 || >=26.0.0"

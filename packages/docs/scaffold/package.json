@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "hono": "4.13.16",
-    "honox": "0.1.61",
+    "honox": "0.1.62",
     "honoxpress": "__HONOXPRESS_VERSION__"
   },
   "devDependencies": {
@@ -30,9 +30,9 @@
     "@types/node": "22.20.4",
     "remark-frontmatter": "5.0.0",
     "remark-mdx-frontmatter": "6.0.0",
-    "typescript": "5.9.3",
+    "typescript": "7.0.2",
     "vite-plus": "1.4.0",
-    "wrangler": "4.156.0"
+    "wrangler": "4.156.2"
   },
   "engines": {
     "node": "^22.20.0 || ^24.12.0 || >=26.0.0"

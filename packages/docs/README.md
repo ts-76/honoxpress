@@ -24,7 +24,7 @@ Write Markdown in `pages/docs`, configure `app/docs.config.ts`, and collect navi
 pnpm add honoxpress hono
 ```
 
-The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX, Vite Plus, MDX, and SSG adapters are application dependencies. See the [compatibility guide](#scope-and-compatibility) for tested versions.
+The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.16`. HonoX, Vite Plus, MDX, and SSG adapters are application dependencies. See the [compatibility guide](#scope-and-compatibility) for tested versions.
 
 The package includes the component installer, runnable starter,
 syntax-highlighting helpers, component-local static CSS, framework integration
@@ -142,7 +142,7 @@ Build client → docs SSG → Worker, preserving the client manifest until rende
 
 Heading anchors use static Markdown text, Unicode normalization, lowercase letters, and hyphens for whitespace, with suffixes for collisions. MDX expressions are not evaluated for heading text; expression-only headings fail. This is a package-specific algorithm, not a guarantee of GitHub slug compatibility.
 
-For the tested HonoX 0.1.61 / Vite Plus 1.4.0 setup, also copy the example's [watch adapter](https://github.com/ts-76/honoxpress/blob/main/examples/poc/build/honox-watch.ts) to register an absolute `app` directory for route additions/removals. The runnable example supplies the virtual module declaration, renderer, manifest handling, and Worker entry.
+For the tested HonoX 0.1.62 / Vite Plus 1.4.0 setup, also copy the example's [watch adapter](https://github.com/ts-76/honoxpress/blob/main/examples/poc/build/honox-watch.ts) to register an absolute `app` directory for route additions/removals. The runnable example supplies the virtual module declaration, renderer, manifest handling, and Worker entry.
 
 ## Components and starter
 

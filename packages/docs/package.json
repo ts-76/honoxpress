@@ -61,10 +61,10 @@
     "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json"
   },
   "dependencies": {
-    "shiki": "4.5.0"
+    "shiki": "4.6.0"
   },
   "peerDependencies": {
-    "hono": "^4.13.12",
+    "hono": "^4.13.16",
     "vite-plus": "^1.0.0"
   },
   "peerDependenciesMeta": {
