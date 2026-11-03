@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.6](https://github.com/ts-76/honoxpress/compare/v0.6.5...v0.6.6) (2026-11-03)
+
+
+### Bug Fixes
+
+* **deps:** refresh HonoX toolchains and remove redundant docs ([#61](https://github.com/ts-76/honoxpress/issues/61)) ([497d040](https://github.com/ts-76/honoxpress/commit/497d04032415c41b5177279a27074f01c3f7929f))
+
 ## [0.6.5](https://github.com/ts-76/honoxpress/compare/v0.6.4...v0.6.5) (2026-11-01)
 
 
