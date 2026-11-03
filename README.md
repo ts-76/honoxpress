@@ -4,13 +4,13 @@ Documentation metadata, build helpers, and an editable Hono JSX component system
 
 Use HonoX's file-based routes to build navigation, tables of contents, and language links. Your application owns its routes, renderer, islands, and CSS, so you can adapt the documentation to your existing app.
 
-[npm](https://www.npmjs.com/package/honoxpress) · [Component system](docs/components.md) · [Integration guide](docs/api.md) · [Package API](packages/docs/README.md) · [Releases](https://github.com/ts-76/honoxpress/releases) · [MIT License](LICENSE)
+[npm](https://www.npmjs.com/package/honoxpress) · [Component system](packages/docs/README.md#components-and-starter) · [Integration guide](packages/docs/README.md#build-integration) · [Package API](packages/docs/README.md) · [Releases](https://github.com/ts-76/honoxpress/releases) · [MIT License](LICENSE)
 
 ![Example documentation page with navigation, a table of contents, language links, code copying, an island, and a live demo.](examples/poc/evidence/screenshots/english.png)
 
 ## Features
 
-- **Markdown-first integration (0.4.0)** — A parser-neutral component boundary for static TSX wrappers and explicit host islands, with English/Japanese `.md` examples. Existing HonoX/MDX setup remains supported; Void integration uses its Hono Markdown adapter and the standard starter. See the [authoring guide](docs/markdown.md).
+- **Markdown-first integration (0.4.0)** — A parser-neutral component boundary for static TSX wrappers and explicit host islands, with English/Japanese `.md` examples. Existing HonoX/MDX setup remains supported; Void integration uses its Hono Markdown adapter and the standard starter. See the [authoring guide](packages/docs/README.md#runtime-api).
 
 - **Page metadata** — Generate navigation from MDX frontmatter, including titles, descriptions, and display order.
 - **Multilingual documentation** — Derive URLs and locales from file paths and connect translations with matching relative slugs. Unavailable translations have no link.
@@ -28,7 +28,7 @@ Markdown wrappers, a docs frame, and a metadata bridge at `honoxpress/void`.
 It supports `void-plugin-hono-jsx >=0.3.0 <0.10.0`; new Void starters use `^0.9.1`.
 
 Create an empty target directory and initialize it with `pnpm dlx honoxpress@latest init --framework void --starter --cwd /path/to/new-docs`. Install dependencies in the generated directory.
-See the [Void guide](docs/void.md) for setup and supported behavior.
+See the [Void guide](packages/docs/README.md#void-support-since-050) for setup and supported behavior.
 
 ## Install and try the API
 
@@ -36,9 +36,9 @@ See the [Void guide](docs/void.md) for setup and supported behavior.
 pnpm add honoxpress hono
 ```
 
-The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.12`. HonoX and MDX build dependencies belong to your application.
+The package is ESM. Node.js engines are `^22.20.0 || ^24.12.0 || >=26.0.0`; the Hono peer dependency is `^4.13.16`. HonoX and MDX build dependencies belong to your application.
 
-The package includes `honoxpress init`, `honoxpress add`, and a runnable starter. To create a new site, create an empty target directory and run `pnpm dlx honoxpress@latest init --starter --cwd /path/to/new-docs`. Then install dependencies in the generated directory. The [component guide](docs/components.md#start-a-new-site) also covers local tarball development.
+The package includes `honoxpress init`, `honoxpress add`, and a runnable starter. To create a new site, create an empty target directory and run `pnpm dlx honoxpress@latest init --starter --cwd /path/to/new-docs`. Then install dependencies in the generated directory. See the [starter commands](packages/docs/README.md#components-and-starter).
 
 `createDocsCatalog` turns page metadata into URLs, navigation, and translation links:
 
@@ -61,7 +61,7 @@ docs.translations("/docs/getting-started");
 //  { locale: "ja", href: "/ja/docs/getting-started" }]
 ```
 
-This example supplies metadata directly. In a HonoX application, the build plugin generates the catalog from MDX, so you do not need to maintain a second page list. See the [integration guide](docs/api.md) for plugin and renderer setup.
+This example supplies metadata directly. In a HonoX application, the build plugin generates the catalog from MDX, so you do not need to maintain a second page list. See the [integration guide](packages/docs/README.md#build-integration) for plugin and renderer setup.
 
 ## Run the example
 
@@ -82,11 +82,11 @@ pnpm build
 pnpm preview
 ```
 
-The build runs **client → docs SSG → Worker**. Local production preview uses Cloudflare tooling; install it with `npm install --global cf@1.0.0-beta.6` before running `pnpm preview`. See the [compatibility guide](docs/compatibility.md) for dependency versions and environment requirements.
+The build runs **client → docs SSG → Worker**. Local production preview uses Cloudflare tooling; install it with `npm install --global cf@1.0.0-beta.6` before running `pnpm preview`. See the [compatibility guide](packages/docs/README.md#scope-and-compatibility) for dependency versions and environment requirements.
 
 ## Add MDX pages
 
-The generated starter centralizes site name, default language, language labels, documentation entry, links, and theme controls in `app/docs.config.ts` using `defineDocsConfig`. Vite, the SSG filter, and the renderer read the same configuration. Set `defaultLocale: "ja"` for Japanese at unprefixed `/docs/*` URLs; English translations then live under `app/routes/en/docs`. Existing content must follow the selected language's file-path convention. See the [site configuration guide](docs/components.md#layout-and-site-configuration).
+The generated starter centralizes site name, default language, language labels, documentation entry, links, and theme controls in `app/docs.config.ts` using `defineDocsConfig`. Vite, the SSG filter, and the renderer read the same configuration. Set `defaultLocale: "ja"` for Japanese at unprefixed `/docs/*` URLs; English translations then live under `app/routes/en/docs`. Existing content must follow the selected language's file-path convention. See the [site configuration guide](packages/docs/README.md#components-and-starter).
 
 Place trusted local MDX under the standard `app/routes` directory. With `defaultLocale: "en"`:
 
@@ -131,14 +131,14 @@ Templates are exported as files through `honoxpress/templates/*`:
 | `docs.css`            | Your public stylesheet                      |
 | `tokens.css`          | Shared theme, typography, and spacing roles |
 
-For the complete component list, props, MDX registry setup, CLI workflow, and starter, see the [component system guide](docs/components.md). The CLI installs Hono JSX components and islands into your app, then validates MDX tags using the same registry supplied to `providerImportSource`.
+See the [starter and component commands](packages/docs/README.md#components-and-starter); component props are defined in the shipped TSX templates. The CLI installs Hono JSX components and islands into your app, then validates MDX tags using the same registry supplied to `providerImportSource`.
 
-The layout and styles include responsive navigation and TOC disclosures, visible keyboard focus, a skip link, copy success/failure feedback, and a persistent Light / Dark / System theme selector. Installed components are app-owned; review changes manually and preserve the MIT notice when distributing copied files. See the [component system guide](docs/components.md) for installation, registry setup, props, and customization.
+The layout and styles include responsive navigation and TOC disclosures, visible keyboard focus, a skip link, copy success/failure feedback, and a persistent Light / Dark / System theme selector. Installed components are app-owned; review changes manually and preserve the MIT notice when distributing copied files. Use the [starter commands](packages/docs/README.md#components-and-starter) and inspect the app-owned component sources when customizing.
 
 Static components define their styles alongside their JSX using `hono/css`;
 `DocsLayout` emits only the static styles used by each page. Shared tokens, shell,
 Markdown, and interactive styles remain in the public stylesheets. Existing sites
-must [merge the copied sources and layout](docs/migrating-static-component-styles.md)
+must [merge the copied sources and layout](packages/docs/README.md#components-and-starter)
 to adopt component-local styling; installing a dependency does not replace their
 customizations.
 
@@ -151,22 +151,12 @@ customizations.
 - Navigation uses ordinary document loads. Island state resets when you leave a page.
 - CI runs on Node.js 22.23.3, 24.12.0, and 24.21.0, validating the package, example, and installation of a packed tarball in an independent application. Node.js 26, other operating systems/browsers, and production Cloudflare deployment are outside that CI coverage.
 
-honoxpress is a 0.x library. Pin your package version and review the [changelog](CHANGELOG.md) and [compatibility guide](docs/compatibility.md) before upgrading.
+honoxpress is a 0.x library. Pin your package version and review the [changelog](CHANGELOG.md) and [compatibility guide](packages/docs/README.md#scope-and-compatibility) before upgrading.
 
-## Documentation and development
+## Development
 
-- [Component system](docs/components.md) — MDX registry, standard component props, CLI, layout config, and starter
-- [Integration guide / API](docs/api.md) — MDX, Vite, renderer, templates, and Worker configuration
-- [Compatibility guide](docs/compatibility.md) — Tested environments and known limitations
-- [Framework integration](docs/framework-integration.md) — SSR/DOM classes, theme lifecycle, docs frame and explicit catalog APIs
-- [Markdown-first authoring](docs/markdown.md) — Parser-neutral component renderer, static wrappers and explicit host islands; runnable `.md` examples
-- [Maintenance and upgrades](docs/maintenance.md) — Compatibility decisions and template migration
-- [Updating existing sites](docs/upgrading-owned-templates.md) — Responsive template fixes and manual merge steps
-- [Example application](examples/poc) — The complete client/SSG/Worker pipeline
-- [Changelog](CHANGELOG.md) / [Releases](https://github.com/ts-76/honoxpress/releases)
-- [Contributing](CONTRIBUTING.md) — Development setup, verification, and PR workflow
-
-Report bugs and proposals in [GitHub Issues](https://github.com/ts-76/honoxpress/issues). Include package/toolchain versions, reproduction steps, the affected URL, and whether the problem occurs in dev, SSG, or Worker mode.
+The [package README](packages/docs/README.md) contains the API, starter commands and host boundaries. Runnable integrations live in `examples/poc` and the packaged `void/scaffold`.
+See [CONTRIBUTING](CONTRIBUTING.md) for checks and release workflow.
 
 ## License and acknowledgements
 
