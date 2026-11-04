@@ -1,6 +1,6 @@
 # Void + hono-decks サンプル
 
-Void のルートから hono-decks を配信し、トップページに同一オリジンの iframe でスライドを埋め込みます。公開後は `https://hono-decks.com` のドキュメントからも埋め込めます。
+Void のルートから hono-decks を配信し、トップページに同一オリジンの iframe でスライドを埋め込みます。公開先は `https://void.hono-decks.com` です。`https://hono-decks.com` のドキュメントからも埋め込めます。
 
 ## 起動と確認
 
@@ -28,27 +28,29 @@ npm run dev
 
 埋め込み用の `/slides/welcome/embed` は CSP の `frame-ancestors` で自サイトと `https://hono-decks.com` だけを許可します。他のサブドメインや任意の外部サイトは許可しません。CSP はブラウザの埋め込み制限であり、公開スライドへのアクセス認証ではありません。プレゼンター、印刷、プレゼンテーション、エクスポートは提供しません。
 
-公開 URL が決まった後、ドキュメント側には次の iframe を置きます。`PUBLIC_ORIGIN` は実際に公開して確認した HTTPS オリジンへ置き換えます。
+ドキュメント側には次の iframe を置きます。カスタムドメインへの反映後、公開 URL とブラウザでの埋め込みを確認します。
 
 ```html
 <iframe
-  src="PUBLIC_ORIGIN/slides/welcome/embed"
+  src="https://void.hono-decks.com/slides/welcome/embed"
   title="Void + hono-decks サンプル"
   style="width:100%;aspect-ratio:16/9;border:0"
   allowfullscreen
 ></iframe>
 ```
 
-## 公開手順（この準備では未実行）
+## カスタムドメインの公開手順（この変更では未実行）
 
-公開先は既存の `hono-decks-docs` とは別の Cloudflare Worker `void-hono-decks-example` です。設定は `void.config.ts` を編集し、`.void-wrangler.jsonc` やビルド出力を編集しません。初期公開はその Worker の `workers.dev` URL を使い、バージョンのプレビュー URL は無効にしています。ドメインの新規割り当てはこの設定には含めません。
+公開先は既存の `hono-decks-docs` とは別の Cloudflare Worker `void-hono-decks-example` です。設定は `void.config.ts` を編集し、`.void-wrangler.jsonc` やビルド出力を編集しません。`cloudflare.routes` に `void.hono-decks.com` を Custom Domain として設定しています。既存の `workers.dev` URL は有効のまま保持し、バージョンのプレビュー URL は無効にしています。デプロイ時にカスタムドメインの割り当てが反映されます。
 
-1. Cloudflare の対象アカウント（既存 docs と同じ運用なら `tsapp`）と既存ルート・ドメインを確認し、`void-hono-decks-example` が別用途の既存 Worker と衝突しないことを確かめます。衝突する場合は公開前に `cloudflare.name` を変更します。既存ドキュメント Worker に上書きしません。
+1. Cloudflare の対象アカウント（既存 docs と同じ運用なら `tsapp`）と既存ルート・ドメインを確認し、`void-hono-decks-example` が別用途の既存 Worker と衝突しないことを確かめます。`void.hono-decks.com` が別の Worker、ルート、DNS レコードで使われていないことも確認します。衝突する場合は公開を止めて所有者と調整します。既存ドキュメント Worker に上書きしません。
 2. このディレクトリで `npm ci`、`npm run typecheck`、`npm run build` を実行し、ローカルプレビューを確認します。
 3. 公開を承認した担当者だけが `npx void deploy --platform cloudflare` を実行します。Void はリソースの準備、ビルド、アップロード、トラフィック更新を行います。初回公開は準備段階で実リソースを作る場合があります。
-4. 出力された公開 URL で `/`、`/slides/welcome`、`/slides/welcome/embed`、`/slides/welcome/render` と参照する JS/CSS を確認します。`/embed` の CSP が `frame-ancestors 'self' https://hono-decks.com` であることと、無効なサーフェスが 404 になることを確認します。
+4. DNS と TLS の反映後、`https://void.hono-decks.com` で `/`、`/slides/welcome`、`/slides/welcome/embed`、`/slides/welcome/render` と参照する JS/CSS を確認します。`/embed` の CSP が `frame-ancestors 'self' https://hono-decks.com` であることと、無効なサーフェスが 404 になることを確認します。
 5. 自サイトのトップページと `hono-decks.com` で iframe、左右キー、全画面、モバイル表示を確認し、それ以外のオリジンの iframe がブラウザで拒否されることを確認してからドキュメントに掲載します。
 
 アカウント情報やトークンをコミットしません。`.void/`、`.wrangler/`、`.env*`、`.dev.vars*` は除外しています。`void.lock.json` はリソース ID やマイグレーションを記録した場合も保持し、公開後に変更された内容を確認してコミットします。
 
-Void 1.5.0 同梱の `docs/integrations/cloudflare.md` と `docs/reference/cli/deploy.md` に基づく手順です。公開操作、本番 URL とドキュメント側 iframe の実表示は別途確認が必要です。
+Void 1.5.0 同梱の `docs/integrations/cloudflare.md`、`docs/reference/config.md`、`docs/reference/cli/deploy.md` に基づく手順です。`cloudflare` の設定は `void.lock.json` の記録より優先されます。`void domain` はルートを即時変更するため、この準備では実行しません。公開操作、本番 URL とドキュメント側 iframe の実表示は別途確認が必要です。
+
+モバイルの左右操作ボタンは、通常時の背景と矢印を透明にしています。フォーカス時・押下時とホバー対応端末でのホバー時は背景と矢印を表示し、タッチ領域・左右キー操作は維持します。公開 npm 1.4.5 向けの一時的な対応として、`router.viewer.style` と `router.embed.viewer.style` に同じ CSS を設定しています。ライブラリ更新後に同等の表示を確認できたら、`mobileNavigationStyle` とその指定を削除できます。
