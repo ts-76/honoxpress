@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "source": {
+    "name": "void-hono-decks-example",
+    "workers_dev": true,
+    "preview_urls": false
+  },
+  "resolved": {
+    "name": "void-hono-decks-example",
+    "compatibility_date": "2026-02-24",
+    "workers_dev": true,
+    "preview_urls": false,
+    "account_id": "934c6255d681d05e1fa9903560de8a59"
+  },
+  "text": "{\n  \"name\": \"void-hono-decks-example\",\n  \"compatibility_date\": \"2026-02-24\",\n  \"workers_dev\": true,\n  \"preview_urls\": false,\n  \"account_id\": \"934c6255d681d05e1fa9903560de8a59\"\n}\n"
+}
